@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MapGen : MonoBehaviour {
+    //Mesh Helper objects 
+    public GameObject MeshHelperContainer;
     public GameObject PointObject;
-    public GameObject TrackContainer;
+    public List<GameObject> MeshHelperEmpties;
 
-    public List<GameObject> TrackSegments;
 
     //barrier data
     public GameObject TireBarrier;
@@ -27,7 +28,19 @@ public class MapGen : MonoBehaviour {
 
     //____________________________________________________________________________________________________________________________________________________
 
-    // Creates Random Points based on specs-----------------------------------------------------------------
+    //HELPER to visualize points
+    public void DebugPlot(List<Vector2> ListToPlot, Color32 PointColor)
+    {
+        foreach (Vector2 point in ListToPlot)
+        {
+            GameObject pt = Instantiate(DebugPointGraphic);
+            pt.transform.position = point;
+            pt.transform.parent = DebugContainer.gameObject.transform;
+            pt.GetComponent<SpriteRenderer>().color = PointColor;
+        }
+    }
+
+    // HELPER : Creates Random Points based on specs-----------------------------------------------------------------
     List<Vector2> CreateQuadrantPoints(int PointCt, float MapW, float MapH, Vector2 Quad)
     {
         List<Vector2> Points = new List<Vector2>();
@@ -35,15 +48,34 @@ public class MapGen : MonoBehaviour {
         float QuadWidth = MapW / 2;
         float QuadHeight = MapH / 2;
 
-        for (int i = 0;i<PointCt; i++)
+        for (int i = 0; i < PointCt; i++)
         {
             Points.Add(new Vector2(Quad.x * Random.Range(0, QuadWidth), Quad.y * Random.Range(0, QuadHeight)));
         }
         return Points;
     }
 
+    //HELPER to check angle of point B between points A,B, C returns answer in degrees.
+    float AngleBetweenThreePoints(Vector2 p0, Vector2 p1, Vector2 p2)
+    {
+        float angleInDeg = Vector2.Angle(p0 - p1, p2 - p1);
+        return angleInDeg;
+    }
+
+    //HELPER function that gives a point on a curve based on three control points and the T var (distance along the curve)
+    Vector2 CalculateTrackPoint(Vector2 p0, Vector2 p1, Vector2 p2, float t)
+    {
+        float x = (1 - t) * (1 - t) * p0.x + 2 * (1 - t) * t * p1.x + t * t * p2.x;
+        float y = (1 - t) * (1 - t) * p0.y + 2 * (1 - t) * t * p1.y + t * t * p2.y;
+        Vector2 TrackPoint = new Vector2(x, y);
+        return TrackPoint;
+    }
+    
+    //____________________________________________________________________________________________________________________________________________________
+
+    
     //Sorts points into a circular sequence-----------------------------------------------------------------
-    List<Vector2> OrganizePointSequence(float MapW, float MapH)
+    List<Vector2> CreateRawPoints()
     {
         List<Vector2> Points = new List<Vector2>();
         Vector2 UR = new Vector2(1, 1);
@@ -81,17 +113,16 @@ public class MapGen : MonoBehaviour {
 
     }
 
-
     //switches last and second to last points in the quadrant depending on the distance to the first point in the next quadrant. 
     //(to prevent loops from forming)-----------------------------------------------------------------
-    List<Vector2> OptimizeTrackFlow(int PtCnt, List<Vector2> ListToScan)
+    List<Vector2> OptimizeRawPoints(List<Vector2> rawPts)
     {
-        List<Vector2> OptimizedList = new List<Vector2>(ListToScan);
-        for (int i=PtCnt -1;i<PtCnt *4;i+=PtCnt)
+        List<Vector2> OptimizedList = new List<Vector2>(rawPts);
+        for (int i=Data.PtCtPerQuad -1;i<Data.PtCtPerQuad*4;i+=Data.PtCtPerQuad)
         {
-            Vector2 SecondToLastPt = new Vector2(ListToScan[i - 1].x, ListToScan[i - 1].y);
-            Vector2 LastPt = new Vector2(ListToScan[i].x, ListToScan[i].y);
-            Vector2 FirstPtNextQuad = new Vector2(ListToScan[i + 1].x, ListToScan[i + 1].y);
+            Vector2 SecondToLastPt = new Vector2(rawPts[i - 1].x, rawPts[i - 1].y);
+            Vector2 LastPt = new Vector2(rawPts[i].x, rawPts[i].y);
+            Vector2 FirstPtNextQuad = new Vector2(rawPts[i + 1].x, rawPts[i + 1].y);
             if (Vector2.Distance(SecondToLastPt, FirstPtNextQuad) < Vector2.Distance(LastPt,FirstPtNextQuad))
             {
                 OptimizedList[i - 1] = LastPt;
@@ -102,32 +133,26 @@ public class MapGen : MonoBehaviour {
 
         return OptimizedList;
     }
+    
     //inserts midpoints into the optimized list.
-    List<Vector2> InsertMidpoints(List<Vector2> currentCtrlPts)
+    List<Vector2> CreateControlPoints(List<Vector2> currentRawPts)
     {
-        List<Vector2> AllBezierPts = new List<Vector2>(currentCtrlPts);
+        List<Vector2> AllBezierPts = new List<Vector2>(currentRawPts);
 
-        for (int i = currentCtrlPts.Count -2; i >=0; i--)
+        for (int i = currentRawPts.Count -2; i >=0; i--)
         {
-            Vector2 MidPoint = (currentCtrlPts[i] + currentCtrlPts[i+1])/2;
+            Vector2 MidPoint = (currentRawPts[i] + currentRawPts[i+1])/2;
             AllBezierPts.Insert(i+1, MidPoint);
         }
         AllBezierPts.Add(AllBezierPts[1]);
         return AllBezierPts;
     }
-    //helper to check angle of point B between points A,B, C returns answer in degrees.
-    float AngleBetweenThreePoints(Vector2 p0, Vector2 p1, Vector2 p2)
-    {
-        float angleInDeg = Vector2.Angle(p0-p1,p2-p1);
-        return angleInDeg;
-    }
-
+    
     //Checks all angles between each three INITIAL control points before midpoint insertion, 
     //and if angle is greater than the minimum angle, 
     //move point B half way towards the midpoint between pt A and C, 
     //thereby increasing the angle.
-    
-    List<Vector2> CheckControlPointAngles(float minimumAngle, List<Vector2> currentCtrlPts)
+    List<Vector2> CheckControlPointAngles(List<Vector2> currentCtrlPts)
     {
         List<Vector2> newPoints = new List<Vector2>(currentCtrlPts);
         
@@ -136,7 +161,7 @@ public class MapGen : MonoBehaviour {
             //in degrees
             float Angle = AngleBetweenThreePoints(newPoints[i], newPoints[i+1], newPoints[i+2]);
             
-            while (Angle < minimumAngle) {
+            while (Angle < Data.MinCornerWidth) {
                 Vector2 MidpointAC = new Vector2((newPoints[i].x + newPoints[i + 2].x) / 2, (newPoints[i].y + newPoints[i + 2].y) / 2);
                 Vector2 MidpointBToMidpointAC = new Vector2((newPoints[i + 1].x + MidpointAC.x) / 2, (newPoints[i + 1].y + MidpointAC.y) / 2);
                 Vector2 originalB = newPoints[i + 1];
@@ -151,36 +176,15 @@ public class MapGen : MonoBehaviour {
         return newPoints;
     }
     
-    //helper to visualize points;
-    public void DebugPlot(List<Vector2> ListToPlot, Color32 PointColor)
-    {
-        foreach (Vector2 point in ListToPlot)
-        {
-            GameObject pt = Instantiate(DebugPointGraphic);
-            pt.transform.position = point;
-            pt.transform.parent = DebugContainer.gameObject.transform;
-            pt.GetComponent<SpriteRenderer>().color = PointColor;
-        }
-    }
-
-    //helper function that gives a point on a curve based on three control points and the T var (distance along the curve)
-    Vector2 CalculateTrackPoint(Vector2 p0, Vector2 p1, Vector2 p2, float t)
-    {
-        float x = (1 - t) * (1 - t) * p0.x + 2 * (1 - t) * t * p1.x + t * t * p2.x;
-        float y = (1 - t) * (1 - t) * p0.y + 2 * (1 - t) * t * p1.y + t * t * p2.y;
-        Vector2 TrackPoint = new Vector2(x, y);
-        return TrackPoint;
-    }
-
     //creates the array of track points with a passed in point frequency and a list of control points.
-    List<Vector2> CreateTrackPoints(float PtFreq, List<Vector2> ControlPts)
+    List<Vector2> CreateTrackPoints(List<Vector2> ControlPts, float trackPtFreq)
     {
         List<Vector2> TrackPts = new List<Vector2>();
         for (int j = 1; j < ControlPts.Count -2; j += 2)
         {
-            for (int i = 1; i <= PtFreq; i++)
+            for (int i = 1; i <= trackPtFreq; i++)
             {
-                float t = (float)i / PtFreq;
+                float t = (float)i / trackPtFreq;
                 Vector2 pt = CalculateTrackPoint(ControlPts[j], ControlPts[j + 1], ControlPts[j + 2], t);
                 TrackPts.Add(pt);
 
@@ -192,17 +196,17 @@ public class MapGen : MonoBehaviour {
     //calls all the functions to actually generate the data that the above functions work with, and returns an array of all the track gameobject pieces.
     List<GameObject> CreateTrackData()
     {
-        Data.Curr_RawPoints = OrganizePointSequence(Data.MapWidth, Data.MapHeight);
-        //Data.Curr_RawPoints = OptimizeTrackFlow(PtCtPerQuad, Data.Curr_RawPoints);
-        Data.Curr_RawPoints = CheckControlPointAngles(Data.MinCornerWidth, Data.Curr_RawPoints);
-        Data.Curr_ControlPoints = InsertMidpoints(Data.Curr_RawPoints);
-        Data.Curr_TrackPoints = CreateTrackPoints(Data.TrackPointFreq, Data.Curr_ControlPoints);
+        Data.Curr_RawPoints = CreateRawPoints();
+        //Data.Curr_RawPoints = OptimizeRawPoints(Data.Curr_RawPoints);
+        Data.Curr_RawPoints = CheckControlPointAngles(Data.Curr_RawPoints);
+        Data.Curr_ControlPoints = CreateControlPoints(Data.Curr_RawPoints);
+        Data.Curr_TrackPoints = CreateTrackPoints(Data.Curr_ControlPoints, Data.TrackPointFreq);
         List<GameObject> TrackObjs = new List<GameObject>();
         foreach (Vector2 pt in Data.Curr_TrackPoints)
         {
             GameObject point = Instantiate(PointObject);
             point.transform.position = pt;
-            point.transform.parent = TrackContainer.transform;
+            point.transform.parent = MeshHelperContainer.transform;
             TrackObjs.Add(point);
         }
         return TrackObjs;
@@ -340,9 +344,9 @@ public class MapGen : MonoBehaviour {
         };
 
         //ceate midpoints for modified Data.Curr_RawPoints
-        List<Vector2> midpoints = InsertMidpoints(RacingLine);
+        List<Vector2> midpoints = CreateControlPoints(RacingLine);
         //create Data.Curr_TrackPoints out of new data
-        List<Vector2> trkpts = CreateTrackPoints(WaypointFreq, midpoints);
+        List<Vector2> trkpts = CreateTrackPoints(midpoints, WaypointFreq);
         
 
         //visualize racingline
@@ -423,7 +427,7 @@ public class MapGen : MonoBehaviour {
 
         DebugPlot(NewCtrlPoints, new Color32(0, 255, 0, 255));
 
-        List<Vector2> MPs = InsertMidpoints(NewCtrlPoints);
+        List<Vector2> MPs = CreateControlPoints(NewCtrlPoints);
 
 
 
@@ -431,7 +435,7 @@ public class MapGen : MonoBehaviour {
         int currentTirePosition = 0;
         List<int> PointIndexesToDelete = new List<int>();
         
-        BarrierPoints = CreateTrackPoints(100, MPs);
+        BarrierPoints = CreateTrackPoints(MPs,100);
         //shrink the data
         //for (int i = 0; i < BarrierPoints.Count; i++)
         //{
@@ -461,7 +465,7 @@ public class MapGen : MonoBehaviour {
         
         foreach (Vector2 pt in BarrierPoints)
         {
-            GameObject barrier = Instantiate(Barrier,TrackContainer.transform);
+            GameObject barrier = Instantiate(Barrier,MeshHelperContainer.transform);
             barrier.transform.position = pt;
         }
 
@@ -473,9 +477,11 @@ public class MapGen : MonoBehaviour {
     //fix by creating the final midpoint to make the function complete the circuit
     void Awake()
     {
-        TrackSegments = CreateTrackData();
-        RotateTrackObjectsAlongCurves(TrackSegments);
-        CreateTrackMesh(TrackSegments);
+        MeshHelperEmpties = CreateTrackData();
+        RotateTrackObjectsAlongCurves(MeshHelperEmpties);
+        CreateTrackMesh(MeshHelperEmpties);
+
+
         RacingLinePoints = CreateRacingLinePoints(Data.Curr_RawPoints, RacingLineWaypointFreq, RacingLineTightness);
         CreateBarriers(Data.Curr_RawPoints,BarrierShrinkFactor,TireRadius,TireBarrier);
         //DEBUGGING VISUALS---------------------------------------------------
@@ -485,9 +491,5 @@ public class MapGen : MonoBehaviour {
         
 
     }
-
     
-
-
-
 }

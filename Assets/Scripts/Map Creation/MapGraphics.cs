@@ -16,7 +16,7 @@ public class MapGraphics : MonoBehaviour {
 
     public MapGen MapGen;
     public List<Vector2> MapPoints;
-    public List<GameObject> MapSegments;
+    public List<GameObject> MeshHelperEmpties;
 
     public float DirtFreq;
     public float OilFreq;
@@ -24,7 +24,7 @@ public class MapGraphics : MonoBehaviour {
     // Use this for initialization
     void Start () {
         MapPoints = Data.Curr_TrackPoints;
-        MapSegments = MapGen.TrackSegments;
+        MeshHelperEmpties = MapGen.MeshHelperEmpties;
         Debug.Log("num of map points: " + MapPoints.Count);
         for(int i = 0; i< MapPoints.Count; i++)
         {
@@ -49,7 +49,7 @@ public class MapGraphics : MonoBehaviour {
             
         }
 
-        for (int i = 0; i < MapSegments.Count; i++)
+        for (int i = 0; i < MeshHelperEmpties.Count; i++)
         {
             float foliageDice = Random.value;
             int foliageSpriteIndex = Random.Range(0,Foliage.Count-1);
@@ -57,14 +57,14 @@ public class MapGraphics : MonoBehaviour {
             if (foliageDice <= FoliageFreq)
             {
                 GameObject newFoliage = Instantiate(Foliage[foliageSpriteIndex], OilContainer.transform);
-                newFoliage.transform.rotation = MapSegments[i].transform.rotation;
+                newFoliage.transform.rotation = MeshHelperEmpties[i].transform.rotation;
                 if (Random.value > 0.5f)
                 {
-                    newFoliage.transform.position = MapSegments[i].transform.position + (MapSegments[i].transform.up * FoliageSpread * Random.Range(1f, 2.5f));
+                    newFoliage.transform.position = MeshHelperEmpties[i].transform.position + (MeshHelperEmpties[i].transform.up * FoliageSpread * Random.Range(1f, 2.5f));
                 }
                 else
                 {
-                    newFoliage.transform.position = MapSegments[i].transform.position + (MapSegments[i].transform.up * -FoliageSpread * Random.Range(1f, 2.5f));
+                    newFoliage.transform.position = MeshHelperEmpties[i].transform.position + (MeshHelperEmpties[i].transform.up * -FoliageSpread * Random.Range(1f, 2.5f));
                 }
             }
         }

@@ -20,17 +20,16 @@ public class Data : MonoBehaviour {
 
 
     //CURRENT game state MAP data
-    public static List<Vector2> Curr_RawPoints;//done
-    public static List<Vector2> Curr_ControlPoints;//done
-    public static List<Vector2> Curr_TrackPoints;//done
+    public static List<Vector2> Curr_RawPoints;
+    public static List<Vector2> Curr_ControlPoints;
+    public static List<Vector2> Curr_TrackPoints;
 
-    
     public static List<Vector2> Curr_RacingLinePoints;
 
     //saved game data
     public static List<SavedTrack> Svd_Tracks;
 
-
+    
 
 }
 
