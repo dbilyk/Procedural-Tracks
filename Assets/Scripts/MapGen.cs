@@ -4,37 +4,28 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MapGen : MonoBehaviour {
-    public List<GameObject> PointObjects;
+    public GameObject PointObject;
     public GameObject TrackContainer;
 
+    public List<GameObject> TrackSegments;
+
+    //barrier data
     public GameObject TireBarrier;
     public float TireRadius;
     public float BarrierShrinkFactor;
     [Tooltip("controls the distance at which to delete control points that will cause a kink to form in barrier line")]
     public float BarrierCornerKinkFactor;
 
-
+    //debug
     public GameObject DebugPointGraphic;
     public GameObject DebugContainer;
-    public float MinCornerWidth;
-    public int PtCtPerQuad;
-    public float PointSpacing;
-
-    public float TrackPointFreq;
-    public float TrackMeshThickness;
-    public int TrackColliderResolution;
-
-    public float MapWidth;
-    public float MapHeight;
-    public List<Vector2> ControlPoints;
-    public List<Vector2> AllBezierPoints;
-    public List<Vector2> TrackPoints;
-    public List<GameObject> TrackSegments;
+   
+    //racing line data
     public List<Vector2> RacingLinePoints;
-
-
     public float RacingLineTightness = 0.2f;
     public float RacingLineWaypointFreq;
+
+    //____________________________________________________________________________________________________________________________________________________
 
     // Creates Random Points based on specs-----------------------------------------------------------------
     List<Vector2> CreateQuadrantPoints(int PointCt, float MapW, float MapH, Vector2 Quad)
@@ -60,10 +51,10 @@ public class MapGen : MonoBehaviour {
         Vector2 LL = new Vector2(-1, -1);
         Vector2 UL = new Vector2(-1, 1);
 
-        List<Vector2> URL = CreateQuadrantPoints(PtCtPerQuad, MapWidth, MapHeight, UR);
-        List<Vector2> LRL = CreateQuadrantPoints(PtCtPerQuad, MapWidth, MapHeight, LR);
-        List<Vector2> LLL = CreateQuadrantPoints(PtCtPerQuad, MapWidth, MapHeight, LL);
-        List<Vector2> ULL = CreateQuadrantPoints(PtCtPerQuad, MapWidth, MapHeight, UL);
+        List<Vector2> URL = CreateQuadrantPoints(Data.PtCtPerQuad, Data.MapWidth, Data.MapHeight, UR);
+        List<Vector2> LRL = CreateQuadrantPoints(Data.PtCtPerQuad, Data.MapWidth, Data.MapHeight, LR);
+        List<Vector2> LLL = CreateQuadrantPoints(Data.PtCtPerQuad, Data.MapWidth, Data.MapHeight, LL);
+        List<Vector2> ULL = CreateQuadrantPoints(Data.PtCtPerQuad, Data.MapWidth, Data.MapHeight, UL);
 
         List<Vector2> URLS = URL.OrderBy(c => c.x).ToList();
         List<Vector2> LRLS = LRL.OrderByDescending(c => c.x).ToList();
@@ -79,7 +70,7 @@ public class MapGen : MonoBehaviour {
         //remove points that are too close to properly draw a mesh
         for (int i = Points.Count - 3; i > 0; i--)
         {
-            if (Mathf.Abs(Points[i].x - Points[i + 2].x)< PointSpacing)
+            if (Mathf.Abs(Points[i].x - Points[i + 2].x)< Data.PointSpacing)
             {
                 Points.RemoveAt(i+1);
             }
@@ -112,13 +103,13 @@ public class MapGen : MonoBehaviour {
         return OptimizedList;
     }
     //inserts midpoints into the optimized list.
-    List<Vector2> InsertMidpoints(List<Vector2> CtrlPts)
+    List<Vector2> InsertMidpoints(List<Vector2> currentCtrlPts)
     {
-        List<Vector2> AllBezierPts = new List<Vector2>(CtrlPts);
+        List<Vector2> AllBezierPts = new List<Vector2>(currentCtrlPts);
 
-        for (int i = CtrlPts.Count -2; i >=0; i--)
+        for (int i = currentCtrlPts.Count -2; i >=0; i--)
         {
-            Vector2 MidPoint = (CtrlPts[i] + CtrlPts[i+1])/2;
+            Vector2 MidPoint = (currentCtrlPts[i] + currentCtrlPts[i+1])/2;
             AllBezierPts.Insert(i+1, MidPoint);
         }
         AllBezierPts.Add(AllBezierPts[1]);
@@ -136,9 +127,9 @@ public class MapGen : MonoBehaviour {
     //move point B half way towards the midpoint between pt A and C, 
     //thereby increasing the angle.
     
-    List<Vector2> CheckControlPointAngles(float minimumAngle, List<Vector2> CtrlPts)
+    List<Vector2> CheckControlPointAngles(float minimumAngle, List<Vector2> currentCtrlPts)
     {
-        List<Vector2> newPoints = new List<Vector2>(CtrlPts);
+        List<Vector2> newPoints = new List<Vector2>(currentCtrlPts);
         
         for (int i = 0; i<newPoints.Count-2; i++)
         {
@@ -201,15 +192,15 @@ public class MapGen : MonoBehaviour {
     //calls all the functions to actually generate the data that the above functions work with, and returns an array of all the track gameobject pieces.
     List<GameObject> CreateTrackData()
     {
-        ControlPoints = OrganizePointSequence(MapWidth, MapHeight);
-        //ControlPoints = OptimizeTrackFlow(PtCtPerQuad, ControlPoints);
-        ControlPoints = CheckControlPointAngles(MinCornerWidth, ControlPoints);
-        AllBezierPoints = InsertMidpoints(ControlPoints);
-        TrackPoints = CreateTrackPoints(TrackPointFreq, AllBezierPoints);
+        Data.Curr_RawPoints = OrganizePointSequence(Data.MapWidth, Data.MapHeight);
+        //Data.Curr_RawPoints = OptimizeTrackFlow(PtCtPerQuad, Data.Curr_RawPoints);
+        Data.Curr_RawPoints = CheckControlPointAngles(Data.MinCornerWidth, Data.Curr_RawPoints);
+        Data.Curr_ControlPoints = InsertMidpoints(Data.Curr_RawPoints);
+        Data.Curr_TrackPoints = CreateTrackPoints(Data.TrackPointFreq, Data.Curr_ControlPoints);
         List<GameObject> TrackObjs = new List<GameObject>();
-        foreach (Vector2 pt in TrackPoints)
+        foreach (Vector2 pt in Data.Curr_TrackPoints)
         {
-            GameObject point = Instantiate(PointObjects[Random.Range(0, PointObjects.Count -1)]);
+            GameObject point = Instantiate(PointObject);
             point.transform.position = pt;
             point.transform.parent = TrackContainer.transform;
             TrackObjs.Add(point);
@@ -229,17 +220,15 @@ public class MapGen : MonoBehaviour {
 
         //mesh is created starting with the inner point, going to the corresponding outer point of the racetrack. 
        
-
-        
         for (int i = 0; i < TPs.Count; i++)
         {
             //add lower point mesh data
-            vertices.Add(TPs[i].transform.GetChild(0).transform.position + (TPs[i].transform.GetChild(0).transform.up*-TrackMeshThickness));
+            vertices.Add(TPs[i].transform.GetChild(0).transform.position + (TPs[i].transform.GetChild(0).transform.up*-Data.TrackMeshThickness));
             UVs.Add(new Vector2((float)(i) / TPs.Count, 0));
             normals.Add(Vector3.back);
             
             //add upper point mesh data
-            vertices.Add(TPs[i].transform.GetChild(1).transform.position + (TPs[i].transform.GetChild(0).transform.up * TrackMeshThickness));
+            vertices.Add(TPs[i].transform.GetChild(1).transform.position + (TPs[i].transform.GetChild(0).transform.up * Data.TrackMeshThickness));
             UVs.Add(new Vector2((float)(i) / TPs.Count, 1));
             normals.Add(Vector3.back);
         }
@@ -290,16 +279,16 @@ public class MapGen : MonoBehaviour {
         List<Vector2> OuterColliderPath = new List<Vector2>();
         List<Vector2> InnerColliderPath = new List<Vector2>();
         PolygonCollider2D col = GetComponent<PolygonCollider2D>();
-        if (TrackColliderResolution%2 != 0)
+        if (Data.TrackColliderResolution%2 != 0)
         {
-            TrackColliderResolution += 1;
+            Data.TrackColliderResolution += 1;
         }
         //create list of outer points at a specified sampling frequency
-        for(int i = 1; i < vertices.Count-1; i += TrackColliderResolution)
+        for(int i = 1; i < vertices.Count-1; i += Data.TrackColliderResolution)
         {
             OuterColliderPath.Add(vertices[i]);
         }
-        for (int i = 0; i < vertices.Count - 1; i += TrackColliderResolution)
+        for (int i = 0; i < vertices.Count - 1; i += Data.TrackColliderResolution)
         {
             InnerColliderPath.Add(vertices[i]);
         }
@@ -331,11 +320,11 @@ public class MapGen : MonoBehaviour {
     }
 
 
-    List<Vector2> CreateRacingLinePoints(List<Vector2> CtrlPts, float WaypointFreq, float LerpTightness)
+    List<Vector2> CreateRacingLinePoints(List<Vector2> currentRawPts, float WaypointFreq, float LerpTightness)
     {
 
         //plots control points with angles shrunk to try and create a racing line.
-        List<Vector2> RacingLine = new List<Vector2>(CtrlPts);
+        List<Vector2> RacingLine = new List<Vector2>(currentRawPts);
         
         //move starting corner towards apex
         Vector2 MpAC = new Vector2((RacingLine[RacingLine.Count - 2].x + RacingLine[1].x) / 2, (RacingLine[RacingLine.Count - 2].y + RacingLine[1].y) / 2);
@@ -350,9 +339,9 @@ public class MapGen : MonoBehaviour {
 
         };
 
-        //ceate midpoints for modified controlpoints
+        //ceate midpoints for modified Data.Curr_RawPoints
         List<Vector2> midpoints = InsertMidpoints(RacingLine);
-        //create trackpoints out of new data
+        //create Data.Curr_TrackPoints out of new data
         List<Vector2> trkpts = CreateTrackPoints(WaypointFreq, midpoints);
         
 
@@ -365,10 +354,10 @@ public class MapGen : MonoBehaviour {
     }
 
     //takes original track data and divides each point in the data by the trackpointDivisor, thereby shrinking or expanding the entire track
-    List<Vector2> CreateBarriers(List<Vector2> OriginalControlPts, float trackCenterpointDivisor, float tireRadius, GameObject Barrier)
+    List<Vector2> CreateBarriers(List<Vector2> currentRawPts, float trackCenterpointDivisor, float tireRadius, GameObject Barrier)
     {
         //pass in original control points data
-        List<Vector2> BarrierPoints = new List<Vector2>(OriginalControlPts);
+        List<Vector2> BarrierPoints = new List<Vector2>(currentRawPts);
         DebugPlot(BarrierPoints, new Color32(0,0,0,255));
 
         List<Vector2> NewCtrlPoints = new List<Vector2>();
@@ -487,8 +476,8 @@ public class MapGen : MonoBehaviour {
         TrackSegments = CreateTrackData();
         RotateTrackObjectsAlongCurves(TrackSegments);
         CreateTrackMesh(TrackSegments);
-        RacingLinePoints = CreateRacingLinePoints(ControlPoints, RacingLineWaypointFreq, RacingLineTightness);
-        CreateBarriers(ControlPoints,BarrierShrinkFactor,TireRadius,TireBarrier);
+        RacingLinePoints = CreateRacingLinePoints(Data.Curr_RawPoints, RacingLineWaypointFreq, RacingLineTightness);
+        CreateBarriers(Data.Curr_RawPoints,BarrierShrinkFactor,TireRadius,TireBarrier);
         //DEBUGGING VISUALS---------------------------------------------------
         
         

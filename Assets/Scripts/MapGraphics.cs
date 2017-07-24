@@ -23,7 +23,7 @@ public class MapGraphics : MonoBehaviour {
     public float FoliageFreq;
     // Use this for initialization
     void Start () {
-        MapPoints = MapGen.TrackPoints;
+        MapPoints = Data.Curr_TrackPoints;
         MapSegments = MapGen.TrackSegments;
         Debug.Log("num of map points: " + MapPoints.Count);
         for(int i = 0; i< MapPoints.Count; i++)

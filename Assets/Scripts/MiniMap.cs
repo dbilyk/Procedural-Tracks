@@ -9,7 +9,7 @@ public class MiniMap : MonoBehaviour {
     public List<Vector2> TrackPts;
     // Use this for initialization
     void Start () {
-        TrackPts = MapGen.TrackPoints;
+        TrackPts = Data.Curr_TrackPoints;
         foreach (Vector2 pt in TrackPts)
         {
             GameObject newPt = Instantiate(MinimapPoint, MinimapContainer.transform);
