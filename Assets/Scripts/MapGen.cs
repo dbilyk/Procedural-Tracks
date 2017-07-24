@@ -36,7 +36,7 @@ public class MapGen : MonoBehaviour {
     public float RacingLineTightness = 0.2f;
     public float RacingLineWaypointFreq;
 
-
+    // Creates Random Points based on specs-----------------------------------------------------------------
     List<Vector2> CreateQuadrantPoints(int PointCt, float MapW, float MapH, Vector2 Quad)
     {
         List<Vector2> Points = new List<Vector2>();
@@ -51,7 +51,7 @@ public class MapGen : MonoBehaviour {
         return Points;
     }
 
-
+    //Sorts points into a circular sequence-----------------------------------------------------------------
     List<Vector2> OrganizePointSequence(float MapW, float MapH)
     {
         List<Vector2> Points = new List<Vector2>();
@@ -91,7 +91,8 @@ public class MapGen : MonoBehaviour {
     }
 
 
-    //switches last and second to last points in the quadrant depending on the distance to the first point in the next quadrant. (to prevent loops from forming)
+    //switches last and second to last points in the quadrant depending on the distance to the first point in the next quadrant. 
+    //(to prevent loops from forming)-----------------------------------------------------------------
     List<Vector2> OptimizeTrackFlow(int PtCnt, List<Vector2> ListToScan)
     {
         List<Vector2> OptimizedList = new List<Vector2>(ListToScan);
@@ -130,7 +131,10 @@ public class MapGen : MonoBehaviour {
         return angleInDeg;
     }
 
-    //Checks all angles between each three INITIAL control points before midpoint insertion, and if angle is greater than the minimum angle, move point B half way towards the midpoint between pt A and C, thereby increasing the angle.
+    //Checks all angles between each three INITIAL control points before midpoint insertion, 
+    //and if angle is greater than the minimum angle, 
+    //move point B half way towards the midpoint between pt A and C, 
+    //thereby increasing the angle.
     
     List<Vector2> CheckControlPointAngles(float minimumAngle, List<Vector2> CtrlPts)
     {
@@ -176,6 +180,7 @@ public class MapGen : MonoBehaviour {
         Vector2 TrackPoint = new Vector2(x, y);
         return TrackPoint;
     }
+
     //creates the array of track points with a passed in point frequency and a list of control points.
     List<Vector2> CreateTrackPoints(float PtFreq, List<Vector2> ControlPts)
     {
@@ -192,6 +197,7 @@ public class MapGen : MonoBehaviour {
         }
         return TrackPts;
     }
+    
     //calls all the functions to actually generate the data that the above functions work with, and returns an array of all the track gameobject pieces.
     List<GameObject> CreateTrackData()
     {
@@ -212,6 +218,7 @@ public class MapGen : MonoBehaviour {
 
     }
 
+    //Creates Track mesh
     void CreateTrackMesh(List<GameObject> TPs)
     {
         Mesh mesh = new Mesh();
@@ -303,7 +310,7 @@ public class MapGen : MonoBehaviour {
 
     }
 
-    //rotates all track objects to face towards the next point, thereby following the curvature of the bezier curves.
+    //Track Mesh Helper: rotates all track objects to face towards the next point, thereby following the curvature of the bezier curves.
     void RotateTrackObjectsAlongCurves(List<GameObject> TrackObjs)
     {
         for (int i = 0; i < TrackObjs.Count; i++)
@@ -329,11 +336,7 @@ public class MapGen : MonoBehaviour {
 
         //plots control points with angles shrunk to try and create a racing line.
         List<Vector2> RacingLine = new List<Vector2>(CtrlPts);
-
-        //plot original control points
-        Color32 col = new Color32(100, 0, 0, 255);
-        //DebugPlot(RacingLine, col);
-
+        
         //move starting corner towards apex
         Vector2 MpAC = new Vector2((RacingLine[RacingLine.Count - 2].x + RacingLine[1].x) / 2, (RacingLine[RacingLine.Count - 2].y + RacingLine[1].y) / 2);
         RacingLine[0] = Vector2.Lerp(RacingLine[0], MpAC, LerpTightness);
@@ -354,9 +357,9 @@ public class MapGen : MonoBehaviour {
         
 
         //visualize racingline
-        Color32 col2 = new Color32(0, 250, 0, 255);
-        //DebugPlot(trkpts, col2);
         
+        // DebugPlot(trkpts, new Color32(0, 250, 0, 255));
+
 
         return trkpts;
     }
