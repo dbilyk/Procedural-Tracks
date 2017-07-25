@@ -7,7 +7,7 @@ public class MapCreator : MonoBehaviour {
     //Mesh Helper objects 
     public GameObject MeshHelperContainer;
     public GameObject PointObject;
-    public List<GameObject> MeshHelperEmpties;
+    public List<GameObject> MeshHelperObjects;
     
     // HELPER : Creates Random Points based on specs-----------------------------------------------------------------
     List<Vector2> CreateQuadrantPoints(int PointCt, float MapW, float MapH, Vector2 Quad)
@@ -82,27 +82,6 @@ public class MapCreator : MonoBehaviour {
 
     }
 
-    //switches last and second to last points in the quadrant depending on the distance to the first point in the next quadrant. 
-    //(to prevent loops from forming)-----------------------------------------------------------------
-    public List<Vector2> OptimizeRawPoints(List<Vector2> rawPts)
-    {
-        List<Vector2> OptimizedList = new List<Vector2>(rawPts);
-        for (int i=Data.PtCtPerQuad -1;i<Data.PtCtPerQuad*4;i+=Data.PtCtPerQuad)
-        {
-            Vector2 SecondToLastPt = new Vector2(rawPts[i - 1].x, rawPts[i - 1].y);
-            Vector2 LastPt = new Vector2(rawPts[i].x, rawPts[i].y);
-            Vector2 FirstPtNextQuad = new Vector2(rawPts[i + 1].x, rawPts[i + 1].y);
-            if (Vector2.Distance(SecondToLastPt, FirstPtNextQuad) < Vector2.Distance(LastPt,FirstPtNextQuad))
-            {
-                OptimizedList[i - 1] = LastPt;
-                OptimizedList[i] = SecondToLastPt;
-            }
-            
-        }
-
-        return OptimizedList;
-    }
-
     //inserts midpoints into the optimized list.
     public List<Vector2> CreateControlPoints(List<Vector2> currentRawPts)
     {
@@ -163,25 +142,7 @@ public class MapCreator : MonoBehaviour {
     }
 
     //calls all the functions to actually generate the data that the above functions work with, and returns an array of all the track gameobject pieces.
-    public List<GameObject> CreateTrackData()
-    {
-        Data.Curr_RawPoints = CreateRawPoints();
-        //Data.Curr_RawPoints = OptimizeRawPoints(Data.Curr_RawPoints);
-        Data.Curr_RawPoints = CheckControlPointAngles(Data.Curr_RawPoints);
-        Data.Curr_ControlPoints = CreateControlPoints(Data.Curr_RawPoints);
-        Data.Curr_TrackPoints = CreateTrackPoints(Data.Curr_ControlPoints, Data.TrackPointFreq);
-        List<GameObject> TrackObjs = new List<GameObject>();
-        foreach (Vector2 pt in Data.Curr_TrackPoints)
-        {
-            GameObject point = Instantiate(PointObject);
-            point.transform.position = pt;
-            point.transform.parent = MeshHelperContainer.transform;
-            TrackObjs.Add(point);
-        }
-        return TrackObjs;
-
-    }
-
+    
     //Creates Track mesh
     public void CreateTrackMesh(List<GameObject> TPs)
     {

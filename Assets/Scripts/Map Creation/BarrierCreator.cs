@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class BarrierCreator : MonoBehaviour {
 
     public MapCreator mapGen;
     public GameObject BarrierContainer;
+    public GameObject InnerBarrier;
+    public GameObject OuterBarrier;
+
+   
     //takes original track data and divides each point in the data by the trackpointDivisor, thereby shrinking or expanding the entire track
-    public List<Vector2> CreateBarriers(List<Vector2> currentRawPts, float trackCenterpointDivisor, float tireRadius, GameObject Barrier)
+    public List<Vector2> CreateBarriers(List<Vector2> currentRawPts, float trackCenterpointDivisor, float tireRadius, string InnerOrOuter)
     {
         //pass in original control points data
         List<Vector2> BarrierPoints = new List<Vector2>(currentRawPts);
@@ -67,20 +72,11 @@ public class BarrierCreator : MonoBehaviour {
                     NewCtrlPoints.RemoveAt(i);
                 }
             }
-
-
-
+            
         }
-
-
-
-        //DebugPlot(NewCtrlPoints, new Color32(0, 255, 0, 255));
-
+        
         List<Vector2> MPs = mapGen.CreateControlPoints(NewCtrlPoints);
-
-
-
-
+        
         int currentTirePosition = 0;
         List<int> PointIndexesToDelete = new List<int>();
 
@@ -102,8 +98,7 @@ public class BarrierCreator : MonoBehaviour {
             {
                 currentTirePosition = i;
             }
-
-
+            
         }
         //remove points that are too close together for placing tire barriers via above array
         for (int i = PointIndexesToDelete.Count - 1; i >= 0; i--)
@@ -119,17 +114,5 @@ public class BarrierCreator : MonoBehaviour {
         }
 
         return BarrierPoints;
-
     }
-
-
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }

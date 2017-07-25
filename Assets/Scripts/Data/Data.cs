@@ -9,8 +9,8 @@ public class Data : MonoBehaviour {
     public static float MapHeight = 40;//done
     
     //track creation settings
-    public static float MinCornerWidth = 70;
-    public static int PtCtPerQuad = 9;
+    public static float MinCornerWidth = 90;
+    public static int PtCtPerQuad =19;
     public static float PointSpacing = 4;
     public static float TrackPointFreq = 40;
 
@@ -29,6 +29,7 @@ public class Data : MonoBehaviour {
     public static List<Vector2> Curr_RawPoints;
     public static List<Vector2> Curr_ControlPoints;
     public static List<Vector2> Curr_TrackPoints;
+    public static List<GameObject> Curr_TrackObjects;
 
     //racing line settings + data
     public static float RacingLineTightness = 0.15f;
