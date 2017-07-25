@@ -16,7 +16,13 @@ public class Data : MonoBehaviour {
 
     //track mesh and collider settings
     public static float TrackMeshThickness = -0.1f;
-    public static int TrackColliderResolution = 24; 
+    public static int TrackColliderResolution = 24;
+
+
+    //barrier data
+    public static float TireRadius = 0.1f;
+    public static float BarrierShrinkFactor = 4;
+    public static float BarrierCornerKinkFactor = 4;
 
 
     //CURRENT game state MAP data
@@ -24,6 +30,9 @@ public class Data : MonoBehaviour {
     public static List<Vector2> Curr_ControlPoints;
     public static List<Vector2> Curr_TrackPoints;
 
+    //racing line settings + data
+    public static float RacingLineTightness = 0.15f;
+    public static float RacingLineWaypointFreq = 8;
     public static List<Vector2> Curr_RacingLinePoints;
 
     //saved game data

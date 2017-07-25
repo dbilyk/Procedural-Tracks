@@ -46,14 +46,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Camera\FollowCar.cs" />
+     <Compile Include="Assets\Scripts\Camera\SmoothFollowCam.cs" />
      <Compile Include="Assets\Scripts\Cars\CarAI.cs" />
      <Compile Include="Assets\Scripts\Cars\CarMovement.cs" />
      <Compile Include="Assets\Scripts\Cars\CreateSkids.cs" />
-     <Compile Include="Assets\Scripts\Cars\FollowCar.cs" />
      <Compile Include="Assets\Scripts\Cars\TurnWheels.cs" />
      <Compile Include="Assets\Scripts\Data\Data.cs" />
+     <Compile Include="Assets\Scripts\Debug\ExtensionMethods.cs" />
+     <Compile Include="Assets\Scripts\Game Logic\GameManager.cs" />
      <Compile Include="Assets\Scripts\Game Logic\TrackTriggerLogic.cs" />
-     <Compile Include="Assets\Scripts\Map Creation\MapGen.cs" />
+     <Compile Include="Assets\Scripts\Map Creation\BarrierCreator.cs" />
+     <Compile Include="Assets\Scripts\Map Creation\MapCreator.cs" />
      <Compile Include="Assets\Scripts\Map Creation\MapGraphics.cs" />
      <Compile Include="Assets\Scripts\UI\MiniMap.cs" />
  <Reference Include="UnityEngine.UI">

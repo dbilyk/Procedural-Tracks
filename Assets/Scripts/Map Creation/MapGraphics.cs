@@ -14,7 +14,7 @@ public class MapGraphics : MonoBehaviour {
     public GameObject OilContainer;
     public GameObject FoliageContainer;
 
-    public MapGen MapGen;
+    public MapCreator MapGen;
     public List<Vector2> MapPoints;
     public List<GameObject> MeshHelperEmpties;
 

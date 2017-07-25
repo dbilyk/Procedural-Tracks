@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CarMovement : MonoBehaviour {
 
-    public MapGen MapGen;
+    public MapCreator MapGen;
     public float MaxSpeed;
     public float MaxBrake;
     public float AccelRate;

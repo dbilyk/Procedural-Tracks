@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CarAI : MonoBehaviour {
 
-    public MapGen MapGen;
+    public MapCreator MapGen;
     public List<Vector2> RacingLine;
     public float MaxSpeed;
     public float MaxBrake;
@@ -104,9 +104,9 @@ public class CarAI : MonoBehaviour {
     void Start()
     {
         RB = gameObject.GetComponent<Rigidbody2D>();
-        RacingLine = MapGen.RacingLinePoints;
-
-
+        MapGen = MapCreator.FindObjectOfType<MapCreator>();
+        RacingLine = Data.Curr_RacingLinePoints;
+        
     }
 
 
@@ -114,7 +114,7 @@ public class CarAI : MonoBehaviour {
     int newPosThrottle;
     int oldPos;
 
-    public float force = 0.0000001f;
+    public float force = 0.00000001f;
 
 
 
