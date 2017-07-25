@@ -5,13 +5,13 @@ using UnityEngine;
 
 public class Data : MonoBehaviour {
     //gerenal map settings
-    public static float MapWidth = 40;//done
-    public static float MapHeight = 40;//done
+    public static float MapWidth = 60;//done
+    public static float MapHeight = 60;//done
     
     //track creation settings
-    public static float MinCornerWidth = 90;
+    public static float MinCornerWidth = 50;
     public static int PtCtPerQuad =19;
-    public static float PointSpacing = 4;
+    public static float PointSpacing = 6;
     public static float TrackPointFreq = 40;
 
     //track mesh and collider settings
@@ -21,8 +21,8 @@ public class Data : MonoBehaviour {
 
     //barrier data
     public static float TireRadius = 0.1f;
-    public static float BarrierShrinkFactor = 3;
-    public static float BarrierCornerKinkFactor = 3;
+    public static float BarrierShrinkFactor = 2;
+    public static float BarrierCornerKinkFactor = 2;
 
 
     //CURRENT game state MAP data

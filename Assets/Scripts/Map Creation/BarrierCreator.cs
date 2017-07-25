@@ -74,6 +74,8 @@ public class BarrierCreator : MonoBehaviour {
             }
             
         }
+
+        NewCtrlPoints = mapGen.SortPoints(NewCtrlPoints);
         
         List<Vector2> MPs = mapGen.CreateControlPoints(NewCtrlPoints);
         

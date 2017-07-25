@@ -16,7 +16,8 @@ public class GameManager : MonoBehaviour {
     {
         
 
-        Data.Curr_RawPoints = MapCreator.CreateRawPoints();
+        Data.Curr_RawPoints = MapCreator.CreateRawUnsortedPoints();
+        Data.Curr_RawPoints = MapCreator.SortPoints(Data.Curr_RawPoints);
         Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints);
         Data.Curr_ControlPoints = MapCreator.CreateControlPoints(Data.Curr_RawPoints);
         Data.Curr_TrackPoints = MapCreator.CreateTrackPoints(Data.Curr_ControlPoints, Data.TrackPointFreq);

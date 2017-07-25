@@ -44,7 +44,7 @@ public class MapCreator : MonoBehaviour {
 
     
     //Sorts points into a circular sequence-----------------------------------------------------------------
-    public List<Vector2> CreateRawPoints()
+    public List<Vector2> CreateRawUnsortedPoints()
     {
         List<Vector2> Points = new List<Vector2>();
         Vector2 UR = new Vector2(1, 1);
@@ -57,28 +57,48 @@ public class MapCreator : MonoBehaviour {
         List<Vector2> LLL = CreateQuadrantPoints(Data.PtCtPerQuad, Data.MapWidth, Data.MapHeight, LL);
         List<Vector2> ULL = CreateQuadrantPoints(Data.PtCtPerQuad, Data.MapWidth, Data.MapHeight, UL);
 
+
+        Points.AddRange(URL);
+        Points.AddRange(LRL);
+        Points.AddRange(LLL);
+        Points.AddRange(ULL);
+        
+        return Points;
+
+    }
+
+    public List<Vector2> SortPoints(List<Vector2> anyPoints)
+    {
+        List<Vector2> pts = new List<Vector2>(anyPoints);
+
+        List<Vector2> URL = pts.Where(c => c.x > 0 && c.y >0).ToList();
+        List<Vector2> LRL = pts.Where(c => c.x > 0 && c.y <0).ToList();
+        List<Vector2> LLL = pts.Where(c => c.x < 0 && c.y < 0).ToList();
+        List<Vector2> ULL = pts.Where(c => c.x < 0 && c.y >0).ToList();
+
         List<Vector2> URLS = URL.OrderBy(c => c.x).ToList();
         List<Vector2> LRLS = LRL.OrderByDescending(c => c.x).ToList();
         List<Vector2> LLLS = LLL.OrderByDescending(c => c.x).ToList();
         List<Vector2> ULLS = ULL.OrderBy(c => c.x).ToList();
 
-        Points.AddRange(URLS);
-        Points.AddRange(LRLS);
-        Points.AddRange(LLLS);
-        Points.AddRange(ULLS);
-        Points.Add(Points[0]);
-       
+        pts.Clear();
+        pts.AddRange(URLS);
+        pts.AddRange(LRLS);
+        pts.AddRange(LLLS);
+        pts.AddRange(ULLS);
+        
         //remove points that are too close to properly draw a mesh
-        for (int i = Points.Count - 3; i > 0; i--)
+        for (int i = pts.Count - 3; i > 0; i--)
         {
-            if (Mathf.Abs(Points[i].x - Points[i + 2].x)< Data.PointSpacing)
+            if (Mathf.Abs(pts[i].x - pts[i + 2].x) < Data.PointSpacing)
             {
-                Points.RemoveAt(i+1);
+                pts.RemoveAt(i + 1);
             }
 
         }
-       
-        return Points;
+        pts.Add(pts[0]);
+
+        return pts;
 
     }
 
