@@ -8,6 +8,8 @@ public class MapCreator : MonoBehaviour {
     public GameObject MeshHelperContainer;
     public GameObject PointObject;
     public List<GameObject> MeshHelperObjects;
+
+    public GameObject ActiveGameTrack;
     
     // HELPER : Creates Random Points based on specs-----------------------------------------------------------------
     List<Vector2> CreateQuadrantPoints(int PointCt, float MapW, float MapH, Vector2 Quad)
@@ -120,7 +122,7 @@ public class MapCreator : MonoBehaviour {
     //and if angle is greater than the minimum angle, 
     //move point B half way towards the midpoint between pt A and C, 
     //thereby increasing the angle.
-    public List<Vector2> CheckControlPointAngles(List<Vector2> currentCtrlPts)
+    public List<Vector2> CheckControlPointAngles(List<Vector2> currentCtrlPts, float lerpStep)
     {
         List<Vector2> newPoints = new List<Vector2>(currentCtrlPts);
         
@@ -131,9 +133,9 @@ public class MapCreator : MonoBehaviour {
             
             while (Angle < Data.MinCornerWidth) {
                 Vector2 MidpointAC = new Vector2((newPoints[i].x + newPoints[i + 2].x) / 2, (newPoints[i].y + newPoints[i + 2].y) / 2);
-                Vector2 MidpointBToMidpointAC = new Vector2((newPoints[i + 1].x + MidpointAC.x) / 2, (newPoints[i + 1].y + MidpointAC.y) / 2);
+                Vector2 MoveBTowardsAC = Vector2.Lerp(newPoints[i + 1], MidpointAC, lerpStep);
                 Vector2 originalB = newPoints[i + 1];
-                newPoints[i + 1] = MidpointBToMidpointAC;
+                newPoints[i + 1] = MoveBTowardsAC;
                 Angle = AngleBetweenThreePoints(newPoints[i], newPoints[i + 1], newPoints[i + 2]);
                 
            
@@ -221,7 +223,7 @@ public class MapCreator : MonoBehaviour {
 
         mesh.RecalculateBounds();
         
-        MeshFilter filter = GetComponent<MeshFilter>();
+        MeshFilter filter = ActiveGameTrack.GetComponent<MeshFilter>();
         if (filter != null)
         {
             filter.sharedMesh = mesh;
@@ -232,7 +234,7 @@ public class MapCreator : MonoBehaviour {
 
         List<Vector2> OuterColliderPath = new List<Vector2>();
         List<Vector2> InnerColliderPath = new List<Vector2>();
-        PolygonCollider2D col = GetComponent<PolygonCollider2D>();
+        PolygonCollider2D col = ActiveGameTrack.GetComponent<PolygonCollider2D>();
         if (Data.TrackColliderResolution%2 != 0)
         {
             Data.TrackColliderResolution += 1;

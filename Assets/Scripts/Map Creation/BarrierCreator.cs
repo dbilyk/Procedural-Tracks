@@ -14,6 +14,7 @@ public class BarrierCreator : MonoBehaviour {
     //takes original track data and divides each point in the data by the trackpointDivisor, thereby shrinking or expanding the entire track
     public List<Vector2> CreateBarriers(List<Vector2> currentRawPts, float trackCenterpointDivisor, float tireRadius, string InnerOrOuter)
     {
+        Debug.LogWarning("TO DO: Implement Outer Barriers and fix barrier generation");
         //pass in original control points data
         List<Vector2> BarrierPoints = new List<Vector2>(currentRawPts);
         //DebugPlot(BarrierPoints, new Color32(0, 0, 0, 255));

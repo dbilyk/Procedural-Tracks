@@ -9,7 +9,9 @@ public class Data : MonoBehaviour {
     public static float MapHeight = 60;//done
     
     //track creation settings
-    public static float MinCornerWidth = 50;
+    public static float MinCornerWidth = 90;
+    //lerp step that is applied while trying to reach the minimum corner angle
+    public static float CornerBroadeningLerpStep = 0.1f;
     public static int PtCtPerQuad =19;
     public static float PointSpacing = 6;
     public static float TrackPointFreq = 40;
