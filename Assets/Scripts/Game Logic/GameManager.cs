@@ -20,20 +20,13 @@ public class GameManager : MonoBehaviour {
         Data.Curr_RawPoints = MapCreator.SortPoints(Data.Curr_RawPoints);
         Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
         Data.Curr_ControlPoints = MapCreator.CreateControlPoints(Data.Curr_RawPoints);
-        Data.Curr_TrackPoints = MapCreator.CreateTrackPoints(Data.Curr_ControlPoints, Data.TrackPointFreq);
+        Data.Curr_TrackPoints = MapCreator.CreateTrackPoints(Data.Curr_ControlPoints, Data.MeshTrackPointFreq);
+        Data.Curr_TrackPoints.DebugPlot(new Color32(0, 0, 0, 255));
 
-        //creates the objects from which to creat mesh
-        MapCreator.MeshHelperObjects = new List<GameObject>();
-        foreach (Vector2 pt in Data.Curr_TrackPoints)
-        {
-            GameObject point = Instantiate(MapCreator.PointObject);
-            point.transform.position = pt;
-            point.transform.parent = MapCreator.MeshHelperContainer.transform;
-            MapCreator.MeshHelperObjects.Add(point);
-        }
-       
-        MapCreator.RotateTrackObjectsAlongCurves(MapCreator.MeshHelperObjects);
-        MapCreator.CreateTrackMesh(MapCreator.MeshHelperObjects);
+        //mesh creation
+        MapCreator.CreateOrSetMeshHelperObjects(Data.Curr_TrackPoints);
+        MapCreator.RotateTrackObjectsAlongCurves(Data.CurrentMeshHelperObjects);
+        MapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects);
 
         //populates current racing line with correct data
         Data.Curr_RacingLinePoints = MapCreator.CreateRacingLinePoints(Data.Curr_RawPoints, Data.RacingLineWaypointFreq, Data.RacingLineTightness);
@@ -42,6 +35,6 @@ public class GameManager : MonoBehaviour {
         //creates a new AI opponent
         Instantiate(newAI,AIContainer.transform);
         
-       InnerBarrier.CreateBarriers(Data.Curr_RawPoints, Data.BarrierShrinkFactor, Data.TireRadius, "Inner");
+       //InnerBarrier.CreateBarriers(Data.Curr_RawPoints, Data.BarrierShrinkFactor, Data.TireRadius, "Inner");
     }	
 }

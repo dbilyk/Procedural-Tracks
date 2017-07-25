@@ -7,8 +7,7 @@ public class MapCreator : MonoBehaviour {
     //Mesh Helper objects 
     public GameObject MeshHelperContainer;
     public GameObject PointObject;
-    public List<GameObject> MeshHelperObjects;
-
+    public List<GameObject> CurrentMeshHelperObjects;
     public GameObject ActiveGameTrack;
     
     // HELPER : Creates Random Points based on specs-----------------------------------------------------------------
@@ -163,7 +162,73 @@ public class MapCreator : MonoBehaviour {
         return TrackPts;
     }
 
-    //calls all the functions to actually generate the data that the above functions work with, and returns an array of all the track gameobject pieces.
+
+    //creates mesh helpers if there aren't enough already instantiated, and positions them according to the data.
+    public void CreateOrSetMeshHelperObjects(List<Vector2> pointData)
+    {
+        //creates the object pool from which to creat mesh if no pool exists
+        if (Data.CurrentMeshHelperObjects == null)
+        {
+            Data.CurrentMeshHelperObjects = new List<GameObject>();
+            foreach (Vector2 pt in pointData)
+            {
+                GameObject point = Instantiate(PointObject, MeshHelperContainer.transform);
+                point.transform.position = pt;
+                Data.CurrentMeshHelperObjects.Add(point);
+            }
+        }
+        //if pool exists...
+        else
+        {
+            int ObjectsCt = Data.CurrentMeshHelperObjects.Count;
+            int DataCt = pointData.Count;
+
+            //make sure there are enough existing helpers in the pool, and if not,
+            //create or destroy before repositioning objects in pool
+            if (ObjectsCt < DataCt)
+            {
+                for (int i = 0; i<DataCt - ObjectsCt; i ++)
+                {
+                    GameObject point = Instantiate(PointObject, MeshHelperContainer.transform);
+                    Data.CurrentMeshHelperObjects.Add(point);
+                }
+            }
+            
+            if(ObjectsCt > DataCt)
+            {
+                for (int i = 0; i < ObjectsCt - DataCt; i ++)
+                {
+                    Destroy(Data.CurrentMeshHelperObjects[Data.CurrentMeshHelperObjects.Count - 1]);
+                    Data.CurrentMeshHelperObjects.RemoveAt(Data.CurrentMeshHelperObjects.Count - 1);
+                }
+            }
+
+            for (int i = 0; i < DataCt; i++)
+            {
+                Data.CurrentMeshHelperObjects[i].transform.position = pointData[i];
+            }
+        }
+    }
+
+    //Track Mesh Helper: rotates all track objects to face towards the next point, thereby following the curvature of the bezier curves.
+    public void RotateTrackObjectsAlongCurves(List<GameObject> TrackObjs)
+    {
+        for (int i = 0; i < TrackObjs.Count; i++)
+        {
+            if (i < TrackObjs.Count - 1)
+            {
+                Vector3 dir = TrackObjs[i + 1].transform.position - TrackObjs[i].transform.position;
+                float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+                TrackObjs[i].transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            }
+            else
+            {
+                Vector3 dir = TrackObjs[0].transform.position - TrackObjs[i].transform.position;
+                float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+                TrackObjs[i].transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            }
+        }
+    }
     
     //Creates Track mesh
     public void CreateTrackMesh(List<GameObject> TPs)
@@ -255,25 +320,11 @@ public class MapCreator : MonoBehaviour {
 
     }
 
-    //Track Mesh Helper: rotates all track objects to face towards the next point, thereby following the curvature of the bezier curves.
-    public void RotateTrackObjectsAlongCurves(List<GameObject> TrackObjs)
+    public void CreateColliderForTrack()
     {
-        for (int i = 0; i < TrackObjs.Count; i++)
-        {
-            if (i < TrackObjs.Count - 1)
-            {
-                Vector3 dir = TrackObjs[i + 1].transform.position - TrackObjs[i].transform.position;
-                float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-                TrackObjs[i].transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-            }
-            else
-            {
-                Vector3 dir = TrackObjs[0].transform.position - TrackObjs[i].transform.position;
-                float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-                TrackObjs[i].transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-            }
-        }
+
     }
+
 
 
     public List<Vector2> CreateRacingLinePoints(List<Vector2> currentRawPts, float WaypointFreq, float LerpTightness)
@@ -299,13 +350,8 @@ public class MapCreator : MonoBehaviour {
         List<Vector2> midpoints = CreateControlPoints(RacingLine);
         //create Data.Curr_TrackPoints out of new data
         List<Vector2> trkpts = CreateTrackPoints(midpoints, WaypointFreq);
+
         
-
-        //visualize racingline
-        
-        // DebugPlot(trkpts, new Color32(0, 250, 0, 255));
-
-
         return trkpts;
     }
     

@@ -14,9 +14,10 @@ public class Data : MonoBehaviour {
     public static float CornerBroadeningLerpStep = 0.1f;
     public static int PtCtPerQuad =19;
     public static float PointSpacing = 6;
-    public static float TrackPointFreq = 40;
 
     //track mesh and collider settings
+    public static List<GameObject> CurrentMeshHelperObjects;
+    public static float MeshTrackPointFreq = 40;
     public static float TrackMeshThickness = -0.1f;
     public static int TrackColliderResolution = 24;
 
@@ -31,7 +32,6 @@ public class Data : MonoBehaviour {
     public static List<Vector2> Curr_RawPoints;
     public static List<Vector2> Curr_ControlPoints;
     public static List<Vector2> Curr_TrackPoints;
-    public static List<GameObject> Curr_TrackObjects;
 
     //racing line settings + data
     public static float RacingLineTightness = 0.15f;
