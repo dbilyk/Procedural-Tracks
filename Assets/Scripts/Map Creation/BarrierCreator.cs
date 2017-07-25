@@ -6,7 +6,7 @@ using UnityEngine;
 public class BarrierCreator : MonoBehaviour {
 
     public MapCreator mapGen;
-    public GameObject BarrierContainer;
+    public GameObject InnerBarrierContainer;
     public GameObject InnerBarrier;
     public GameObject OuterBarrier;
 
@@ -81,6 +81,7 @@ public class BarrierCreator : MonoBehaviour {
         List<int> PointIndexesToDelete = new List<int>();
 
         BarrierPoints = mapGen.CreateTrackPoints(MPs, 100);
+        
         //shrink the data
         //for (int i = 0; i < BarrierPoints.Count; i++)
         //{
@@ -88,18 +89,18 @@ public class BarrierCreator : MonoBehaviour {
         //}
 
         //add point indexs that are too close together to place the tires to a new array;
-        for (int i = 0; i < BarrierPoints.Count; i++)
-        {
-            if (Vector2.Distance(BarrierPoints[currentTirePosition], BarrierPoints[i]) < tireRadius * 2)
-            {
-                PointIndexesToDelete.Add(i);
-            }
-            else
-            {
-                currentTirePosition = i;
-            }
+        //for (int i = 0; i < BarrierPoints.Count; i++)
+        //{
+        //    if (Vector2.Distance(BarrierPoints[currentTirePosition], BarrierPoints[i]) < tireRadius * 2)
+        //    {
+        //        PointIndexesToDelete.Add(i);
+        //    }
+        //    else
+        //    {
+        //        currentTirePosition = i;
+        //    }
             
-        }
+        //}
         //remove points that are too close together for placing tire barriers via above array
         for (int i = PointIndexesToDelete.Count - 1; i >= 0; i--)
         {
@@ -109,7 +110,7 @@ public class BarrierCreator : MonoBehaviour {
 
         foreach (Vector2 pt in BarrierPoints)
         {
-            GameObject barrier = Instantiate(Barrier, BarrierContainer.transform);
+            GameObject barrier = Instantiate(InnerBarrier, InnerBarrierContainer.transform);
             barrier.transform.position = pt;
         }
 

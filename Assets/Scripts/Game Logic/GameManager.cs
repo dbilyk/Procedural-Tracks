@@ -41,6 +41,6 @@ public class GameManager : MonoBehaviour {
         //creates a new AI opponent
         Instantiate(newAI,AIContainer.transform);
         
-       BarrierCreator.CreateBarriers(Data.Curr_RawPoints, Data.BarrierShrinkFactor, Data.TireRadius);
+       InnerBarrier.CreateBarriers(Data.Curr_RawPoints, Data.BarrierShrinkFactor, Data.TireRadius, "Inner");
     }	
 }

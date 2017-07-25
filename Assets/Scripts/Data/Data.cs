@@ -21,8 +21,8 @@ public class Data : MonoBehaviour {
 
     //barrier data
     public static float TireRadius = 0.1f;
-    public static float BarrierShrinkFactor = 4;
-    public static float BarrierCornerKinkFactor = 4;
+    public static float BarrierShrinkFactor = 3;
+    public static float BarrierCornerKinkFactor = 3;
 
 
     //CURRENT game state MAP data

@@ -24,7 +24,7 @@ public class MapGraphics : MonoBehaviour {
     // Use this for initialization
     void Start () {
         MapPoints = Data.Curr_TrackPoints;
-        MeshHelperEmpties = MapGen.MeshHelperEmpties;
+        MeshHelperEmpties = MapGen.MeshHelperObjects;
         Debug.Log("num of map points: " + MapPoints.Count);
         for(int i = 0; i< MapPoints.Count; i++)
         {
