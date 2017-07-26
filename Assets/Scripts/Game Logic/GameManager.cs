@@ -9,29 +9,27 @@ public class GameManager : MonoBehaviour {
     public BarrierCreator InnerBarrier;
     public GameObject AIContainer;
     public GameObject newAI;
+    public GameObject MiniMapGroup;
     
-
-    private Color32 red = new Color32(255,0,0,255);
-    private Color32 green = new Color32(0, 255, 0,255);
-    private Color32 blue = new Color32(0,0, 255, 255);
-
     public void StartNewGameButton()
     {
         Data.Curr_RawPoints = MapCreator.CreateRawUnsortedPoints();
-        
-
         Data.Curr_RawPoints = MapCreator.SortPoints(Data.Curr_RawPoints);
-        Data.Curr_RawPoints.DebugPlot(blue);
-
+        //have to run point thinning and angle adjustment several times because they recursively affect each other.
+        Data.Curr_RawPoints = MapCreator.RemovePointsTooClose(Data.Curr_RawPoints, Data.PointSpacing);
         Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
-        Data.Curr_RawPoints.DebugPlot(green);
+        Data.Curr_RawPoints = MapCreator.RemovePointsTooClose(Data.Curr_RawPoints, Data.PointSpacing);
+        Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
+        Data.Curr_RawPoints = MapCreator.RemovePointsTooClose(Data.Curr_RawPoints, Data.PointSpacing);
+        Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
+
         //Data.Curr_RawPoints = MapCreator.ApplyRandomRotation(Data.Curr_RawPoints);
         Data.Curr_ControlPoints = MapCreator.CreateControlPoints(Data.Curr_RawPoints);
         Data.Curr_TrackPoints = MapCreator.CreateTrackPoints(Data.Curr_ControlPoints, Data.MeshTrackPointFreq);
         //mesh creation
         MapCreator.CreateOrSetMeshHelperObjects(Data.Curr_TrackPoints);
         MapCreator.RotateTrackObjectsAlongCurves(Data.CurrentMeshHelperObjects);
-        MapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects);
+        MapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects, Data.TrackMeshThickness, InnerBarrier.gameObject.GetComponent<MeshFilter>());
         MapCreator.CreateColliderForTrack(Data.Curr_OuterTrackPoints, Data.Curr_InnerTrackPoints);
 
         //populates current racing line with correct data
@@ -39,6 +37,8 @@ public class GameManager : MonoBehaviour {
         
         //creates a new AI opponent
         Instantiate(newAI,AIContainer.transform);
+        MiniMapGroup.SetActive(true);
        //InnerBarrier.CreateBarriers(Data.Curr_RawPoints, Data.BarrierShrinkFactor, Data.TireRadius, "Inner");
+        
     }	
 }

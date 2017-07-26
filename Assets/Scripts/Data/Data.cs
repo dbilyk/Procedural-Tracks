@@ -4,16 +4,23 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Data : MonoBehaviour {
+    public static Color32 red= new Color32(255,0,0,255);
+    public static Color32 green= new Color32(0, 255,0, 255);
+    public static Color32 blue= new Color32(0,0, 255, 255);
+    public static Color32 yellow= new Color32(255, 255,0, 255);
+    public static Color32 orange= new Color32(255, 100,0, 255);
+
+
     //gerenal map settings
-    public static float MapWidth = 60;//done
-    public static float MapHeight = 60;//done
+    public static float MapWidth = 70;//done
+    public static float MapHeight = 70;//done
     
     //track creation settings
-    public static float MinCornerWidth = 100;
+    public static float MinCornerWidth = 95;
     //lerp step that is applied while trying to reach the minimum corner angle
     public static float CornerBroadeningLerpStep = 0.1f;
     public static int PtCtPerQuad =50;
-    public static float PointSpacing =4.8f;
+    public static float PointSpacing =5.5f;
 
     //track mesh and collider settings
     public static List<GameObject> CurrentMeshHelperObjects;
@@ -28,15 +35,20 @@ public class Data : MonoBehaviour {
 
 
     public static float MeshTrackPointFreq = 30;
-    public static float TrackMeshThickness = 1.1f;
+    public static float TrackMeshThickness = 1.2f;
 
     public static int TrackColliderResolution = 13;
 
 
     //barrier data
-    public static float TireRadius = 0.1f;
-    public static float BarrierShrinkFactor = 2;
-    public static float BarrierCornerKinkFactor = 2;
+    //expansion mults cant be negative
+    public static float InnerExpansionMultiplier = -1.1f;
+    public static float OuterExpansionMultiplier = 1.1f;
+    public static int BarrierMeshPointFrequency = 10;
+    public static float Barrier Thickness = 0.1f;
+    //public static float TireRadius = 0.1f;
+    //public static float BarrierShrinkFactor = 2.2f;
+    //public static float BarrierCornerKinkFactor = 2;
 
 
     //CURRENT game state MAP data
@@ -46,8 +58,8 @@ public class Data : MonoBehaviour {
     public static List<Vector2> Curr_TrackPoints;
 
     //racing line settings + data
-    public static float RacingLineTightness = 0.15f;
-    public static float RacingLineWaypointFreq = 8;
+    public static float RacingLineTightness = 0.1f;
+    public static float RacingLineWaypointFreq = 10;
     public static List<Vector2> Curr_RacingLinePoints;
 
     //saved game data
@@ -61,7 +73,7 @@ public class Data : MonoBehaviour {
 //data structure for saving a track
 public struct SavedTrack 
 {
-    public List<Vector2> ControlPoints;
+    public List<Vector2> RawPoints;
     public string name;
     public int id;
     

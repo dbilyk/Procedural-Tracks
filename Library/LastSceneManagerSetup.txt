@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/ActiveGame Scene/ActiveGame v1.1 working.unity
+- path: Assets/Scenes/ActiveGame Scene/ActiveGame v1.6 pt sorting working OK.unity
   isLoaded: 1
   isActive: 1

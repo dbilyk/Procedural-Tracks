@@ -1,122 +1,192 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
 public class BarrierCreator : MonoBehaviour {
 
-    public MapCreator mapGen;
-    public GameObject InnerBarrierContainer;
+    public MapCreator mapCreator;
     public GameObject InnerBarrier;
     public GameObject OuterBarrier;
 
    
     //takes original track data and divides each point in the data by the trackpointDivisor, thereby shrinking or expanding the entire track
-    public List<Vector2> CreateBarriers(List<Vector2> currentRawPts, float trackCenterpointDivisor, float tireRadius, string InnerOrOuter)
+    
+    //public List<Vector2> CreateBarriers(List<Vector2> currentRawPts, float trackCenterpointDivisor, float tireRadius, string InnerOrOuter)
+    //{
+    //    Debug.LogWarning("TO DO: Implement Outer Barriers and fix barrier generation");
+    //    //pass in original control points data
+    //    List<Vector2> BarrierPoints = new List<Vector2>(currentRawPts);
+    //    //DebugPlot(BarrierPoints, new Color32(0, 0, 0, 255));
+
+    //    List<Vector2> NewCtrlPoints = new List<Vector2>();
+
+    //    //shifts all control points inward along the normal of the two adjacent points on either side, controlled by the trackCenterpointDivisor Var.
+    //    for (int i = 0; i < BarrierPoints.Count; i++)
+    //    {
+    //        //move first point into position
+    //        if (i == 0)
+    //        {
+    //            Vector2 AC = BarrierPoints[BarrierPoints.Count - 1] - BarrierPoints[i + 1];
+    //            Vector2 NormalAC = new Vector2(-AC.y, AC.x).normalized;
+    //            NewCtrlPoints.Add(BarrierPoints[i] - (NormalAC * -trackCenterpointDivisor));
+
+    //        }
+
+
+    //        //most points
+    //        if (i + 1 < BarrierPoints.Count && i != 0)
+    //        {
+    //            Vector2 AC = BarrierPoints[i - 1] - BarrierPoints[i + 1];
+    //            Vector2 NormalAC = new Vector2(-AC.y, AC.x).normalized;
+    //            NewCtrlPoints.Add(BarrierPoints[i] - (NormalAC * -trackCenterpointDivisor));
+
+    //        }
+
+    //        //move the last point in array into position
+    //        if (i + 1 == BarrierPoints.Count)
+    //        {
+    //            Vector2 AC = BarrierPoints[i - 1] - BarrierPoints[0];
+    //            Vector2 NormalAC = new Vector2(-AC.y, AC.x).normalized;
+    //            NewCtrlPoints.Add(BarrierPoints[i] - (NormalAC * -trackCenterpointDivisor));
+
+    //        }
+
+    //    }
+    //    //removes one of any two control points that are within a certain distance of one another.
+    //    for (int i = NewCtrlPoints.Count - 1; i >= 1; i--)
+    //    {
+    //        float distBetweenPts;
+    //        if (i == NewCtrlPoints.Count - 1)
+    //        {
+    //            distBetweenPts = Vector2.Distance(NewCtrlPoints[i], NewCtrlPoints[0]);
+    //            if (distBetweenPts <= Data.BarrierCornerKinkFactor)
+    //            {
+    //                NewCtrlPoints.RemoveAt(i);
+    //            }
+    //        }
+    //        else
+    //        {
+    //            distBetweenPts = Vector2.Distance(NewCtrlPoints[i], NewCtrlPoints[i - 1]);
+    //            if (distBetweenPts <= Data.BarrierCornerKinkFactor)
+    //            {
+    //                NewCtrlPoints.RemoveAt(i);
+    //            }
+    //        }
+            
+    //    }
+
+    //    NewCtrlPoints = mapCreator.SortPoints(NewCtrlPoints);
+        
+    //    List<Vector2> MPs = mapCreator.CreateControlPoints(NewCtrlPoints);
+        
+    //    int currentTirePosition = 0;
+    //    List<int> PointIndexesToDelete = new List<int>();
+
+    //    BarrierPoints = mapCreator.CreateTrackPoints(MPs, 100);
+        
+    //    //shrink the data
+    //    //for (int i = 0; i < BarrierPoints.Count; i++)
+    //    //{
+    //    //    BarrierPoints[i] = new Vector2(BarrierPoints[i].x /1.1f , BarrierPoints[i].y / (trackCenterpointDivisor + (trackCenterpointDivisor/8)));
+    //    //}
+
+    //    //add point indexs that are too close together to place the tires to a new array;
+    //    //for (int i = 0; i < BarrierPoints.Count; i++)
+    //    //{
+    //    //    if (Vector2.Distance(BarrierPoints[currentTirePosition], BarrierPoints[i]) < tireRadius * 2)
+    //    //    {
+    //    //        PointIndexesToDelete.Add(i);
+    //    //    }
+    //    //    else
+    //    //    {
+    //    //        currentTirePosition = i;
+    //    //    }
+            
+    //    //}
+    //    //remove points that are too close together for placing tire barriers via above array
+    //    for (int i = PointIndexesToDelete.Count - 1; i >= 0; i--)
+    //    {
+    //        BarrierPoints.RemoveAt(PointIndexesToDelete[i]);
+    //    }
+
+
+    //    foreach (Vector2 pt in BarrierPoints)
+    //    {
+    //        GameObject barrier = Instantiate(InnerBarrier, InnerBarrierContainer.transform);
+    //        barrier.transform.position = pt;
+    //    }
+
+    //    return BarrierPoints;
+    //}
+    /// <summary>
+    /// expansionMultiplier must be positive value
+    /// </summary>
+    public void CreateBarrierss(List<Vector2> currentRawPts, float expansionMultiplier, string innerOrOuter)
     {
-        Debug.LogWarning("TO DO: Implement Outer Barriers and fix barrier generation");
-        //pass in original control points data
-        List<Vector2> BarrierPoints = new List<Vector2>(currentRawPts);
-        //DebugPlot(BarrierPoints, new Color32(0, 0, 0, 255));
+        List<Vector2> passedData = new List<Vector2>(currentRawPts);
 
-        List<Vector2> NewCtrlPoints = new List<Vector2>();
+        List<Vector2> AboveY = passedData.Where(c => c.y > 0).ToList();
+        List<Vector2> BelowY = passedData.Where(c => c.y < 0).ToList();
 
-        //shifts all control points inward along the normal of the two adjacent points on either side, controlled by the trackCenterpointDivisor Var.
-        for (int i = 0; i < BarrierPoints.Count; i++)
+        //stores the multiply or divide operator in a lambda depending on whether this is the inner or outer barrier
+        Func<float, float> action;
+        if (innerOrOuter.ToLower() == "inner")
         {
-            //move first point into position
-            if (i == 0)
-            {
-                Vector2 AC = BarrierPoints[BarrierPoints.Count - 1] - BarrierPoints[i + 1];
-                Vector2 NormalAC = new Vector2(-AC.y, AC.x).normalized;
-                NewCtrlPoints.Add(BarrierPoints[i] - (NormalAC * -trackCenterpointDivisor));
-
-            }
-
-
-            //most points
-            if (i + 1 < BarrierPoints.Count && i != 0)
-            {
-                Vector2 AC = BarrierPoints[i - 1] - BarrierPoints[i + 1];
-                Vector2 NormalAC = new Vector2(-AC.y, AC.x).normalized;
-                NewCtrlPoints.Add(BarrierPoints[i] - (NormalAC * -trackCenterpointDivisor));
-
-            }
-
-            //move the last point in array into position
-            if (i + 1 == BarrierPoints.Count)
-            {
-                Vector2 AC = BarrierPoints[i - 1] - BarrierPoints[0];
-                Vector2 NormalAC = new Vector2(-AC.y, AC.x).normalized;
-                NewCtrlPoints.Add(BarrierPoints[i] - (NormalAC * -trackCenterpointDivisor));
-
-            }
-
+            action = x => x / expansionMultiplier;
         }
-        //removes one of any two control points that are within a certain distance of one another.
-        for (int i = NewCtrlPoints.Count - 1; i >= 1; i--)
+        else if (innerOrOuter.ToLower() == "outer")
         {
-            float distBetweenPts;
-            if (i == NewCtrlPoints.Count - 1)
-            {
-                distBetweenPts = Vector2.Distance(NewCtrlPoints[i], NewCtrlPoints[0]);
-                if (distBetweenPts <= Data.BarrierCornerKinkFactor)
-                {
-                    NewCtrlPoints.RemoveAt(i);
-                }
-            }
-            else
-            {
-                distBetweenPts = Vector2.Distance(NewCtrlPoints[i], NewCtrlPoints[i - 1]);
-                if (distBetweenPts <= Data.BarrierCornerKinkFactor)
-                {
-                    NewCtrlPoints.RemoveAt(i);
-                }
-            }
-            
+            action = x => x * expansionMultiplier;
+        }
+        else
+        {
+            throw new Exception("variable innerOrOuter in CreateBarriers() is invalid. Check the passed string.");
+        }
+        if (expansionMultiplier< 0)
+        {
+            throw new Exception("exceptionMultiplier cannot be negative!");
         }
 
-        NewCtrlPoints = mapGen.SortPoints(NewCtrlPoints);
-        
-        List<Vector2> MPs = mapGen.CreateControlPoints(NewCtrlPoints);
-        
-        int currentTirePosition = 0;
-        List<int> PointIndexesToDelete = new List<int>();
-
-        BarrierPoints = mapGen.CreateTrackPoints(MPs, 100);
-        
-        //shrink the data
-        //for (int i = 0; i < BarrierPoints.Count; i++)
-        //{
-        //    BarrierPoints[i] = new Vector2(BarrierPoints[i].x /1.1f , BarrierPoints[i].y / (trackCenterpointDivisor + (trackCenterpointDivisor/8)));
-        //}
-
-        //add point indexs that are too close together to place the tires to a new array;
-        //for (int i = 0; i < BarrierPoints.Count; i++)
-        //{
-        //    if (Vector2.Distance(BarrierPoints[currentTirePosition], BarrierPoints[i]) < tireRadius * 2)
-        //    {
-        //        PointIndexesToDelete.Add(i);
-        //    }
-        //    else
-        //    {
-        //        currentTirePosition = i;
-        //    }
-            
-        //}
-        //remove points that are too close together for placing tire barriers via above array
-        for (int i = PointIndexesToDelete.Count - 1; i >= 0; i--)
+        //manipulate all positive Y values
+        for (int i = 0; i < AboveY.Count; i ++)
         {
-            BarrierPoints.RemoveAt(PointIndexesToDelete[i]);
+            AboveY[i] = new Vector2(AboveY[i].x, action(AboveY[i].y)); 
         }
+        //manipulate all negative Y values
 
-
-        foreach (Vector2 pt in BarrierPoints)
+        for (int i = 0; i < BelowY.Count; i++)
         {
-            GameObject barrier = Instantiate(InnerBarrier, InnerBarrierContainer.transform);
-            barrier.transform.position = pt;
+            BelowY[i] = new Vector2(BelowY[i].x, action(BelowY[i].y));
         }
+        //sort all values in ascending X order
+        AboveY = AboveY.OrderBy(v => v.x).ToList();
+        BelowY = BelowY.OrderBy(v => v.x).ToList();
 
-        return BarrierPoints;
+        //move the outermost four points into position
+        Vector2 AboveLeft = AboveY.First();
+        Vector2 AboveRight = AboveY.Last();
+        Vector2 BelowLeft = BelowY.First();
+        Vector2 BelowRight = BelowY.Last();
+        AboveY.First().Equals(new Vector2(action(AboveLeft.x),AboveLeft.y));
+        AboveY.Last().Equals(new Vector2(action(AboveRight.x), AboveRight.y));
+        BelowY.First().Equals(new Vector2(action(BelowLeft.x), BelowLeft.y));
+        BelowY.Last().Equals(new Vector2(action(BelowRight.x), BelowRight.y));
+
+        //reconstruct the new barrier points list
+        passedData.Clear();
+        passedData.AddRange(AboveY);
+        passedData.AddRange(BelowY);
+        passedData = mapCreator.SortPoints(passedData);
+
+        //converts our newly adjusted raw points into mesh!
+        passedData = mapCreator.CreateControlPoints(passedData);
+        passedData = mapCreator.CreateTrackPoints(passedData,Data.BarrierMeshPointFrequency);
+        mapCreator.CreateOrSetMeshHelperObjects(passedData);
+        mapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects, );
+
+
     }
 }

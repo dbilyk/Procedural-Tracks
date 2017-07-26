@@ -88,90 +88,55 @@ public class MapCreator : MonoBehaviour {
         pts.AddRange(LLLS);
         pts.AddRange(ULLS);
 
-        //remove points that are too close to properly draw a mesh
-        //for (int i = pts.Count - 1; i >= 0; i--)
-        //{
-        //    if (i > pts.Count - 3)
-        //    {
-        //        if (Mathf.Abs(pts[i].x - pts[(i - pts.Count) + 2].x) < Data.PointSpacing)
-        //        {
-        //            pts.RemoveAt((i - (pts.Count - 1)) + 1);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        if (Mathf.Abs(pts[i].x - pts[i + 2].x) < Data.PointSpacing)
-        //        {
-        //            pts.RemoveAt(i + 1);
-        //        }
-        //    }
-        //}
-        //flag for removal
-        //for (int i = pts.Count - 1; i >= 0; i--)
-        //{
-        //    for (int j = 0; j < pts.Count; j++)
-        //    {
-        //        if (Vector2.SqrMagnitude(pts[i] - pts[j]) < Data.PointSpacing && j != i+1)
-        //        {
-        //            indexesToRemove.Add(j);
-
-        //        }
-        //    }
-        //    indexesToRemove.Sort();
-        //    indexesToRemove.Reverse();
-        //}
-
-        //for (int j = indexesToRemove.Count - 2; j >= 0; j--)
-        //{
-        //    if (indexesToRemove[j] == indexesToRemove[j+1])
-        //    {
-        //        indexesToRemove.RemoveAt(j);
-
-        //    }
-        //}
-        //for (int i = 1; i< indexesToRemove.Count; i+=2)
-        //{
-        //    pts.RemoveAt(indexesToRemove[i]);
-        //}
-        bool noMoreConflicts = false;
-
-        while (!noMoreConflicts) {
-            Debug.Log("here");
-            int counter = 0;
-            for (int i = pts.Count - 1; i >= 0; i--)
-            {
-
-                if (i == pts.Count - 1)
-                {
-                    if (Mathf.Abs(Mathf.Abs(pts[i].x) - Mathf.Abs(pts[0].x)) < Data.PointSpacing)
-                    {
-                        pts.RemoveAt(i);
-                        counter += 1;
-                    }
-                } else
-                {
-                    if (Mathf.Abs(Mathf.Abs(pts[i].x) - Mathf.Abs(pts[i + 1].x)) < Data.PointSpacing)
-                    {
-                       
-                        pts.RemoveAt(i);
-                        counter += 1;
-                       
-                    }
-                }
-                if (i==0 && counter == 0)
-                {
-                    noMoreConflicts = true;
-                }
-
-
-            }
-        }
-
-
-            pts.Add(pts[0]);
-
+        pts.Add(pts[0]);
         return pts;
 
+    }
+
+    public List<Vector2> RemovePointsTooClose(List<Vector2> anyPoints, float spacing)
+{
+    List<Vector2> pts = new List<Vector2>(anyPoints);
+
+    bool noMoreConflicts = false;
+
+    while (!noMoreConflicts)
+    {
+        
+        int counter = 0;
+        for (int i = pts.Count - 1; i >= 0; i--)
+        {
+            if (i == pts.Count - 1)
+            {
+
+                if (Mathf.Abs(pts[i].x - pts[0].x) < spacing)
+                {
+                    pts.RemoveAt(i);
+                    counter += 1;
+                }
+            }
+            else
+            {
+                if (Mathf.Abs(pts[i].x - pts[i + 1].x) < spacing)
+                {
+                    pts.RemoveAt(i);
+                    counter += 1;
+                }
+            }
+            if (i == 0 && counter == 0)
+            {
+                noMoreConflicts = true;
+            }
+
+        }
+
+    }
+
+        if (pts[pts.Count -1] != pts[0])
+        {
+            pts.Add(pts[0]);
+        }
+        
+        return pts;
     }
 
     //inserts midpoints into the optimized list.
@@ -315,7 +280,7 @@ public class MapCreator : MonoBehaviour {
     }
 
     //Creates Track mesh
-    public void CreateTrackMesh(List<GameObject> TPs)
+    public void CreateTrackMesh(List<GameObject> TPs, float Thickness, MeshFilter targetMeshFilter)
     {
         Mesh mesh = new Mesh();
         List<Vector3> vertices = new List<Vector3>();
@@ -328,18 +293,18 @@ public class MapCreator : MonoBehaviour {
         for (int i = 0; i < TPs.Count; i++)
         {
             //add lower point mesh data
-            vertices.Add(TPs[i].transform.position + (TPs[i].transform.up * -Data.TrackMeshThickness));
+            vertices.Add(TPs[i].transform.position + (TPs[i].transform.up * -Thickness));
             UVs.Add(new Vector2((float)(i) / TPs.Count, 0));
             normals.Add(Vector3.back);
 
             //add upper point mesh data
-            vertices.Add(TPs[i].transform.position + (TPs[i].transform.up * Data.TrackMeshThickness));
+            vertices.Add(TPs[i].transform.position + (TPs[i].transform.up * Thickness));
             UVs.Add(new Vector2((float)(i) / TPs.Count, 1));
             normals.Add(Vector3.back);
 
             //adds vert data
-            Data.Curr_InnerTrackPoints.Add(TPs[i].transform.position + (TPs[i].transform.up * -Data.TrackMeshThickness));
-            Data.Curr_OuterTrackPoints.Add(TPs[i].transform.position + (TPs[i].transform.up * Data.TrackMeshThickness));
+            Data.Curr_InnerTrackPoints.Add(TPs[i].transform.position + (TPs[i].transform.up * -Thickness));
+            Data.Curr_OuterTrackPoints.Add(TPs[i].transform.position + (TPs[i].transform.up * Thickness));
 
 
         }
@@ -383,7 +348,7 @@ public class MapCreator : MonoBehaviour {
 
         mesh.RecalculateBounds();
 
-        MeshFilter filter = ActiveGameTrack.GetComponent<MeshFilter>();
+        MeshFilter filter = targetMeshFilter.GetComponent<MeshFilter>();
         if (filter != null)
         {
             filter.sharedMesh = mesh;
@@ -438,7 +403,6 @@ public class MapCreator : MonoBehaviour {
 
         //plots control points with angles shrunk to try and create a racing line.
         List<Vector2> RacingLine = new List<Vector2>(currentRawPts);
-        
         //move starting corner towards apex
         Vector2 MpAC = new Vector2((RacingLine[RacingLine.Count - 2].x + RacingLine[1].x) / 2, (RacingLine[RacingLine.Count - 2].y + RacingLine[1].y) / 2);
         RacingLine[0] = Vector2.Lerp(RacingLine[0], MpAC, LerpTightness);
