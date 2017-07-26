@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class FlagForScenePersistence : MonoBehaviour {
-    public GameObject Data;
-    public GameObject GameManager;
-    public GameObject MapCreator;
-    
+    public List<GameObject> PersistenceList;
 	// Use this for initialization
 	void Start () {
-        DontDestroyOnLoad(Data);
-        DontDestroyOnLoad(GameManager);
-        DontDestroyOnLoad(MapCreator);
+
+        foreach (GameObject obj in PersistenceList)
+        {
+            DontDestroyOnLoad(obj);
+        }
+       
         
 	}
 }

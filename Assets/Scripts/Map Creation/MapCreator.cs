@@ -6,8 +6,7 @@ using UnityEngine;
 public class MapCreator : MonoBehaviour {
     //Mesh Helper objects 
     public GameObject MeshHelperContainer;
-    public GameObject PointObject;
-    public List<GameObject> CurrentMeshHelperObjects;
+    public GameObject MeshHelperObject;
     public GameObject ActiveGameTrack;
     
     // HELPER : Creates Random Points based on specs-----------------------------------------------------------------
@@ -89,13 +88,22 @@ public class MapCreator : MonoBehaviour {
         pts.AddRange(ULLS);
         
         //remove points that are too close to properly draw a mesh
-        for (int i = pts.Count - 3; i > 0; i--)
+        for (int i = pts.Count - 1; i >= 0; i--)
         {
-            if (Mathf.Abs(pts[i].x - pts[i + 2].x) < Data.PointSpacing)
+            if (i > pts.Count - 3)
             {
-                pts.RemoveAt(i + 1);
+                if (Mathf.Abs(pts[i].x - pts[(i - pts.Count) + 2].x) < Data.PointSpacing)
+                {
+                    pts.RemoveAt((i - (pts.Count-1)) + 1);
+                }
             }
-
+            else
+            {
+                if (Mathf.Abs(pts[i].x - pts[i + 2].x) < Data.PointSpacing)
+                {
+                    pts.RemoveAt(i + 1);
+                }
+            }
         }
         pts.Add(pts[0]);
 
@@ -162,17 +170,30 @@ public class MapCreator : MonoBehaviour {
         return TrackPts;
     }
 
+    //applies the same rotation (random) to each point in the list
+    public List<Vector2> ApplyRandomRotation(List<Vector2> points)
+    {
+        List<Vector2> pts = new List<Vector2>(points);
+        int randomAngle = Random.Range(0, 180);
+        for (int i = 0;i< pts.Count; i ++)
+        {
+            pts[i] = Quaternion.Euler(0,0,randomAngle) * (pts[i] - Vector2.zero);
+        }
+
+        return pts;
+
+    }
 
     //creates mesh helpers if there aren't enough already instantiated, and positions them according to the data.
-    public void CreateOrSetMeshHelperObjects(List<Vector2> pointData)
+    public void CreateOrSetMeshHelperObjects(List<Vector2> trackPoints)
     {
         //creates the object pool from which to creat mesh if no pool exists
         if (Data.CurrentMeshHelperObjects == null)
         {
             Data.CurrentMeshHelperObjects = new List<GameObject>();
-            foreach (Vector2 pt in pointData)
+            foreach (Vector2 pt in trackPoints)
             {
-                GameObject point = Instantiate(PointObject, MeshHelperContainer.transform);
+                GameObject point = Instantiate(MeshHelperObject, MeshHelperContainer.transform);
                 point.transform.position = pt;
                 Data.CurrentMeshHelperObjects.Add(point);
             }
@@ -181,7 +202,7 @@ public class MapCreator : MonoBehaviour {
         else
         {
             int ObjectsCt = Data.CurrentMeshHelperObjects.Count;
-            int DataCt = pointData.Count;
+            int DataCt = trackPoints.Count;
 
             //make sure there are enough existing helpers in the pool, and if not,
             //create or destroy before repositioning objects in pool
@@ -189,7 +210,7 @@ public class MapCreator : MonoBehaviour {
             {
                 for (int i = 0; i<DataCt - ObjectsCt; i ++)
                 {
-                    GameObject point = Instantiate(PointObject, MeshHelperContainer.transform);
+                    GameObject point = Instantiate(MeshHelperObject, MeshHelperContainer.transform);
                     Data.CurrentMeshHelperObjects.Add(point);
                 }
             }
@@ -205,7 +226,7 @@ public class MapCreator : MonoBehaviour {
 
             for (int i = 0; i < DataCt; i++)
             {
-                Data.CurrentMeshHelperObjects[i].transform.position = pointData[i];
+                Data.CurrentMeshHelperObjects[i].transform.position = trackPoints[i];
             }
         }
     }
@@ -229,7 +250,7 @@ public class MapCreator : MonoBehaviour {
             }
         }
     }
-    
+
     //Creates Track mesh
     public void CreateTrackMesh(List<GameObject> TPs)
     {
@@ -240,22 +261,28 @@ public class MapCreator : MonoBehaviour {
         List<int> indicies = new List<int>();
 
         //mesh is created starting with the inner point, going to the corresponding outer point of the racetrack. 
-       
+
         for (int i = 0; i < TPs.Count; i++)
         {
             //add lower point mesh data
-            vertices.Add(TPs[i].transform.GetChild(0).transform.position + (TPs[i].transform.GetChild(0).transform.up*-Data.TrackMeshThickness));
+            vertices.Add(TPs[i].transform.position + (TPs[i].transform.up * -Data.TrackMeshThickness));
             UVs.Add(new Vector2((float)(i) / TPs.Count, 0));
             normals.Add(Vector3.back);
-            
+
             //add upper point mesh data
-            vertices.Add(TPs[i].transform.GetChild(1).transform.position + (TPs[i].transform.GetChild(0).transform.up * Data.TrackMeshThickness));
+            vertices.Add(TPs[i].transform.position + (TPs[i].transform.up * Data.TrackMeshThickness));
             UVs.Add(new Vector2((float)(i) / TPs.Count, 1));
             normals.Add(Vector3.back);
+
+            //adds vert data
+            Data.Curr_InnerTrackPoints.Add(TPs[i].transform.position + (TPs[i].transform.up * -Data.TrackMeshThickness));
+            Data.Curr_OuterTrackPoints.Add(TPs[i].transform.position + (TPs[i].transform.up * Data.TrackMeshThickness));
+
+
         }
         //add starting point to the end in order to close the seal the loop!
         vertices.Add(vertices[0]);
-        UVs.Add(new Vector2(1,0));
+        UVs.Add(new Vector2(1, 0));
         normals.Add(Vector3.back);
 
         vertices.Add(vertices[1]);
@@ -264,7 +291,6 @@ public class MapCreator : MonoBehaviour {
 
         for (int i = 3; i < vertices.Count; i++)
         {
-
             //add two triangles every time four verticies are created
             if (i % 2 != 0)
             {
@@ -276,18 +302,43 @@ public class MapCreator : MonoBehaviour {
                 indicies.Add(i - 3);
                 indicies.Add(i);
                 indicies.Add(i - 1);
-
             }
         }
+
+        //populate current data with all mesh info for saving option later.
+        Data.Curr_InnerTrackPoints.Add(vertices[0]);
+        Data.Curr_InnerTrackPoints.Add(vertices[1]);
+        Data.Curr_Verts = vertices;
+        Data.Curr_Normals = normals;
+        Data.Curr_UVs = UVs;
+        Data.Curr_Indicies = indicies;
 
         mesh.vertices = vertices.ToArray();
         mesh.uv = UVs.ToArray();
         mesh.normals = normals.ToArray();
         mesh.triangles = indicies.ToArray();
 
+        mesh.RecalculateBounds();
+
+        MeshFilter filter = ActiveGameTrack.GetComponent<MeshFilter>();
+        if (filter != null)
+        {
+            filter.sharedMesh = mesh;
+             
+        }
+    }
+    //OVERLOAD for creating mesh with existing data
+    public void CreateTrackMesh(List<Vector3> Vertices, List<Vector3> Normals, List<Vector2> UVs, List<int> Indicies)
+    {
+        Mesh mesh = new Mesh();
+
+        mesh.vertices = Vertices.ToArray();
+        mesh.normals = Normals.ToArray();
+        mesh.uv = UVs.ToArray();
+        mesh.triangles = Indicies.ToArray();
 
         mesh.RecalculateBounds();
-        
+
         MeshFilter filter = ActiveGameTrack.GetComponent<MeshFilter>();
         if (filter != null)
         {
@@ -295,37 +346,29 @@ public class MapCreator : MonoBehaviour {
 
         }
 
-        //Generate polygonCollider While were at it!
+    }
 
+    public void CreateColliderForTrack(List<Vector2> outerColliderPath, List<Vector2> innerColliderPath)
+    {
         List<Vector2> OuterColliderPath = new List<Vector2>();
         List<Vector2> InnerColliderPath = new List<Vector2>();
         PolygonCollider2D col = ActiveGameTrack.GetComponent<PolygonCollider2D>();
-        if (Data.TrackColliderResolution%2 != 0)
+        for (int i = 0; i < outerColliderPath.Count; i += Data.TrackColliderResolution)
         {
-            Data.TrackColliderResolution += 1;
+            OuterColliderPath.Add(outerColliderPath[i]);
         }
-        //create list of outer points at a specified sampling frequency
-        for(int i = 1; i < vertices.Count-1; i += Data.TrackColliderResolution)
+        for (int i = 0; i < innerColliderPath.Count; i += Data.TrackColliderResolution)
         {
-            OuterColliderPath.Add(vertices[i]);
+            InnerColliderPath.Add(innerColliderPath[i]);
         }
-        for (int i = 0; i < vertices.Count - 1; i += Data.TrackColliderResolution)
-        {
-            InnerColliderPath.Add(vertices[i]);
-        }
+        //to make sure the collider completes full circle
+        OuterColliderPath.Add(outerColliderPath[0]);
+        InnerColliderPath.Add(innerColliderPath[0]);
         //set collider paths at index 0 and 1 to our new point lists (paths)
         col.SetPath(0, OuterColliderPath.ToArray());
         col.SetPath(1, InnerColliderPath.ToArray());
 
-
     }
-
-    public void CreateColliderForTrack()
-    {
-
-    }
-
-
 
     public List<Vector2> CreateRacingLinePoints(List<Vector2> currentRawPts, float WaypointFreq, float LerpTightness)
     {
@@ -340,7 +383,6 @@ public class MapCreator : MonoBehaviour {
         //move the apex of each B control point towards the midpoint of the line between AC. (shifts the racing line towards the midpoint of each corner)
         for (int i = 0; i < RacingLine.Count -2; i++)
         {
-            float angle = AngleBetweenThreePoints(RacingLine[i], RacingLine[i + 1], RacingLine[i + 2]);
             Vector2 MidpointAC = new Vector2((RacingLine[i].x + RacingLine[i + 2].x) / 2, (RacingLine[i].y + RacingLine[i + 2].y) / 2);
             RacingLine[i + 1] = Vector2.Lerp(RacingLine[i + 1], MidpointAC, LerpTightness);
 
@@ -356,3 +398,4 @@ public class MapCreator : MonoBehaviour {
     }
     
 }
+

@@ -9,17 +9,28 @@ public class Data : MonoBehaviour {
     public static float MapHeight = 60;//done
     
     //track creation settings
-    public static float MinCornerWidth = 90;
+    public static float MinCornerWidth = 60;
     //lerp step that is applied while trying to reach the minimum corner angle
     public static float CornerBroadeningLerpStep = 0.1f;
-    public static int PtCtPerQuad =19;
-    public static float PointSpacing = 6;
+    public static int PtCtPerQuad =3;
+    public static float PointSpacing = 4.5f;
 
     //track mesh and collider settings
     public static List<GameObject> CurrentMeshHelperObjects;
-    public static float MeshTrackPointFreq = 40;
-    public static float TrackMeshThickness = -0.1f;
-    public static int TrackColliderResolution = 24;
+    public static List<Vector2> Curr_OuterTrackPoints = new List<Vector2>();
+    public static List<Vector2> Curr_InnerTrackPoints = new List<Vector2>();
+
+    //to use for saved games
+    public static List<Vector3> Curr_Verts = new List<Vector3>();
+    public static List<Vector3> Curr_Normals = new List<Vector3>();
+    public static List<Vector2> Curr_UVs = new List<Vector2>();
+    public static List<int> Curr_Indicies = new List<int>();
+
+
+    public static float MeshTrackPointFreq = 30;
+    public static float TrackMeshThickness = 1.2f;
+
+    public static int TrackColliderResolution = 13;
 
 
     //barrier data
@@ -29,6 +40,7 @@ public class Data : MonoBehaviour {
 
 
     //CURRENT game state MAP data
+    public static int Curr_TrackRotation;
     public static List<Vector2> Curr_RawPoints;
     public static List<Vector2> Curr_ControlPoints;
     public static List<Vector2> Curr_TrackPoints;

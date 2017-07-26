@@ -16,7 +16,6 @@ public class CreateSkids : MonoBehaviour {
 
     private List<GameObject> CurrentSkidmarks = new List<GameObject>();
     private float CurrentTraction = 0;
-    private float LastFrameTraction = 0;
    
     void Start()
     {
@@ -50,10 +49,6 @@ public class CreateSkids : MonoBehaviour {
         {
             CurrentSkidmarks.Clear();
         } 
-
-
-
-        LastFrameTraction = CarMovement.CurrentTraction.SqrMagnitude();
-
+        
     }
 }
