@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour {
     public void StartNewGameButton()
     {
         Data.Curr_RawPoints = MapCreator.CreateRawUnsortedPoints();
-        Data.Curr_RawPoints.DebugPlot(red);
+        
 
         Data.Curr_RawPoints = MapCreator.SortPoints(Data.Curr_RawPoints);
         Data.Curr_RawPoints.DebugPlot(blue);
@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour {
 
         //populates current racing line with correct data
         Data.Curr_RacingLinePoints = MapCreator.CreateRacingLinePoints(Data.Curr_RawPoints, Data.RacingLineWaypointFreq, Data.RacingLineTightness);
-        Data.Curr_RacingLinePoints.DebugPlot(red);
+        
         //creates a new AI opponent
         Instantiate(newAI,AIContainer.transform);
        //InnerBarrier.CreateBarriers(Data.Curr_RawPoints, Data.BarrierShrinkFactor, Data.TireRadius, "Inner");

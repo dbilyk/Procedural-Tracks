@@ -70,7 +70,8 @@ public class MapCreator : MonoBehaviour {
     public List<Vector2> SortPoints(List<Vector2> anyPoints)
     {
         List<Vector2> pts = new List<Vector2>(anyPoints);
-
+        //List<Vector2> ptsRemovalCopy = new List<Vector2>(anyPoints);
+        List<int> indexesToRemove = new List<int>();
         List<Vector2> URL = pts.Where(c => c.x > 0 && c.y >0).ToList();
         List<Vector2> LRL = pts.Where(c => c.x > 0 && c.y <0).ToList();
         List<Vector2> LLL = pts.Where(c => c.x < 0 && c.y < 0).ToList();
@@ -86,26 +87,88 @@ public class MapCreator : MonoBehaviour {
         pts.AddRange(LRLS);
         pts.AddRange(LLLS);
         pts.AddRange(ULLS);
-        
+
         //remove points that are too close to properly draw a mesh
-        for (int i = pts.Count - 1; i >= 0; i--)
-        {
-            if (i > pts.Count - 3)
+        //for (int i = pts.Count - 1; i >= 0; i--)
+        //{
+        //    if (i > pts.Count - 3)
+        //    {
+        //        if (Mathf.Abs(pts[i].x - pts[(i - pts.Count) + 2].x) < Data.PointSpacing)
+        //        {
+        //            pts.RemoveAt((i - (pts.Count - 1)) + 1);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (Mathf.Abs(pts[i].x - pts[i + 2].x) < Data.PointSpacing)
+        //        {
+        //            pts.RemoveAt(i + 1);
+        //        }
+        //    }
+        //}
+        //flag for removal
+        //for (int i = pts.Count - 1; i >= 0; i--)
+        //{
+        //    for (int j = 0; j < pts.Count; j++)
+        //    {
+        //        if (Vector2.SqrMagnitude(pts[i] - pts[j]) < Data.PointSpacing && j != i+1)
+        //        {
+        //            indexesToRemove.Add(j);
+
+        //        }
+        //    }
+        //    indexesToRemove.Sort();
+        //    indexesToRemove.Reverse();
+        //}
+
+        //for (int j = indexesToRemove.Count - 2; j >= 0; j--)
+        //{
+        //    if (indexesToRemove[j] == indexesToRemove[j+1])
+        //    {
+        //        indexesToRemove.RemoveAt(j);
+
+        //    }
+        //}
+        //for (int i = 1; i< indexesToRemove.Count; i+=2)
+        //{
+        //    pts.RemoveAt(indexesToRemove[i]);
+        //}
+        bool noMoreConflicts = false;
+
+        while (!noMoreConflicts) {
+            Debug.Log("here");
+            int counter = 0;
+            for (int i = pts.Count - 1; i >= 0; i--)
             {
-                if (Mathf.Abs(pts[i].x - pts[(i - pts.Count) + 2].x) < Data.PointSpacing)
+
+                if (i == pts.Count - 1)
                 {
-                    pts.RemoveAt((i - (pts.Count-1)) + 1);
-                }
-            }
-            else
-            {
-                if (Mathf.Abs(pts[i].x - pts[i + 2].x) < Data.PointSpacing)
+                    if (Mathf.Abs(Mathf.Abs(pts[i].x) - Mathf.Abs(pts[0].x)) < Data.PointSpacing)
+                    {
+                        pts.RemoveAt(i);
+                        counter += 1;
+                    }
+                } else
                 {
-                    pts.RemoveAt(i + 1);
+                    if (Mathf.Abs(Mathf.Abs(pts[i].x) - Mathf.Abs(pts[i + 1].x)) < Data.PointSpacing)
+                    {
+                       
+                        pts.RemoveAt(i);
+                        counter += 1;
+                       
+                    }
                 }
+                if (i==0 && counter == 0)
+                {
+                    noMoreConflicts = true;
+                }
+
+
             }
         }
-        pts.Add(pts[0]);
+
+
+            pts.Add(pts[0]);
 
         return pts;
 
