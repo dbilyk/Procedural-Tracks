@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/ActiveGame Scene/ActiveGame v1.6 pt sorting working OK.unity
+- path: Assets/Scenes/ActiveGame Scene/ActiveGame v2 Barriers work and new cam follow.unity
   isLoaded: 1
   isActive: 1
