@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour {
     public MapCreator MapCreator;
     public GameObject ActiveGameTrack;
     public BarrierCreator InnerBarrier;
+    public BarrierCreator OuterBarrier;
     public GameObject AIContainer;
     public GameObject newAI;
     public GameObject MiniMapGroup;
@@ -36,10 +37,12 @@ public class GameManager : MonoBehaviour {
         //populates current racing line with correct data
         Data.Curr_RacingLinePoints = MapCreator.CreateRacingLinePoints(Data.Curr_RawPoints, Data.RacingLineWaypointFreq, Data.RacingLineTightness);
         
+        
         //creates a new AI opponent
         Instantiate(newAI,AIContainer.transform);
         MiniMapGroup.SetActive(true);
-       InnerBarrier.CreateBarriers(Data.Curr_RawPoints,Data.InnerExpansionMultiplier,"inner");
+        InnerBarrier.CreateBarriers(Data.Curr_RawPoints,Data.BarrierOffset,"inner");
+        
         
     }	
 }

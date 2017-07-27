@@ -125,80 +125,11 @@ public class BarrierCreator : MonoBehaviour {
     {
         List<Vector2> passedData = new List<Vector2>(currentRawPts);
         List<Vector2> newData = new List<Vector2>();
-
-        //ORIGINAL SOLUTION ---------------------------------------------------------------------------------------------------------------
-        //passedData.RemoveAt(passedData.Count-1);
-        //List<Vector2> AboveY = passedData.Where(c => c.y > 0).ToList();
-        //List<Vector2> BelowY = passedData.Where(c => c.y < 0).ToList();
-
-        ////stores the multiply or divide operator in a lambda depending on whether this is the inner or outer barrier
-        //Func<float, float> UpperAction;
-        //Func<float, float> LowerAction;
-
-        //if (innerOrOuter.ToLower() == "inner")
-        //{
-        //    UpperAction = x => x - expansionMultiplier;
-        //    LowerAction = x => x + expansionMultiplier;
-        //}
-        //else if (innerOrOuter.ToLower() == "outer")
-        //{
-        //    UpperAction = x => x + expansionMultiplier;
-        //    LowerAction = x => x - expansionMultiplier;
-        //}
-        //else
-        //{
-        //    throw new Exception("variable innerOrOuter in CreateBarriers() is invalid. Check the passed string.");
-        //}
-        //if (expansionMultiplier < 0)
-        //{
-        //    throw new Exception("exceptionMultiplier cannot be negative!");
-        //}
-
-        ////manipulate all positive Y values
-        //for (int i = 0; i < AboveY.Count; i++)
-        //{
-        //    AboveY[i] = new Vector2(AboveY[i].x, UpperAction(AboveY[i].y));
-        //}
-        ////manipulate all negative Y values
-
-        //for (int i = 0; i < BelowY.Count; i++)
-        //{
-        //    BelowY[i] = new Vector2(BelowY[i].x, LowerAction(BelowY[i].y));
-        //}
-        ////sort all values in ascending X order
-        //AboveY = AboveY.OrderBy(v => v.x).ToList();
-        //BelowY = BelowY.OrderBy(v => v.x).ToList();
-
-        ////move the outermost four points into position
-        //Vector2 AboveLeft = AboveY.First();
-        //Vector2 AboveRight = AboveY.Last();
-        //Vector2 BelowLeft = BelowY.First();
-        //Vector2 BelowRight = BelowY.Last();
-        //int index;
-
-        //index = AboveY.FindIndex(c => c == AboveLeft);
-        //AboveY[index] = new Vector2(LowerAction(AboveLeft.x),AboveLeft.y);
-        //index = AboveY.FindIndex(c => c == AboveRight);
-        //AboveY[index]  = new Vector2(UpperAction(AboveRight.x), AboveRight.y);
-        //index = BelowY.FindIndex(c => c == BelowLeft);
-        //BelowY[index] = new Vector2(LowerAction(BelowLeft.x), BelowLeft.y);
-        //index = BelowY.FindIndex(c => c == BelowRight);
-        //BelowY[index] = new Vector2(UpperAction(BelowRight.x), BelowRight.y);
-
-
-
-        ////reconstruct the new barrier points list
-        //passedData.Clear();
-        //passedData.AddRange(AboveY);
-        //passedData.AddRange(BelowY);
-        //passedData = mapCreator.SortPoints(passedData);
-        //END ORIGINAL SOLUTION ---------------------------------------------------------------------------------------------------------------
-
         
         passedData.RemoveAt(passedData.Count - 1);
         float offset = barrierOffset;
 
-        for (int i = 0; i < passedData.Count - 1; i++)
+        for (int i = 0; i < passedData.Count; i++)
         {
             //points of lines logic
             int Aloc = i - 1;
@@ -224,16 +155,16 @@ public class BarrierCreator : MonoBehaviour {
             if (innerOrOuter.ToLower() == "inner")
             {
                 lineANormal = (ptB - ptA);
-                lineANormal = new Vector2(-lineANormal.y, lineANormal.x).normalized;
+                lineANormal = new Vector2(lineANormal.y, -lineANormal.x).normalized;
                 lineBNormal = (ptD - ptC);
-                lineBNormal = new Vector2(-lineBNormal.y, lineBNormal.x).normalized;
+                lineBNormal = new Vector2(lineBNormal.y, -lineBNormal.x).normalized;
             }
             else if (innerOrOuter.ToLower() == "outer")
             {
                 lineANormal = (ptB - ptA);
-                lineANormal = new Vector2(lineANormal.y, -lineANormal.x).normalized;
+                lineANormal = new Vector2(-lineANormal.y, lineANormal.x).normalized;
                 lineBNormal = (ptD - ptC);
-                lineBNormal = new Vector2(lineBNormal.y, -lineBNormal.x).normalized;
+                lineBNormal = new Vector2(-lineBNormal.y, lineBNormal.x).normalized;
             }
             else
             {
@@ -241,11 +172,11 @@ public class BarrierCreator : MonoBehaviour {
             }
 
             //move these original points in the desired direction along the normal
-            ptA = ptA + lineANormal * offset;
-            ptB = ptB + lineANormal * offset;
-            ptC = ptC + lineBNormal * offset;
-            ptD = ptD + lineBNormal * offset;
-
+            ptA = ptA + (lineANormal * offset);
+            ptB = ptB + (lineANormal * offset);
+            ptC = ptC + (lineBNormal * offset);
+            ptD = ptD + (lineBNormal * offset);
+            
             //slopes of my two lines (m in y= Mx +B)
             float mAB = (ptB.y - ptA.y) / (ptB.x - ptA.x);
             float mCD = (ptD.y - ptC.y) / (ptD.x - ptC.x);
@@ -255,20 +186,20 @@ public class BarrierCreator : MonoBehaviour {
             float bCD = (ptC.y - mCD*ptC.x);
 
 
-            //my desired x and y!
-            float x = mCD * ptC.x + bCD - bAB;
+            //my desired x and y
+            float x = (bCD - bAB) / (mAB - mCD);
             float y = mAB * x + bAB;
             Vector2 RESULT = new Vector2(x,y);
             newData.Add(RESULT);
+            
         }
+        
         //close the loop
         if (newData[0] != newData[newData.Count - 1])
         {
             newData.Add(newData[0]);
         }
-
-
-
+        
         //converts our newly adjusted raw points into mesh!
         newData = mapCreator.CreateControlPoints(newData);
         newData = mapCreator.CreateTrackPoints(newData,Data.BarrierMeshPointFrequency);
