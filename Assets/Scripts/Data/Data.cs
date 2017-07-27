@@ -47,6 +47,8 @@ public class Data : MonoBehaviour {
     public static int BarrierMeshPointFrequency = 10;
     public static float BarrierThickness = 0.1f;
     public static int BarrierColliderResolution = 2;
+    //new formula
+    public static float BarrierOffset = 2;
     //public static float TireRadius = 0.1f;
     //public static float BarrierShrinkFactor = 2.2f;
     //public static float BarrierCornerKinkFactor = 2;
