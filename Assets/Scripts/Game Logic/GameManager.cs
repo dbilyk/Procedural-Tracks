@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
     public Canvas Canvas;
+    public GameObject Player;
     public MapCreator MapCreator;
     public GameObject ActiveGameTrack;
     public BarrierCreator InnerBarrier;
@@ -12,8 +13,9 @@ public class GameManager : MonoBehaviour {
     public GameObject AIContainer;
     public GameObject newAI;
     public GameObject MiniMapGroup;
-    
-    public void StartNewGameButton()
+
+
+    private void StartNewGame()
     {
         Data.Curr_RawPoints = MapCreator.CreateRawUnsortedPoints();
         Data.Curr_RawPoints = MapCreator.SortPoints(Data.Curr_RawPoints);
@@ -36,13 +38,19 @@ public class GameManager : MonoBehaviour {
 
         //populates current racing line with correct data
         Data.Curr_RacingLinePoints = MapCreator.CreateRacingLinePoints(Data.Curr_RawPoints, Data.RacingLineWaypointFreq, Data.RacingLineTightness);
-        
-        
+
         //creates a new AI opponent
-        Instantiate(newAI,AIContainer.transform);
+        GameObject Ai1 = Instantiate(newAI, AIContainer.transform);
         MiniMapGroup.SetActive(true);
-        InnerBarrier.CreateBarriers(Data.Curr_RawPoints,Data.BarrierOffset,"inner");
-        
-        
+        InnerBarrier.CreateBarriers(Data.Curr_RawPoints, Data.InnerBarrierOffset, "inner");
+        OuterBarrier.CreateBarriers(Data.Curr_RawPoints, Data.OuterBarrierOffset, "outer");
+        Player.transform.position = Data.Curr_TrackPoints[0];
+        Ai1.transform.position = Data.Curr_TrackPoints[0];
+    }
+
+
+    public void StartNewGameButton()
+    {
+        StartNewGame();
     }	
 }

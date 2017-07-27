@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class FollowCar : MonoBehaviour {
     public GameObject target;
+    public bool rotatesWithTarget;
 	// Use this for initialization
 	void Start () {
 		
@@ -12,5 +13,9 @@ public class FollowCar : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         gameObject.transform.position = (Vector2)target.transform.position;
+        if (rotatesWithTarget)
+        {
+            gameObject.transform.rotation = target.transform.rotation * Quaternion.Euler(0,0,-90);
+        }
 	}
 }

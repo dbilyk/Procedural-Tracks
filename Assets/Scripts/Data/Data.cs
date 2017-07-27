@@ -16,11 +16,11 @@ public class Data : MonoBehaviour {
     public static float MapHeight = 70;//done
     
     //track creation settings
-    public static float MinCornerWidth = 95;
+    public static float MinCornerWidth = 75;
     //lerp step that is applied while trying to reach the minimum corner angle
     public static float CornerBroadeningLerpStep = 0.1f;
     public static int PtCtPerQuad =50;
-    public static float PointSpacing =5.5f;
+    public static float PointSpacing =4.5f;
 
     //track mesh and collider settings
     public static List<GameObject> CurrentMeshHelperObjects;
@@ -41,9 +41,10 @@ public class Data : MonoBehaviour {
 
 
     //barrier data
-    public static float InnerBarrierOffset = 3f;
-    public static int BarrierMeshPointFrequency = 10;
+    public static float InnerBarrierOffset = 2f;
+    public static float OuterBarrierOffset = 2f;
     public static float BarrierThickness = 0.1f;
+    public static int BarrierMeshPointFrequency = 10;
     public static int BarrierColliderResolution = 2;
     
 
