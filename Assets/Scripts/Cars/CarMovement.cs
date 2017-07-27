@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CarMovement : MonoBehaviour {
 
@@ -22,11 +23,19 @@ public class CarMovement : MonoBehaviour {
     
     private Rigidbody2D RB;
     private Vector2 Velocity;
-    
+
+    private float touchLoc;
+    private string touchPosition;
     //returns positive number on the left side of a vector, negative on the right, and 0 on the same vector
     public static float AngleDir(Vector2 A, Vector2 B)
     {
         return -A.x * B.y + A.y * B.x;
+    }
+
+    void OnGUI()
+    {
+        GUI.Label(new Rect(50,50,50,50), touchPosition);
+        
     }
 
     // Use this for initialization
@@ -37,6 +46,11 @@ public class CarMovement : MonoBehaviour {
 	// Update is called once per frame
     //traction force must be proportional to velocity.  is velocity is 
 	void Update () {
+        if (Input.touchCount > 0)
+        {
+            touchLoc = (Input.touches[0].position.x - (Screen.width/2))/(Screen.width/2);
+            touchPosition = touchLoc.ToString();
+        }
         Velocity = RB.velocity;
         CurrentTraction = Vector2.ClampMagnitude(gameObject.transform.up * Velocity.magnitude * (SteeringAngle * 5),MaxTractionForce);
         SteeringAngle = Mathf.Acos((Vector2.Dot(Velocity,gameObject.transform.right))/(Velocity.magnitude * gameObject.transform.right.magnitude));

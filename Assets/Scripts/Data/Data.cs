@@ -16,11 +16,11 @@ public class Data : MonoBehaviour {
     public static float MapHeight = 70;//done
     
     //track creation settings
-    public static float MinCornerWidth = 85;
+    public static float MinCornerWidth = 100;
     //lerp step that is applied while trying to reach the minimum corner angle
     public static float CornerBroadeningLerpStep = 0.1f;
     public static int PtCtPerQuad =5000;
-    public static float PointSpacing =5.5f;
+    public static float PointSpacing =4f;
 
     //track mesh and collider settings
     public static List<GameObject> CurrentMeshHelperObjects;

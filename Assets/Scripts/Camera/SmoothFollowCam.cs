@@ -20,6 +20,6 @@ public class SmoothFollowCam : MonoBehaviour {
 	void FixedUpdate () {
         
         transform.position = Vector3.Lerp(transform.position, PlayerTrans.position /*+ PlayerTrans.right* CameraOffset*/, PosLerpRate  * Time.fixedDeltaTime);
-        //transform.rotation = Quaternion.Lerp(transform.rotation, PlayerTrans.rotation* Quaternion.Euler(0,0,-90), RotLerpRate * Time.fixedDeltaTime);
+        transform.rotation = Quaternion.Lerp(transform.rotation, PlayerTrans.rotation* Quaternion.Euler(0,0,-90), RotLerpRate * Time.fixedDeltaTime);
 	}
 }
