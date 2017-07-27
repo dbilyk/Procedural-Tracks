@@ -8,12 +8,9 @@ using UnityEngine;
 public class BarrierCreator : MonoBehaviour {
 
     public MapCreator mapCreator;
-    public GameObject InnerBarrier;
-    public GameObject OuterBarrier;
 
-   
     //takes original track data and divides each point in the data by the trackpointDivisor, thereby shrinking or expanding the entire track
-    
+
     //public List<Vector2> CreateBarriers(List<Vector2> currentRawPts, float trackCenterpointDivisor, float tireRadius, string InnerOrOuter)
     //{
     //    Debug.LogWarning("TO DO: Implement Outer Barriers and fix barrier generation");
@@ -75,18 +72,18 @@ public class BarrierCreator : MonoBehaviour {
     //                NewCtrlPoints.RemoveAt(i);
     //            }
     //        }
-            
+
     //    }
 
     //    NewCtrlPoints = mapCreator.SortPoints(NewCtrlPoints);
-        
+
     //    List<Vector2> MPs = mapCreator.CreateControlPoints(NewCtrlPoints);
-        
+
     //    int currentTirePosition = 0;
     //    List<int> PointIndexesToDelete = new List<int>();
 
     //    BarrierPoints = mapCreator.CreateTrackPoints(MPs, 100);
-        
+
     //    //shrink the data
     //    //for (int i = 0; i < BarrierPoints.Count; i++)
     //    //{
@@ -104,7 +101,7 @@ public class BarrierCreator : MonoBehaviour {
     //    //    {
     //    //        currentTirePosition = i;
     //    //    }
-            
+
     //    //}
     //    //remove points that are too close together for placing tire barriers via above array
     //    for (int i = PointIndexesToDelete.Count - 1; i >= 0; i--)
@@ -124,69 +121,91 @@ public class BarrierCreator : MonoBehaviour {
     /// <summary>
     /// expansionMultiplier must be positive value
     /// </summary>
-    public void CreateBarrierss(List<Vector2> currentRawPts, float expansionMultiplier, string innerOrOuter)
+    public void CreateBarriers(List<Vector2> currentRawPts, float expansionMultiplier, string innerOrOuter)
     {
         List<Vector2> passedData = new List<Vector2>(currentRawPts);
 
-        List<Vector2> AboveY = passedData.Where(c => c.y > 0).ToList();
-        List<Vector2> BelowY = passedData.Where(c => c.y < 0).ToList();
+        //ORIGINAL SOLUTION ---------------------------------------------------------------------------------------------------------------
+        //passedData.RemoveAt(passedData.Count-1);
+        //List<Vector2> AboveY = passedData.Where(c => c.y > 0).ToList();
+        //List<Vector2> BelowY = passedData.Where(c => c.y < 0).ToList();
 
-        //stores the multiply or divide operator in a lambda depending on whether this is the inner or outer barrier
-        Func<float, float> action;
-        if (innerOrOuter.ToLower() == "inner")
-        {
-            action = x => x / expansionMultiplier;
-        }
-        else if (innerOrOuter.ToLower() == "outer")
-        {
-            action = x => x * expansionMultiplier;
-        }
-        else
-        {
-            throw new Exception("variable innerOrOuter in CreateBarriers() is invalid. Check the passed string.");
-        }
-        if (expansionMultiplier< 0)
-        {
-            throw new Exception("exceptionMultiplier cannot be negative!");
-        }
+        ////stores the multiply or divide operator in a lambda depending on whether this is the inner or outer barrier
+        //Func<float, float> UpperAction;
+        //Func<float, float> LowerAction;
 
-        //manipulate all positive Y values
-        for (int i = 0; i < AboveY.Count; i ++)
-        {
-            AboveY[i] = new Vector2(AboveY[i].x, action(AboveY[i].y)); 
-        }
-        //manipulate all negative Y values
+        //if (innerOrOuter.ToLower() == "inner")
+        //{
+        //    UpperAction = x => x - expansionMultiplier;
+        //    LowerAction = x => x + expansionMultiplier;
+        //}
+        //else if (innerOrOuter.ToLower() == "outer")
+        //{
+        //    UpperAction = x => x + expansionMultiplier;
+        //    LowerAction = x => x - expansionMultiplier;
+        //}
+        //else
+        //{
+        //    throw new Exception("variable innerOrOuter in CreateBarriers() is invalid. Check the passed string.");
+        //}
+        //if (expansionMultiplier < 0)
+        //{
+        //    throw new Exception("exceptionMultiplier cannot be negative!");
+        //}
 
-        for (int i = 0; i < BelowY.Count; i++)
-        {
-            BelowY[i] = new Vector2(BelowY[i].x, action(BelowY[i].y));
-        }
-        //sort all values in ascending X order
-        AboveY = AboveY.OrderBy(v => v.x).ToList();
-        BelowY = BelowY.OrderBy(v => v.x).ToList();
+        ////manipulate all positive Y values
+        //for (int i = 0; i < AboveY.Count; i++)
+        //{
+        //    AboveY[i] = new Vector2(AboveY[i].x, UpperAction(AboveY[i].y));
+        //}
+        ////manipulate all negative Y values
 
-        //move the outermost four points into position
-        Vector2 AboveLeft = AboveY.First();
-        Vector2 AboveRight = AboveY.Last();
-        Vector2 BelowLeft = BelowY.First();
-        Vector2 BelowRight = BelowY.Last();
-        AboveY.First().Equals(new Vector2(action(AboveLeft.x),AboveLeft.y));
-        AboveY.Last().Equals(new Vector2(action(AboveRight.x), AboveRight.y));
-        BelowY.First().Equals(new Vector2(action(BelowLeft.x), BelowLeft.y));
-        BelowY.Last().Equals(new Vector2(action(BelowRight.x), BelowRight.y));
+        //for (int i = 0; i < BelowY.Count; i++)
+        //{
+        //    BelowY[i] = new Vector2(BelowY[i].x, LowerAction(BelowY[i].y));
+        //}
+        ////sort all values in ascending X order
+        //AboveY = AboveY.OrderBy(v => v.x).ToList();
+        //BelowY = BelowY.OrderBy(v => v.x).ToList();
 
-        //reconstruct the new barrier points list
-        passedData.Clear();
-        passedData.AddRange(AboveY);
-        passedData.AddRange(BelowY);
-        passedData = mapCreator.SortPoints(passedData);
+        ////move the outermost four points into position
+        //Vector2 AboveLeft = AboveY.First();
+        //Vector2 AboveRight = AboveY.Last();
+        //Vector2 BelowLeft = BelowY.First();
+        //Vector2 BelowRight = BelowY.Last();
+        //int index;
+
+        //index = AboveY.FindIndex(c => c == AboveLeft);
+        //AboveY[index] = new Vector2(LowerAction(AboveLeft.x),AboveLeft.y);
+        //index = AboveY.FindIndex(c => c == AboveRight);
+        //AboveY[index]  = new Vector2(UpperAction(AboveRight.x), AboveRight.y);
+        //index = BelowY.FindIndex(c => c == BelowLeft);
+        //BelowY[index] = new Vector2(LowerAction(BelowLeft.x), BelowLeft.y);
+        //index = BelowY.FindIndex(c => c == BelowRight);
+        //BelowY[index] = new Vector2(UpperAction(BelowRight.x), BelowRight.y);
+        
+
+
+        ////reconstruct the new barrier points list
+        //passedData.Clear();
+        //passedData.AddRange(AboveY);
+        //passedData.AddRange(BelowY);
+        //passedData = mapCreator.SortPoints(passedData);
+        //END ORIGINAL SOLUTION ---------------------------------------------------------------------------------------------------------------
+
+
 
         //converts our newly adjusted raw points into mesh!
         passedData = mapCreator.CreateControlPoints(passedData);
         passedData = mapCreator.CreateTrackPoints(passedData,Data.BarrierMeshPointFrequency);
         mapCreator.CreateOrSetMeshHelperObjects(passedData);
-        mapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects, );
+        mapCreator.RotateTrackObjectsAlongCurves(Data.CurrentMeshHelperObjects);
 
-
+        //this shouldnt be here, needs refactoring...
+        Data.Curr_InnerTrackPoints.Clear();
+        Data.Curr_OuterTrackPoints.Clear();
+        mapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects, Data.BarrierThickness, this.GetComponent<MeshFilter>());
+        
+        mapCreator.CreateColliderForTrack(Data.Curr_OuterTrackPoints,Data.Curr_InnerTrackPoints, Data.BarrierColliderResolution, this.GetComponent<PolygonCollider2D>());
     }
 }

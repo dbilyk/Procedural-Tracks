@@ -88,7 +88,10 @@ public class MapCreator : MonoBehaviour {
         pts.AddRange(LLLS);
         pts.AddRange(ULLS);
 
-        pts.Add(pts[0]);
+        if (pts[pts.Count - 1] != pts[0])
+        {
+            pts.Add(pts[0]);
+        }
         return pts;
 
     }
@@ -280,7 +283,7 @@ public class MapCreator : MonoBehaviour {
     }
 
     //Creates Track mesh
-    public void CreateTrackMesh(List<GameObject> TPs, float Thickness, MeshFilter targetMeshFilter)
+    public void CreateTrackMesh(List<GameObject> TPs, float Thickness, MeshFilter targetMeshFilter) 
     {
         Mesh mesh = new Mesh();
         List<Vector3> vertices = new List<Vector3>();
@@ -376,16 +379,16 @@ public class MapCreator : MonoBehaviour {
 
     }
 
-    public void CreateColliderForTrack(List<Vector2> outerColliderPath, List<Vector2> innerColliderPath)
+    public void CreateColliderForTrack(List<Vector2> outerColliderPath, List<Vector2> innerColliderPath, int resolution,PolygonCollider2D targetCollider)
     {
         List<Vector2> OuterColliderPath = new List<Vector2>();
         List<Vector2> InnerColliderPath = new List<Vector2>();
-        PolygonCollider2D col = ActiveGameTrack.GetComponent<PolygonCollider2D>();
-        for (int i = 0; i < outerColliderPath.Count; i += Data.TrackColliderResolution)
+        PolygonCollider2D col = targetCollider.GetComponent<PolygonCollider2D>();
+        for (int i = 0; i < outerColliderPath.Count; i += resolution)
         {
             OuterColliderPath.Add(outerColliderPath[i]);
         }
-        for (int i = 0; i < innerColliderPath.Count; i += Data.TrackColliderResolution)
+        for (int i = 0; i < innerColliderPath.Count; i += resolution)
         {
             InnerColliderPath.Add(innerColliderPath[i]);
         }

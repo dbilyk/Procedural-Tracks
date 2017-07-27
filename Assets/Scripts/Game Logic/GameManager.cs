@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour {
     public Canvas Canvas;
     public MapCreator MapCreator;
+    public GameObject ActiveGameTrack;
     public BarrierCreator InnerBarrier;
     public GameObject AIContainer;
     public GameObject newAI;
@@ -29,8 +30,8 @@ public class GameManager : MonoBehaviour {
         //mesh creation
         MapCreator.CreateOrSetMeshHelperObjects(Data.Curr_TrackPoints);
         MapCreator.RotateTrackObjectsAlongCurves(Data.CurrentMeshHelperObjects);
-        MapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects, Data.TrackMeshThickness, InnerBarrier.gameObject.GetComponent<MeshFilter>());
-        MapCreator.CreateColliderForTrack(Data.Curr_OuterTrackPoints, Data.Curr_InnerTrackPoints);
+        MapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects, Data.TrackMeshThickness, ActiveGameTrack.gameObject.GetComponent<MeshFilter>());
+        MapCreator.CreateColliderForTrack(Data.Curr_OuterTrackPoints, Data.Curr_InnerTrackPoints, Data.TrackColliderResolution, ActiveGameTrack.GetComponent<PolygonCollider2D>());
 
         //populates current racing line with correct data
         Data.Curr_RacingLinePoints = MapCreator.CreateRacingLinePoints(Data.Curr_RawPoints, Data.RacingLineWaypointFreq, Data.RacingLineTightness);
@@ -38,7 +39,7 @@ public class GameManager : MonoBehaviour {
         //creates a new AI opponent
         Instantiate(newAI,AIContainer.transform);
         MiniMapGroup.SetActive(true);
-       //InnerBarrier.CreateBarriers(Data.Curr_RawPoints, Data.BarrierShrinkFactor, Data.TireRadius, "Inner");
+       InnerBarrier.CreateBarriers(Data.Curr_RawPoints,Data.InnerExpansionMultiplier,"inner");
         
     }	
 }

@@ -42,10 +42,11 @@ public class Data : MonoBehaviour {
 
     //barrier data
     //expansion mults cant be negative
-    public static float InnerExpansionMultiplier = -1.1f;
-    public static float OuterExpansionMultiplier = 1.1f;
+    public static float InnerExpansionMultiplier = 4f;
+    public static float OuterExpansionMultiplier = 4f;
     public static int BarrierMeshPointFrequency = 10;
-    public static float Barrier Thickness = 0.1f;
+    public static float BarrierThickness = 0.1f;
+    public static int BarrierColliderResolution = 2;
     //public static float TireRadius = 0.1f;
     //public static float BarrierShrinkFactor = 2.2f;
     //public static float BarrierCornerKinkFactor = 2;
