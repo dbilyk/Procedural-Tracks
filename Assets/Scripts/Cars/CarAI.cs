@@ -14,11 +14,11 @@ public class CarAI : MonoBehaviour {
     public float MaxTractionForce;
     public float steeringResponse;
 
+    public bool TrackTriggerInit;
     public float SteeringAngle;
     public Vector2 CurrentTraction;
 
     public string FacingRelativeToVelocity;
-
 
     //how many waypoints ahead of the closest racing line waypoint does the car aim?
     public int RacingLineWaypointsLookahead = 5;
@@ -31,12 +31,6 @@ public class CarAI : MonoBehaviour {
 
     private Rigidbody2D RB;
     private Vector2 Velocity;
-
-    //returns positive number on the left side of a vector, negative on the right, and 0 on the same vector
-    public static float AngleDir(Vector2 A, Vector2 B)
-    {
-        return -A.x * B.y + A.y * B.x;
-    }
 
     int SteerTowardsWaypoint()
     {
@@ -162,7 +156,7 @@ public class CarAI : MonoBehaviour {
             SteeringAngle = 0;
         }
 
-        if (AngleDir(Velocity, gameObject.transform.right) < 0)
+        if (ExtensionMethods.AngularDirection(Velocity, gameObject.transform.right) < 0)
         {
             FacingRelativeToVelocity = "PushRight";
 
@@ -205,37 +199,76 @@ public class CarAI : MonoBehaviour {
         {
             RB.AddRelativeForce(Vector2.right * Mathf.Clamp((MaxSpeed - angleDiff2*angleDiff2* angleDiff2),MaxSpeed/2,MaxSpeed) * Time.deltaTime);
         }
+
+
+
     }
-       
+    //COPY PASTE TRACK TRIGGER.... REDO THIS LATER!
+    private float StartingTractionForce;
+    private float StartingSpeed;
+    private float StartingBrakes;
+    private float StartingSteeringResponse;
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        if (!TrackTriggerInit && col.gameObject.name == "ActiveGameTrack")
+        {
+            StartingTractionForce = this.MaxTractionForce;
+            StartingSpeed = this.MaxSpeed;
+            StartingBrakes = this.MaxBrake;
+            StartingSteeringResponse = this.steeringResponse;
+            TrackTriggerInit = true;
+        }
+        else
+        {
+            this.MaxTractionForce = StartingTractionForce;
+            this.MaxSpeed = StartingSpeed;
+            this.MaxBrake = StartingBrakes;
+            this.steeringResponse = StartingSteeringResponse;
+        }
+    }
+    void OnTriggerExit2D(Collider2D col)
+    {
+        if (col.gameObject.name == "ActiveGameTrack")
+        {
+            this.MaxTractionForce /= 2;
+            this.MaxSpeed /= 2;
+            this.MaxBrake /= 2;
+            this.steeringResponse /= 2f;
+        }
+    }
 
-        //    //brake force
-        //    if (Input.GetKey(KeyCode.B))
-        //    {
-        //        //Debug.Log(Velocity.SqrMagnitude());
-
-        //        if (Brake + BrakeRate < MaxBrake && Velocity.SqrMagnitude() > 0.001f)
-        //        {
-
-        //            Brake += BrakeRate;
-        //            RB.AddForce(Velocity.normalized * -Brake * Time.deltaTime);
-        //        }
-        //        else if (Brake + BrakeRate >= MaxBrake && Velocity.SqrMagnitude() > 0.001f)
-        //        {
-        //            RB.AddForce(Velocity.normalized * -Brake * Time.deltaTime);
-        //        }
-        //        else
-        //        {
-        //            return;
-        //        }
-        //    }
-        //    if (!Input.GetKey(KeyCode.B) && Brake > 1f)
-        //    {
-        //        Brake -= BrakeRate / 5;
-        //    }
 
 
 
-    
+
+    //    //brake force
+    //    if (Input.GetKey(KeyCode.B))
+    //    {
+    //        //Debug.Log(Velocity.SqrMagnitude());
+
+    //        if (Brake + BrakeRate < MaxBrake && Velocity.SqrMagnitude() > 0.001f)
+    //        {
+
+    //            Brake += BrakeRate;
+    //            RB.AddForce(Velocity.normalized * -Brake * Time.deltaTime);
+    //        }
+    //        else if (Brake + BrakeRate >= MaxBrake && Velocity.SqrMagnitude() > 0.001f)
+    //        {
+    //            RB.AddForce(Velocity.normalized * -Brake * Time.deltaTime);
+    //        }
+    //        else
+    //        {
+    //            return;
+    //        }
+    //    }
+    //    if (!Input.GetKey(KeyCode.B) && Brake > 1f)
+    //    {
+    //        Brake -= BrakeRate / 5;
+    //    }
+
+
+
+
 }
 
 

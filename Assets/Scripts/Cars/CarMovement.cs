@@ -6,15 +6,19 @@ using UnityEngine.UI;
 
 public interface CarDynamics
 {
-    //
-    void ApplySteeringInput();
-    
+    /// <summary>
+    /// Steering Input should be a value between -1 and 1.
+    /// </summary>
+    /// <param name="SteeringInput"></param>
+    void ApplySteeringInput(float SteeringInput);
 
+    void ApplyBrakingInput(bool brakingInput);
+
+    void ApplyThrottle(bool Throttle);
 }
 
 public class CarMovement : MonoBehaviour{
 
-    public MapCreator MapGen;
     public float MaxSpeed;
     public float MaxBrake;
     public float AccelRate;
@@ -24,47 +28,65 @@ public class CarMovement : MonoBehaviour{
     public float steeringResponse;
 
     public float SteeringAngle;
-    public Vector2 CurrentTraction;
-
+    
     public string FacingRelativeToVelocity;
+
+    private bool TrackTriggerInit = false;
+
     private float Accel = 0f;
     private float Brake = 0f;
     
-    private Rigidbody2D RB;
+    private Rigidbody2D rigidbody;
     private Vector2 Velocity;
     public InputManager input;
     private float touchLoc;
-    
+
+
+
+    private float StartingTractionForce;
+    private float StartingSpeed;
+    private float StartingBrakes;
+    private float StartingSteeringResponse;
+   
+
     // Use this for initialization
     void Start () {
-        RB = gameObject.GetComponent<Rigidbody2D>();
+        rigidbody = gameObject.GetComponent<Rigidbody2D>();
     }
 	
-	// Update is called once per frame
-    //traction force must be proportional to velocity.  is velocity is 
+    //get traction force
+    public Vector2 GetTractionVector(float maxTraction)
+    {
+        Velocity = rigidbody.velocity;
+        float turningTowards = ExtensionMethods.AngularDirection(gameObject.transform.right, Velocity);
+        return Vector2.ClampMagnitude(gameObject.transform.up * Velocity.magnitude * turningTowards * (SteeringAngle * 5), maxTraction);
+    }
+
+
+
 	void Update () {
         
-        Velocity = RB.velocity;
-        CurrentTraction = Vector2.ClampMagnitude(gameObject.transform.up * Velocity.magnitude * (SteeringAngle * 5),MaxTractionForce);
+        Velocity = rigidbody.velocity;
+        
         SteeringAngle = Mathf.Acos((Vector2.Dot(Velocity,gameObject.transform.right))/(Velocity.magnitude * gameObject.transform.right.magnitude));
         if (float.IsNaN(SteeringAngle))
         {
             SteeringAngle = 0;
         }
-        if (ExtensionMethods.AngularDirection(Velocity, gameObject.transform.right) < 0)
+        //if (ExtensionMethods.AngularDirection(Velocity, gameObject.transform.right) < 0)
+        //{
+        //    FacingRelativeToVelocity = "PushRight";
+        //}
+        //else {
+        //    FacingRelativeToVelocity = "PushLeft";
+        //}
+        //if(SteeringAngle > 0.01f && FacingRelativeToVelocity == "PushLeft")
+        //{
+            //rigidbody.AddForce(GetTractionVector(MaxTractionForce) * -1);
+        //}
+        if (SteeringAngle > 0.01f/* && FacingRelativeToVelocity == "PushRight"*/)
         {
-            FacingRelativeToVelocity = "PushRight";
-        }
-        else {
-            FacingRelativeToVelocity = "PushLeft";
-        }
-        if(!float.IsNaN(SteeringAngle) && SteeringAngle > 0.01f && FacingRelativeToVelocity == "PushLeft")
-        {
-            RB.AddForce(CurrentTraction * -1);
-        }
-        if (!float.IsNaN(SteeringAngle) && SteeringAngle > 0.01f && FacingRelativeToVelocity == "PushRight")
-        {
-            RB.AddForce(CurrentTraction);
+            rigidbody.AddForce(GetTractionVector(MaxTractionForce));
         }
 
         //gas force
@@ -73,11 +95,11 @@ public class CarMovement : MonoBehaviour{
             if(Accel + AccelRate < MaxSpeed)
             {
                 Accel += AccelRate;
-                RB.AddRelativeForce(Vector2.right * Accel * Time.deltaTime);
+                rigidbody.AddRelativeForce(Vector2.right * Accel * Time.deltaTime);
             }
             else
             {
-                RB.AddRelativeForce(Vector2.right * MaxSpeed * Time.deltaTime);
+                rigidbody.AddRelativeForce(Vector2.right * MaxSpeed * Time.deltaTime);
             }
         }
         if (!Input.GetKey(KeyCode.Space) && Accel > 1f) {
@@ -94,11 +116,11 @@ public class CarMovement : MonoBehaviour{
             {
                 
                 Brake += BrakeRate;
-                RB.AddForce(Velocity.normalized * -Brake * Time.deltaTime);
+                rigidbody.AddForce(Velocity.normalized * -Brake * Time.deltaTime);
             }
             else if(Brake + BrakeRate >= MaxBrake && Velocity.SqrMagnitude() > 0.001f)
             {
-                RB.AddForce(Velocity.normalized * -Brake * Time.deltaTime);
+                rigidbody.AddForce(Velocity.normalized * -Brake * Time.deltaTime);
             }
             else
             {
@@ -116,15 +138,15 @@ public class CarMovement : MonoBehaviour{
         if (Velocity.magnitude > 0.01f && Input.touchCount > 0)
         {
             touchLoc = (Input.touches[0].position.x - (Screen.width / 2)) / (Screen.width / 2);
-            
-            RB.AddTorque(steeringResponse * -touchLoc * Mathf.Clamp(Velocity.magnitude, 0, 1f) * Time.deltaTime);
+
+            rigidbody.AddTorque(steeringResponse * -touchLoc * Mathf.Clamp(Velocity.magnitude, 0, 1f) * Time.deltaTime);
             
         }
         //turn Left
         if (Velocity.magnitude > 0.01f && Input.GetKey(KeyCode.LeftArrow))
         {
-                
-            RB.AddTorque(steeringResponse * Mathf.Clamp(Velocity.magnitude, 0, 1f) * Time.deltaTime);
+
+            rigidbody.AddTorque(steeringResponse * Mathf.Clamp(Velocity.magnitude, 0, 1f) * Time.deltaTime);
         }
 
 
@@ -132,7 +154,38 @@ public class CarMovement : MonoBehaviour{
         
         if (Velocity.magnitude > 0.01f && Input.GetKey(KeyCode.RightArrow))
         {
-            RB.AddTorque(-steeringResponse * Mathf.Clamp(Velocity.magnitude, 0, 1f) * Time.deltaTime);
+            rigidbody.AddTorque(-steeringResponse * Mathf.Clamp(Velocity.magnitude, 0, 1f) * Time.deltaTime);
+        }
+    }
+
+
+    //TrackTriggerBehavior
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        if (!TrackTriggerInit && col.gameObject.name == "ActiveGameTrack")
+        {
+            StartingTractionForce = this.MaxTractionForce;
+            StartingSpeed = this.MaxSpeed;
+            StartingBrakes = this.MaxBrake;
+            StartingSteeringResponse = this.steeringResponse;
+            TrackTriggerInit = true;
+        }
+        else
+        {
+            this.MaxTractionForce = StartingTractionForce;
+            this.MaxSpeed = StartingSpeed;
+            this.MaxBrake = StartingBrakes;
+            this.steeringResponse = StartingSteeringResponse;
+        }
+    }
+    void OnTriggerExit2D(Collider2D col)
+    {
+        if (col.gameObject.name == "ActiveGameTrack")
+        {
+            this.MaxTractionForce /= 1.5f;
+            this.MaxSpeed /= 1.5f;
+            this.MaxBrake /= 1.5f;
+            this.steeringResponse /= 1.2f;
         }
     }
 }

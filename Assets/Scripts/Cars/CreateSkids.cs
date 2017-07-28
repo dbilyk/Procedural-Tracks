@@ -27,7 +27,7 @@ public class CreateSkids : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        CurrentTraction = CarMovement.CurrentTraction.SqrMagnitude();
+        CurrentTraction = CarMovement.GetTractionVector(CarMovement.MaxTractionForce).SqrMagnitude();
         if(CurrentTraction > skidMinimumTractionForce && CurrentSkidmarks.Count < 4)
         {
             for(int i = 0; i<Tires.Length; i ++)
