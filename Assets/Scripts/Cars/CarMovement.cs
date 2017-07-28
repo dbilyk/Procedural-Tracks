@@ -124,15 +124,23 @@ public class CarMovement : MonoBehaviour {
 
 
 
-        //turn left
-        if (Input.GetKey(KeyCode.LeftArrow) && Velocity.magnitude > 0.01f)
+        //iOS control
+        if (Velocity.magnitude > 0.01f && Input.touchCount > 0)
         {
-            RB.AddTorque(steeringResponse * Mathf.Clamp(Velocity.magnitude,0,1f) * Time.deltaTime);
+            RB.AddTorque(steeringResponse * -touchLoc * Mathf.Clamp(Velocity.magnitude, 0, 1f) * Time.deltaTime);
             
-
-        //turn Right
         }
-        if (Input.GetKey(KeyCode.RightArrow) && Velocity.magnitude > 0.01f)
+        //turn Left
+        if (Velocity.magnitude > 0.01f && Input.GetKey(KeyCode.LeftArrow))
+        {
+                Debug.Log("here");
+            RB.AddTorque(steeringResponse * Mathf.Clamp(Velocity.magnitude, 0, 1f) * Time.deltaTime);
+        }
+
+
+            //turn Right
+        
+        if (Velocity.magnitude > 0.01f && Input.GetKey(KeyCode.RightArrow))
         {
             RB.AddTorque(-steeringResponse * Mathf.Clamp(Velocity.magnitude, 0, 1f) * Time.deltaTime);
         }
