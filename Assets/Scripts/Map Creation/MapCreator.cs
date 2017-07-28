@@ -7,6 +7,9 @@ public class MapCreator : MonoBehaviour {
     //Mesh Helper objects 
     public GameObject MeshHelperContainer;
     public GameObject MeshHelperObject;
+    public GameObject StartingGridContainer;
+    public GameObject StartingGridObject;
+    public GameObject StartingLineObject;
     public GameObject ActiveGameTrack;
     
     // HELPER : Creates Random Points based on specs-----------------------------------------------------------------
@@ -359,7 +362,7 @@ public class MapCreator : MonoBehaviour {
         }
     }
     //OVERLOAD for creating mesh with existing data
-    public void CreateTrackMesh(List<Vector3> Vertices, List<Vector3> Normals, List<Vector2> UVs, List<int> Indicies)
+    public void CreateTrackMesh(List<Vector3> Vertices, List<Vector3> Normals, List<Vector2> UVs, List<int> Indicies, MeshFilter targetMeshFilter)
     {
         Mesh mesh = new Mesh();
 
@@ -370,7 +373,7 @@ public class MapCreator : MonoBehaviour {
 
         mesh.RecalculateBounds();
 
-        MeshFilter filter = ActiveGameTrack.GetComponent<MeshFilter>();
+        MeshFilter filter = targetMeshFilter.GetComponent<MeshFilter>();
         if (filter != null)
         {
             filter.sharedMesh = mesh;
@@ -426,6 +429,57 @@ public class MapCreator : MonoBehaviour {
         
         return trkpts;
     }
-    
+    /// <summary>
+    /// Must happen before MeshHelpers are reset to something else...
+    /// </summary>
+    public void CreateStartingGrid(List<GameObject> TrackMeshHelpers, float gridLength, float gridWidth, int numberOfPositions)
+    {
+        List<GameObject> passedData = new List<GameObject>(TrackMeshHelpers);
+       
+        Data.CarStartingPositions = new List<GameObject>();
+        int randomStartingPointIndex = Random.Range((int)Data.MeshTrackPointFreq* 2, (int)passedData.Count - (int)(Data.MeshTrackPointFreq *2));
+        bool firstLoop = true;
+        
+            Vector2 CurrentGridPairCenterpoint = passedData[randomStartingPointIndex - (int)Data.MeshTrackPointFreq / 6].transform.position;
+        for (int i = randomStartingPointIndex-(int)Data.MeshTrackPointFreq/6; i > 0/*(int)Data.MeshTrackPointFreq*2*/; i --)
+        {
+
+
+            if((CurrentGridPairCenterpoint - (Vector2)passedData[i].transform.position).sqrMagnitude > gridLength || firstLoop)
+            {
+                GameObject innerGO = Instantiate(StartingGridObject, StartingGridContainer.transform);
+                GameObject outerGO = Instantiate(StartingGridObject, StartingGridContainer.transform);
+                Vector2 innerPos = passedData[i].transform.position + (passedData[i].transform.up * -gridWidth);
+                Vector2 outerPos = passedData[i].transform.position + (passedData[i].transform.up * gridWidth);
+                Quaternion rotation = passedData[i].transform.rotation;
+
+                innerGO.transform.position = innerPos;
+                outerGO.transform.position = outerPos;
+                innerGO.transform.rotation = rotation;
+                outerGO.transform.rotation = rotation;
+                Data.CarStartingPositions.Add(innerGO);
+                if (Data.CarStartingPositions.Count == numberOfPositions) break;
+
+                Data.CarStartingPositions.Add(outerGO);
+                if (Data.CarStartingPositions.Count == numberOfPositions) break;
+
+                CurrentGridPairCenterpoint = passedData[i].transform.position;
+
+
+            }
+            
+
+            firstLoop = false;
+        }
+
+        GameObject startingLine = Instantiate(StartingLineObject, StartingGridContainer.transform);
+        Data.StartingLine = startingLine;
+        Data.StartingLine.transform.position = passedData[randomStartingPointIndex].transform.position;
+        Data.StartingLine.transform.rotation= passedData[randomStartingPointIndex].transform.rotation;
+        
+        
+
+    }
+
 }
 

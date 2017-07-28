@@ -55,8 +55,8 @@ public class InputManager : MonoBehaviour
     {
         if (_instance == null)
         {
-            _instance = new InputManager();
-            Data = _instance;
+           
+            Data =this;
         }
         else
         {

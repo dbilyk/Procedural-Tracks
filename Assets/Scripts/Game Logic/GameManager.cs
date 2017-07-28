@@ -39,15 +39,15 @@ public class GameManager : MonoBehaviour {
         //mesh creation
         MapCreator.CreateOrSetMeshHelperObjects(Data.Curr_TrackPoints);
         MapCreator.RotateTrackObjectsAlongCurves(Data.CurrentMeshHelperObjects);
+        MapCreator.CreateStartingGrid(Data.CurrentMeshHelperObjects,Data.StartingGridLength, Data.StartingGridWidth, Data.NumberOfGridPositions);
+       
         MapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects, Data.TrackMeshThickness, ActiveGameTrack.gameObject.GetComponent<MeshFilter>());
         MapCreator.CreateColliderForTrack(Data.Curr_OuterTrackPoints, Data.Curr_InnerTrackPoints, Data.TrackColliderResolution, ActiveGameTrack.GetComponent<PolygonCollider2D>());
 
         //populates current racing line with correct data
         Data.Curr_RacingLinePoints = MapCreator.CreateRacingLinePoints(Data.Curr_RawPoints, Data.RacingLineWaypointFreq, Data.RacingLineTightness);
 
-        //creates a new AI opponent
-        GameObject Ai1 = Instantiate(newAI, AIContainer.transform);
-
+       
         //enable minimap
         MiniMapGroup.SetActive(true);
 
@@ -58,8 +58,19 @@ public class GameManager : MonoBehaviour {
         OuterBarrier.CreateBarrier(Data.OuterBarrierPoints);
 
         //positions player/AIs
-        Player.transform.position = Data.Curr_TrackPoints[0];
-        Ai1.transform.position = Data.Curr_TrackPoints[0];
+        Player.transform.position = Data.CarStartingPositions[0].transform.position;
+        Player.transform.rotation = Data.CarStartingPositions[0].transform.rotation;
+
+        //creates a new AI opponent
+        for(int i = 1; i < Data.CarStartingPositions.Count; i++)
+        {
+            GameObject Ai = Instantiate(newAI, AIContainer.transform);
+
+            Ai.transform.position = Data.CarStartingPositions[i].transform.position;
+            Ai.transform.rotation = Data.CarStartingPositions[i].transform.rotation;
+
+        }
+
     }
 
 

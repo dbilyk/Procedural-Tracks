@@ -26,19 +26,15 @@ public class Data : MonoBehaviour {
     public static List<GameObject> CurrentMeshHelperObjects;
     public static List<Vector2> Curr_OuterTrackPoints = new List<Vector2>();
     public static List<Vector2> Curr_InnerTrackPoints = new List<Vector2>();
+    public static float MeshTrackPointFreq = 30;
+    public static float TrackMeshThickness = 1.2f;
+    public static int TrackColliderResolution = 13;
 
     //to use for saved games
     public static List<Vector3> Curr_Verts = new List<Vector3>();
     public static List<Vector3> Curr_Normals = new List<Vector3>();
     public static List<Vector2> Curr_UVs = new List<Vector2>();
     public static List<int> Curr_Indicies = new List<int>();
-
-
-    public static float MeshTrackPointFreq = 30;
-    public static float TrackMeshThickness = 1.2f;
-
-    public static int TrackColliderResolution = 13;
-
 
     //barrier data
     public static List<Vector2> InnerBarrierPoints;
@@ -52,15 +48,24 @@ public class Data : MonoBehaviour {
     
 
     //CURRENT game state MAP data
-    public static int Curr_TrackRotation;
     public static List<Vector2> Curr_RawPoints;
     public static List<Vector2> Curr_ControlPoints;
     public static List<Vector2> Curr_TrackPoints;
+    public static int Curr_TrackRotation;
 
+    //starting grid
+    public static GameObject StartingLine;
+    public static List<GameObject> CarStartingPositions;
+    public static float StartingGridLength = 3;
+    public static float StartingGridWidth = 0.5f;
+    public static int NumberOfGridPositions = 6;
+    
     //racing line settings + data
+    public static List<Vector2> Curr_RacingLinePoints;
     public static float RacingLineTightness = 0.1f;
     public static float RacingLineWaypointFreq = 10;
-    public static List<Vector2> Curr_RacingLinePoints;
+
+
 
     //saved game data
     public static List<SavedTrack> Svd_Tracks;
@@ -68,7 +73,6 @@ public class Data : MonoBehaviour {
     
 
 }
-
 
 //data structure for saving a track
 public struct SavedTrack 
