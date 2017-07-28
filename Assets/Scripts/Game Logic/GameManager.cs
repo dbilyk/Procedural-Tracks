@@ -47,9 +47,17 @@ public class GameManager : MonoBehaviour {
 
         //creates a new AI opponent
         GameObject Ai1 = Instantiate(newAI, AIContainer.transform);
+
+        //enable minimap
         MiniMapGroup.SetActive(true);
-        InnerBarrier.CreateBarriers(Data.Curr_RawPoints, Data.InnerBarrierOffset, "inner");
-        OuterBarrier.CreateBarriers(Data.Curr_RawPoints, Data.OuterBarrierOffset, "outer");
+
+        //create barriers
+        Data.InnerBarrierPoints = InnerBarrier.CreateOutline(Data.Curr_RawPoints, Data.InnerBarrierOffset, "inner");
+        Data.OuterBarrierPoints = OuterBarrier.CreateOutline(Data.Curr_RawPoints, Data.OuterBarrierOffset, "outer");
+        InnerBarrier.CreateBarrier(Data.InnerBarrierPoints);
+        OuterBarrier.CreateBarrier(Data.OuterBarrierPoints);
+
+        //positions player/AIs
         Player.transform.position = Data.Curr_TrackPoints[0];
         Ai1.transform.position = Data.Curr_TrackPoints[0];
     }

@@ -3,7 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CarMovement : MonoBehaviour {
+
+public interface CarDynamics
+{
+    //
+    void ApplySteeringInput();
+    
+
+}
+
+public class CarMovement : MonoBehaviour{
 
     public MapCreator MapGen;
     public float MaxSpeed;
@@ -23,21 +32,9 @@ public class CarMovement : MonoBehaviour {
     
     private Rigidbody2D RB;
     private Vector2 Velocity;
-
+    public InputManager input;
     private float touchLoc;
-    private string touchPosition;
-    //returns positive number on the left side of a vector, negative on the right, and 0 on the same vector
-    public static float AngleDir(Vector2 A, Vector2 B)
-    {
-        return -A.x * B.y + A.y * B.x;
-    }
-
-    void OnGUI()
-    {
-        GUI.Label(new Rect(50,50,50,50), touchPosition);
-        
-    }
-
+    
     // Use this for initialization
     void Start () {
         RB = gameObject.GetComponent<Rigidbody2D>();
@@ -46,11 +43,7 @@ public class CarMovement : MonoBehaviour {
 	// Update is called once per frame
     //traction force must be proportional to velocity.  is velocity is 
 	void Update () {
-        if (Input.touchCount > 0)
-        {
-            touchLoc = (Input.touches[0].position.x - (Screen.width/2))/(Screen.width/2);
-            touchPosition = touchLoc.ToString();
-        }
+        
         Velocity = RB.velocity;
         CurrentTraction = Vector2.ClampMagnitude(gameObject.transform.up * Velocity.magnitude * (SteeringAngle * 5),MaxTractionForce);
         SteeringAngle = Mathf.Acos((Vector2.Dot(Velocity,gameObject.transform.right))/(Velocity.magnitude * gameObject.transform.right.magnitude));
@@ -58,21 +51,16 @@ public class CarMovement : MonoBehaviour {
         {
             SteeringAngle = 0;
         }
-
-        if (AngleDir(Velocity, gameObject.transform.right) < 0)
+        if (ExtensionMethods.AngularDirection(Velocity, gameObject.transform.right) < 0)
         {
             FacingRelativeToVelocity = "PushRight";
-
         }
         else {
             FacingRelativeToVelocity = "PushLeft";
-
         }
-         
         if(!float.IsNaN(SteeringAngle) && SteeringAngle > 0.01f && FacingRelativeToVelocity == "PushLeft")
         {
             RB.AddForce(CurrentTraction * -1);
-            
         }
         if (!float.IsNaN(SteeringAngle) && SteeringAngle > 0.01f && FacingRelativeToVelocity == "PushRight")
         {
@@ -82,6 +70,7 @@ public class CarMovement : MonoBehaviour {
         //gas force
         if (Input.GetKey(KeyCode.Space))
         {
+            Debug.Log(input.Data.GetSteering());
             if(Accel + AccelRate < MaxSpeed)
             {
                 Accel += AccelRate;
@@ -93,7 +82,7 @@ public class CarMovement : MonoBehaviour {
             }
         }
         if (!Input.GetKey(KeyCode.Space) && Accel > 1f) {
-            Accel -= AccelRate/10;
+            //Accel -= AccelRate/10;
         }
 
 
@@ -127,13 +116,15 @@ public class CarMovement : MonoBehaviour {
         //iOS control
         if (Velocity.magnitude > 0.01f && Input.touchCount > 0)
         {
+            touchLoc = (Input.touches[0].position.x - (Screen.width / 2)) / (Screen.width / 2);
+            
             RB.AddTorque(steeringResponse * -touchLoc * Mathf.Clamp(Velocity.magnitude, 0, 1f) * Time.deltaTime);
             
         }
         //turn Left
         if (Velocity.magnitude > 0.01f && Input.GetKey(KeyCode.LeftArrow))
         {
-                Debug.Log("here");
+                
             RB.AddTorque(steeringResponse * Mathf.Clamp(Velocity.magnitude, 0, 1f) * Time.deltaTime);
         }
 

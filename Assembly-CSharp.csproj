@@ -56,6 +56,7 @@
      <Compile Include="Assets\Scripts\Debug\ExtensionMethods.cs" />
      <Compile Include="Assets\Scripts\Game Logic\FlagForScenePersistence.cs" />
      <Compile Include="Assets\Scripts\Game Logic\GameManager.cs" />
+     <Compile Include="Assets\Scripts\Game Logic\InputManager.cs" />
      <Compile Include="Assets\Scripts\Game Logic\TrackTriggerLogic.cs" />
      <Compile Include="Assets\Scripts\Map Creation\BarrierCreator.cs" />
      <Compile Include="Assets\Scripts\Map Creation\MapCreator.cs" />
