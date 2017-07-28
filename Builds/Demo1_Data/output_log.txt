@@ -1,36 +1,42 @@
-Mono path[0] = 'C:/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Demo1_Data/Managed'
-Mono path[1] = 'C:/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Demo1_Data/Mono'
-Mono config path = 'C:/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Demo1_Data/Mono/etc'
-PlayerConnection initialized from C:/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Demo1_Data (debug = 0)
-PlayerConnection initialized network socket : 0.0.0.0 55232
-Multi-casting "[IP] 192.168.1.209 [Port] 55232 [Flags] 2 [Guid] 19755064 [EditorId] 437642789 [Version] 1048832 [Id] WindowsPlayer(D-Recording) [Debug] 0" to [225.0.0.222:54997]...
-Started listening to [0.0.0.0:55232]
-PlayerConnection already initialized - listening to [0.0.0.0:55232]
-Player data archive not found at `C:/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Demo1_Data/data.unity3d`, using local filesystemInitialize engine version: 5.6.1f1 (2860b30f0b54)
+Mono path[0] = 'C:/Users/DB/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Demo1_Data/Managed'
+Mono path[1] = 'C:/Users/DB/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Demo1_Data/Mono'
+Mono config path = 'C:/Users/DB/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Demo1_Data/Mono/etc'
+PlayerConnection initialized from C:/Users/DB/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Demo1_Data (debug = 0)
+PlayerConnection initialized network socket : 0.0.0.0 55364
+Multi-casting "[IP] 192.168.1.225 [Port] 55364 [Flags] 2 [Guid] 3269879268 [EditorId] 3318655279 [Version] 1048832 [Id] WindowsPlayer(D-Tablet) [Debug] 0" to [225.0.0.222:54997]...
+Started listening to [0.0.0.0:55364]
+PlayerConnection already initialized - listening to [0.0.0.0:55364]
+Player data archive not found at `C:/Users/DB/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Demo1_Data/data.unity3d`, using local filesystemInitialize engine version: 5.6.1f1 (2860b30f0b54)
 GfxDevice: creating device client; threaded=1
 Direct3D:
     Version:  Direct3D 11.0 [level 11.0]
-    Renderer: NVIDIA GeForce GT 610 (ID=0x104a)
-    Vendor:   NVIDIA
-    VRAM:     1968 MB
-    Driver:   21.21.13.7866
+    Renderer: Intel(R) HD Graphics (ID=0xf31)
+    Vendor:   Intel
+    VRAM:     526 MB
+    Driver:   10.18.10.4358
 Begin MonoManager ReloadAssembly
-Platform assembly: C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\UnityEngine.dll (this message is harmless)
-Loading C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\UnityEngine.dll into Unity Child Domain
-Platform assembly: C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\Assembly-CSharp.dll (this message is harmless)
-Loading C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
-Platform assembly: C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\UnityEngine.UI.dll (this message is harmless)
-Loading C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-Platform assembly: C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
-Loading C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
-- Completed reload, in  0.146 seconds
-Platform assembly: C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\System.Core.dll (this message is harmless)
-Platform assembly: C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\System.dll (this message is harmless)
-desktop: 1920x1080 60Hz; virtual: 3840x1080 at 0,0
+Platform assembly: C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+- Completed reload, in  0.093 seconds
+Platform assembly: C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Demo1_Data\Managed\System.dll (this message is harmless)
+desktop: 1366x768 60Hz; virtual: 1366x768 at 0,0
 <RI> Initializing input.
+XInput1_3.dll not found. Trying XInput9_1_0.dll instead...
 <RI> Input initialized.
 <RI> Initialized touch support.
-UnloadTime: 1.710406 ms
+UnloadTime: 10.854906 ms
+NullReferenceException: Object reference not set to an instance of an object
+  at MapGraphics.Start () [0x00017] in C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Assets\Scripts\Map Creation\MapGraphics.cs:28 
+ 
+(Filename: C:/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Assets/Scripts/Map Creation/MapGraphics.cs Line: 28)
+
 Setting up 2 worker threads for Enlighten.
-  Thread -> id: 1228 -> priority: 1 
-  Thread -> id: 185c -> priority: 1 
+  Thread -> id: ef8 -> priority: 1 
+  Thread -> id: 1c1c -> priority: 1 

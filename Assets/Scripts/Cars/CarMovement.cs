@@ -70,7 +70,6 @@ public class CarMovement : MonoBehaviour{
         //gas force
         if (Input.GetKey(KeyCode.Space))
         {
-            Debug.Log(input.Data.GetSteering());
             if(Accel + AccelRate < MaxSpeed)
             {
                 Accel += AccelRate;
