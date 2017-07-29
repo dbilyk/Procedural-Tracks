@@ -55,6 +55,7 @@
      <Compile Include="Assets\Scripts\Cars\TurnWheels.cs" />
      <Compile Include="Assets\Scripts\Data\Data.cs" />
      <Compile Include="Assets\Scripts\Debug\ExtensionMethods.cs" />
+     <Compile Include="Assets\Scripts\Game Logic\AIInputController.cs" />
      <Compile Include="Assets\Scripts\Game Logic\FlagForScenePersistence.cs" />
      <Compile Include="Assets\Scripts\Game Logic\GameManager.cs" />
      <Compile Include="Assets\Scripts\Game Logic\InputManager.cs" />

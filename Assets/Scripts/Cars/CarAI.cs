@@ -92,9 +92,6 @@ public class CarAI : MonoBehaviour {
         return closestWaypointIndex;
     }
 
-
-
-    // Use this for initialization
     void Start()
     {
         RB = gameObject.GetComponent<Rigidbody2D>();
@@ -102,18 +99,11 @@ public class CarAI : MonoBehaviour {
         RacingLine = Data.Curr_RacingLinePoints;
         
     }
-
-
     int newPosSteer;
     int newPosThrottle;
     int oldPos;
-
     public float force = 0.00000001f;
 
-
-
-    // Update is called once per frame
-    //traction force must be proportional to velocity.  is velocity is 
     void Update()
     {
         newPosSteer = SteerTowardsWaypoint();
@@ -203,7 +193,6 @@ public class CarAI : MonoBehaviour {
 
 
     }
-    //COPY PASTE TRACK TRIGGER.... REDO THIS LATER!
     private float StartingTractionForce;
     private float StartingSpeed;
     private float StartingBrakes;
@@ -236,38 +225,6 @@ public class CarAI : MonoBehaviour {
             this.steeringResponse /= 2f;
         }
     }
-
-
-
-
-
-    //    //brake force
-    //    if (Input.GetKey(KeyCode.B))
-    //    {
-    //        //Debug.Log(Velocity.SqrMagnitude());
-
-    //        if (Brake + BrakeRate < MaxBrake && Velocity.SqrMagnitude() > 0.001f)
-    //        {
-
-    //            Brake += BrakeRate;
-    //            RB.AddForce(Velocity.normalized * -Brake * Time.deltaTime);
-    //        }
-    //        else if (Brake + BrakeRate >= MaxBrake && Velocity.SqrMagnitude() > 0.001f)
-    //        {
-    //            RB.AddForce(Velocity.normalized * -Brake * Time.deltaTime);
-    //        }
-    //        else
-    //        {
-    //            return;
-    //        }
-    //    }
-    //    if (!Input.GetKey(KeyCode.B) && Brake > 1f)
-    //    {
-    //        Brake -= BrakeRate / 5;
-    //    }
-
-
-
 
 }
 

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TurnWheels : MonoBehaviour {
     public CarMovement CarMovement;
+    public InputManager input;
     public float MaxRotation;
     public float LerpSpeed;
     public GameObject[] FrontWheels = new GameObject[2];
@@ -16,21 +17,20 @@ public class TurnWheels : MonoBehaviour {
         
         foreach (GameObject wheel in FrontWheels)
         {
+            CarMovement.GetSteeringAngle();
             currentRotation = wheel.transform.localRotation.eulerAngles;
-            if (CarMovement.FacingRelativeToVelocity == "PushRight")
+            float SteeringInput = input.GetSteering();
+            float desiredRotation = SteeringInput * (MaxRotation - Mathf.Clamp(CarMovement.Velocity.sqrMagnitude * CarMovement.Velocity.sqrMagnitude, 0f, MaxRotation - (MaxRotation / 2)));
+            //if (CarMovement.Velocity.sqrMagnitude > 5)
+            //{
+            //    currentRotation.z = Mathf.LerpAngle(currentRotation.z, SteeringInput *MaxRotation * Mathf.Clamp(SteeringAngle,0f,1), LerpSpeed*Time.deltaTime);
+            //    wheel.transform.localEulerAngles = currentRotation;
+            //}
+            if (currentRotation.z != desiredRotation)
             {
-                currentRotation.z = Mathf.LerpAngle(currentRotation.z, MaxRotation * Mathf.Clamp(SteeringAngle,0,1), LerpSpeed*Time.deltaTime);
+                currentRotation.z = Mathf.LerpAngle(currentRotation.z, desiredRotation, LerpSpeed * Time.deltaTime);
                 wheel.transform.localEulerAngles = currentRotation;
-            }
-            else if (CarMovement.FacingRelativeToVelocity == "PushLeft")
-            {
-                currentRotation.z = Mathf.LerpAngle(currentRotation.z, -MaxRotation * Mathf.Clamp(SteeringAngle, 0, 1), LerpSpeed * Time.deltaTime);
-                wheel.transform.localEulerAngles = currentRotation;
-            }
-            else
-            {
-                currentRotation.z = Mathf.LerpAngle(currentRotation.z, 0, LerpSpeed/2 * Time.deltaTime);
-                wheel.transform.localEulerAngles = currentRotation;
+
             }
         }
     }

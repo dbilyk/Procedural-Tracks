@@ -10,7 +10,6 @@ public class Data : MonoBehaviour {
     public static Color32 yellow= new Color32(255, 255,0, 255);
     public static Color32 orange= new Color32(255, 100,0, 255);
 
-
     //gerenal map settings
     public static float MapWidth = 70;//done
     public static float MapHeight = 70;//done
@@ -39,7 +38,6 @@ public class Data : MonoBehaviour {
     //barrier data
     public static List<Vector2> InnerBarrierPoints;
     public static List<Vector2> OuterBarrierPoints;
-
     public static float InnerBarrierOffset = 2f;
     public static float OuterBarrierOffset = 2f;
     public static float BarrierThickness = 0.05f;
@@ -57,15 +55,20 @@ public class Data : MonoBehaviour {
     public static GameObject StartingLine;
     public static List<GameObject> CarStartingPositions;
     public static float StartingGridLength = 3;
-    public static float StartingGridWidth = 0.5f;
-    public static int NumberOfGridPositions = 10;
+    public static float StartingGridWidth = 0.3f;
+    public static int NumberOfGridPositions = 2;
     
     //racing line settings + data
     public static List<Vector2> Curr_RacingLinePoints;
     public static float RacingLineTightness = 0.1f;
     public static float RacingLineWaypointFreq = 10;
 
-
+    //car off-track performance reduction variables
+    public static float PlayerAccelerationDivisor = 1.5f;
+    public static float PlayerMaxBrakeDivisor = 1.5f;
+    public static float PlayerMaxTractionDivisor = 1.5f;
+    public static float PlayerSteeringResponsivenessDivisor = 1.2f;
+    
 
     //saved game data
     public static List<SavedTrack> Svd_Tracks;
