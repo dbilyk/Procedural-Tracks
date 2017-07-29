@@ -11,12 +11,9 @@ public class TurnWheels : MonoBehaviour {
     private float SteeringAngle;
 	// Update is called once per frame
 	void Update () {
-        SteeringAngle = CarMovement.SteeringAngle;
+        SteeringAngle = CarMovement.GetSteeringAngle();
         Vector3 currentRotation;
-        if (float.IsNaN(SteeringAngle))
-        {
-            SteeringAngle = 0;
-        }
+        
         foreach (GameObject wheel in FrontWheels)
         {
             currentRotation = wheel.transform.localRotation.eulerAngles;
