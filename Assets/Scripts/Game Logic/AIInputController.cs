@@ -99,6 +99,15 @@ public class AIInputController : MonoBehaviour {
 
     }
 
+    //NEEDS WORK.
+    float GetAccelerationInput(Vector2 targetWaypoint)
+    {
+    Vector3 targetDelta = targetWaypoint - (Vector2)transform.position;
+    float angleDifference = Vector2.Angle(transform.right, targetDelta);
+    Vector3 cross = Vector3.Cross(transform.right, targetDelta);
+    return Mathf.Clamp(Mathf.Abs(angleDifference) * cross.z ,1,0);
+    }
+
     // Update is called once per frame
     void Update() {
         int CurrentNearest = GetNearestWaypoint();
@@ -107,7 +116,7 @@ public class AIInputController : MonoBehaviour {
         float steeringInput = GetSteeringInput(steeringTarget);
         
         CarMovement.SteerTarget(steeringInput,CarMovement.SteeringResponsiveness,this.GetComponent<Rigidbody2D>());
-        CarMovement.Accelerate(Vector2.right, CarMovement._currentAcceleration,CarMovement.MaxSpeed, CarMovement.AccelerationRate, rigidbody);
+        CarMovement.Accelerate(Vector2.right * GetAccelerationInput(steeringTarget), CarMovement._currentAcceleration,CarMovement.MaxSpeed, CarMovement.AccelerationRate, rigidbody);
         //CarMovement.Accelerate(Vector2.right,1,1,1,this.GetComponent<Rigidbody2D>());
         //CarMovement.SteerTarget(steeringInput,20, this.GetComponent<Rigidbody2D>());
     }

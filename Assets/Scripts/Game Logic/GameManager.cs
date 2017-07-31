@@ -13,27 +13,22 @@ public class GameManager : MonoBehaviour {
     public GameObject AIContainer;
     public GameObject newAI;
     public GameObject MiniMapGroup;
-
+    public MiniMap MiniMapScript;
 
     private void StartNewGame()
     {
+        Data.Curr_RawPoints = new List<Vector2>();
+
         Data.Curr_RawPoints = MapCreator.CreateRawUnsortedPoints();
         Data.Curr_RawPoints = MapCreator.SortPoints(Data.Curr_RawPoints);
         //have to run point thinning and angle adjustment several times because they recursively affect each other.
-        Data.Curr_RawPoints = MapCreator.RemovePointsTooClose(Data.Curr_RawPoints, Data.PointSpacing);
-        Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
-        Data.Curr_RawPoints = MapCreator.RemovePointsTooClose(Data.Curr_RawPoints, Data.PointSpacing);
-        Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
-        Data.Curr_RawPoints = MapCreator.RemovePointsTooClose(Data.Curr_RawPoints, Data.PointSpacing);
-        Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
-        Data.Curr_RawPoints = MapCreator.RemovePointsTooClose(Data.Curr_RawPoints, Data.PointSpacing);
-        Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
-        Data.Curr_RawPoints = MapCreator.RemovePointsTooClose(Data.Curr_RawPoints, Data.PointSpacing);
-        Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
-        Data.Curr_RawPoints = MapCreator.RemovePointsTooClose(Data.Curr_RawPoints, Data.PointSpacing);
-        Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
+        for(int i = 0; i < 20; i++)
+        {
+            Data.Curr_RawPoints = MapCreator.RemovePointsTooClose(Data.Curr_RawPoints, Data.PointSpacing);
+            Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
+        }
 
-        //Data.Curr_RawPoints = MapCreator.ApplyRandomRotation(Data.Curr_RawPoints);
+        Data.Curr_RawPoints = MapCreator.ApplyRandomRotation(Data.Curr_RawPoints);
         Data.Curr_ControlPoints = MapCreator.CreateControlPoints(Data.Curr_RawPoints);
         Data.Curr_TrackPoints = MapCreator.CreateTrackPoints(Data.Curr_ControlPoints, Data.MeshTrackPointFreq);
         //mesh creation
@@ -50,6 +45,7 @@ public class GameManager : MonoBehaviour {
        
         //enable minimap
         MiniMapGroup.SetActive(true);
+        MiniMapScript.CreateMinimap(Data.Curr_ControlPoints);
 
         //create barriers
         Data.InnerBarrierPoints = InnerBarrier.CreateOutline(Data.Curr_RawPoints, Data.InnerBarrierOffset, "inner");

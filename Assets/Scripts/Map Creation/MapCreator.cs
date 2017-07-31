@@ -167,17 +167,32 @@ public class MapCreator : MonoBehaviour {
     {
         List<Vector2> newPoints = new List<Vector2>(currentCtrlPts);
         
-        for (int i = 0; i<newPoints.Count-2; i++)
+        for (int i = 0; i<newPoints.Count; i++)
         {
             //in degrees
-            float Angle = AngleBetweenThreePoints(newPoints[i], newPoints[i+1], newPoints[i+2]);
+            int indexA = i;
+            int indexB= i+1;
+            int indexC = i + 2;
+
+            if (i == newPoints.Count -2)
+            {
+                indexC = 0;
+            }
+            if(i == newPoints.Count - 1)
+            {
+                indexB = 0;
+                indexC = 1;
+            }
+            
+
+            float Angle = AngleBetweenThreePoints(newPoints[indexA], newPoints[indexB], newPoints[indexC]);
             
             while (Angle < Data.MinCornerWidth) {
-                Vector2 MidpointAC = new Vector2((newPoints[i].x + newPoints[i + 2].x) / 2, (newPoints[i].y + newPoints[i + 2].y) / 2);
-                Vector2 MoveBTowardsAC = Vector2.Lerp(newPoints[i + 1], MidpointAC, lerpStep);
-                Vector2 originalB = newPoints[i + 1];
-                newPoints[i + 1] = MoveBTowardsAC;
-                Angle = AngleBetweenThreePoints(newPoints[i], newPoints[i + 1], newPoints[i + 2]);
+                Vector2 MidpointAC = new Vector2((newPoints[indexA].x + newPoints[indexC].x) / 2, (newPoints[indexA].y + newPoints[indexC].y) / 2);
+                Vector2 MoveBTowardsAC = Vector2.Lerp(newPoints[indexB], MidpointAC, lerpStep);
+                Vector2 originalB = newPoints[indexB];
+                newPoints[indexB] = MoveBTowardsAC;
+                Angle = AngleBetweenThreePoints(newPoints[indexA], newPoints[indexB], newPoints[indexC]);
                 
            
             }
@@ -230,6 +245,7 @@ public class MapCreator : MonoBehaviour {
                 GameObject point = Instantiate(MeshHelperObject, MeshHelperContainer.transform);
                 point.transform.position = pt;
                 Data.CurrentMeshHelperObjects.Add(point);
+                
             }
         }
         //if pool exists...

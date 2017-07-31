@@ -11,15 +11,15 @@ public class Data : MonoBehaviour {
     public static Color32 orange= new Color32(255, 100,0, 255);
 
     //gerenal map settings
-    public static float MapWidth = 70;//done
-    public static float MapHeight = 70;//done
+    public static float MapWidth = 80;//done
+    public static float MapHeight = 80;//done
     
     //track creation settings
     public static float MinCornerWidth = 90;
     //lerp step that is applied while trying to reach the minimum corner angle
     public static float CornerBroadeningLerpStep = 0.1f;
     public static int PtCtPerQuad =500;
-    public static float PointSpacing =4.7f;
+    public static float PointSpacing =6f;
 
     //track mesh and collider settings
     public static List<GameObject> CurrentMeshHelperObjects;
@@ -56,7 +56,7 @@ public class Data : MonoBehaviour {
     public static List<GameObject> CarStartingPositions;
     public static float StartingGridLength = 3;
     public static float StartingGridWidth = 0.3f;
-    public static int NumberOfGridPositions = 10;
+    public static int NumberOfGridPositions = 6;
     
     //racing line settings + data
     public static List<Vector2> Curr_RacingLinePoints;
