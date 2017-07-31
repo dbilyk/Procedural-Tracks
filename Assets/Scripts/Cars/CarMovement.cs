@@ -14,7 +14,7 @@ public class CarMovement : MonoBehaviour{
     public  Vector2 Velocity;
 
     private Rigidbody2D rigidbody;
-    private float _currentAcceleration = 0f;
+    public float _currentAcceleration = 0f;
     private float _currentBraking = 0f;
     private float Brake = 0f;
 

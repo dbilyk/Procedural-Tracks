@@ -56,7 +56,7 @@ public class Data : MonoBehaviour {
     public static List<GameObject> CarStartingPositions;
     public static float StartingGridLength = 3;
     public static float StartingGridWidth = 0.3f;
-    public static int NumberOfGridPositions = 2;
+    public static int NumberOfGridPositions = 10;
     
     //racing line settings + data
     public static List<Vector2> Curr_RacingLinePoints;

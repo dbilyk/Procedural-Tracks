@@ -8,10 +8,10 @@ public class AIInputController : MonoBehaviour {
     public int throttleWaypointLookahead = 8;
 
     private List<Vector2> RacingLine = Data.Curr_RacingLinePoints;
-
+    private Rigidbody2D rigidbody;
 	// Use this for initialization
 	void Start () {
-		
+        rigidbody = gameObject.transform.GetComponent<Rigidbody2D>();
 	}
 
     int GetNearestWaypoint()
@@ -75,26 +75,39 @@ public class AIInputController : MonoBehaviour {
         return closestWaypointIndex;
     }
 
-   
+    int GetSteeringWaypoint(int nearestWP, int steeringWPLookahead)
+    {
+        int newPosSteer = nearestWP + steeringWaypointLookahead;
+        //move this waypoint logic somewhere more... logical....
+        if (nearestWP + steeringWPLookahead >= RacingLine.Count)
+        {
+            newPosSteer = (newPosSteer + steeringWaypointLookahead) - RacingLine.Count;
+        }
+        return newPosSteer;
+    }
 
-    //not working....
     float GetSteeringInput(Vector2 targetWaypoint)
     {
-        float angleDifference = Vector2.Angle(GetComponent<Rigidbody2D>().velocity, targetWaypoint);
-        
-        return Mathf.Clamp(angleDifference/180, 0, 1f) * Mathf.Clamp(ExtensionMethods.AngularDirection(gameObject.transform.right, targetWaypoint),-1,1);
+        //cross product is 0 when the two vectors its perpendicular to are the same.
+        Vector3 targetDelta = targetWaypoint - (Vector2)transform.position;
+        float angleDifference = Vector2.Angle(transform.right, targetDelta);
+        Vector3 cross = Vector3.Cross(transform.right, targetDelta);
+        return Mathf.Clamp(angleDifference * cross.z,-1,1);
+
+        //return Mathf.Clamp(angleDifference/180, 0, 1f) * Mathf.Clamp(ExtensionMethods.AngularDirection(gameObject.transform.right, targetWaypoint),-1,1);
 
 
     }
 
     // Update is called once per frame
     void Update() {
-        int nearest = GetNearestWaypoint();
-       
-        Vector2 steeringTarget = RacingLine[nearest + steeringWaypointLookahead];
+        int CurrentNearest = GetNearestWaypoint();
+        int CurrentSteering = GetSteeringWaypoint(CurrentNearest,steeringWaypointLookahead);
+        Vector2 steeringTarget = RacingLine[CurrentSteering];
         float steeringInput = GetSteeringInput(steeringTarget);
-        ExtensionMethods.DebugPlot(steeringTarget, Data.red);
-        CarMovement.SteerTarget(steeringInput,40,this.GetComponent<Rigidbody2D>());
+        
+        CarMovement.SteerTarget(steeringInput,CarMovement.SteeringResponsiveness,this.GetComponent<Rigidbody2D>());
+        CarMovement.Accelerate(Vector2.right, CarMovement._currentAcceleration,CarMovement.MaxSpeed, CarMovement.AccelerationRate, rigidbody);
         //CarMovement.Accelerate(Vector2.right,1,1,1,this.GetComponent<Rigidbody2D>());
         //CarMovement.SteerTarget(steeringInput,20, this.GetComponent<Rigidbody2D>());
     }
