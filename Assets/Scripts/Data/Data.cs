@@ -38,10 +38,10 @@ public class Data : MonoBehaviour {
     //barrier data
     public static List<Vector2> InnerBarrierPoints;
     public static List<Vector2> OuterBarrierPoints;
-    public static float InnerBarrierOffset = 2f;
+    public static float InnerBarrierOffset = 10f;
     public static float OuterBarrierOffset = 2f;
     public static float BarrierThickness = 0.05f;
-    public static int BarrierMeshPointFrequency = 10;
+    public static int BarrierMeshPointFrequency = 9;
     public static int BarrierColliderResolution = 2;
     
 
@@ -55,7 +55,7 @@ public class Data : MonoBehaviour {
     public static GameObject StartingLine;
     public static List<GameObject> CarStartingPositions;
     public static float StartingGridLength = 3;
-    public static float StartingGridWidth = 0.3f;
+    public static float StartingGridWidth = 0.5f;
     public static int NumberOfGridPositions = 6;
     
     //racing line settings + data
