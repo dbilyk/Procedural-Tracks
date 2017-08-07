@@ -85,7 +85,8 @@ public class BarrierCreator : MonoBehaviour {
             newData.Add(RESULT);
             
         }
-        
+        //newData = mapCreator.CheckControlPointAngles(newData,0.1f);
+        //newData = mapCreator.RemovePointsTooClose(newData,1);
         //close the loop
         if (newData[0] != newData[newData.Count - 1])
         {
@@ -95,11 +96,11 @@ public class BarrierCreator : MonoBehaviour {
         //converts our newly adjusted raw points into mesh!
         }
 
-    public void CreateBarrier(List<Vector2> barrierPointData)
+    public void CreateBarrier(List<Vector2> barrierRawPointData)
     {
-        barrierPointData = mapCreator.CreateControlPoints(barrierPointData);
-        barrierPointData = mapCreator.CreateTrackPoints(barrierPointData, Data.BarrierMeshPointFrequency);
-        mapCreator.CreateOrSetMeshHelperObjects(barrierPointData);
+        barrierRawPointData = mapCreator.CreateControlPoints(barrierRawPointData);
+        barrierRawPointData = mapCreator.CreateTrackPoints(barrierRawPointData, Data.BarrierMeshPointFrequency);
+        mapCreator.CreateOrSetMeshHelperObjects(barrierRawPointData);
         mapCreator.RotateTrackObjectsAlongCurves(Data.CurrentMeshHelperObjects);
 
         //this shouldnt be here, needs refactoring...

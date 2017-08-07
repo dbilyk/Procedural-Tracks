@@ -22,13 +22,13 @@ public class GameManager : MonoBehaviour {
         Data.Curr_RawPoints = MapCreator.CreateRawUnsortedPoints();
         Data.Curr_RawPoints = MapCreator.SortPoints(Data.Curr_RawPoints);
         //have to run point thinning and angle adjustment several times because they recursively affect each other.
-        for(int i = 0; i < 20; i++)
+        for(int i = 0; i < 50; i++)
         {
             Data.Curr_RawPoints = MapCreator.RemovePointsTooClose(Data.Curr_RawPoints, Data.PointSpacing);
             Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
         }
 
-        Data.Curr_RawPoints = MapCreator.ApplyRandomRotation(Data.Curr_RawPoints);
+        //Data.Curr_RawPoints = MapCreator.ApplyRandomRotation(Data.Curr_RawPoints);
         Data.Curr_ControlPoints = MapCreator.CreateControlPoints(Data.Curr_RawPoints);
         Data.Curr_TrackPoints = MapCreator.CreateTrackPoints(Data.Curr_ControlPoints, Data.MeshTrackPointFreq);
         //mesh creation
@@ -53,6 +53,7 @@ public class GameManager : MonoBehaviour {
         InnerBarrier.CreateBarrier(Data.InnerBarrierPoints);
         OuterBarrier.CreateBarrier(Data.OuterBarrierPoints);
 
+        Data.InnerBarrierPoints.DebugPlot(Data.green);
         //positions player/AIs
         Player.transform.position = Data.CarStartingPositions[0].transform.position;
         Player.transform.rotation = Data.CarStartingPositions[0].transform.rotation;
@@ -66,7 +67,6 @@ public class GameManager : MonoBehaviour {
             Ai.transform.rotation = Data.CarStartingPositions[i].transform.rotation;
 
         }
-
     }
 
 

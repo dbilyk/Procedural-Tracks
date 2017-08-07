@@ -41,9 +41,9 @@ public class InputManager : MonoBehaviour
             return false;
     }
 
-    public bool GetAccel(DeviceType deviceType)
+    public bool GetAccel()
     {
-        if (deviceType == DeviceType.Handheld || Input.GetKey(KeyCode.Space))
+        if (Input.touchCount > 0 || Input.GetKey(KeyCode.Space))
             return true;
         else
             return false;

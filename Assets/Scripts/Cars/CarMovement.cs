@@ -12,16 +12,20 @@ public class CarMovement : MonoBehaviour{
     public float MaxTractionForce;
     public float SteeringResponsiveness;
     public  Vector2 Velocity;
+    private bool isPlayer;
 
     private Rigidbody2D rigidbody;
     public float _currentAcceleration = 0f;
     private float _currentBraking = 0f;
     private float Brake = 0f;
 
+    
+
     // Use this for initialization
     void Start () {
         rigidbody = gameObject.GetComponent<Rigidbody2D>();
-        
+        if (gameObject.tag == "Player") isPlayer = true;
+        else isPlayer = false;
     }
 	
     //get traction force
@@ -62,32 +66,34 @@ public class CarMovement : MonoBehaviour{
         content.text = GetSteeringAngle().ToString();
         GUI.Label(new Rect(50,50,50,50),  content);
     }
-
+    
 	void FixedUpdate () {
-        Velocity = rigidbody.velocity;
-        //traction force
-        if (ExtensionMethods.AngularDirection(gameObject.transform.right, Velocity) != 0)
+            Velocity = rigidbody.velocity;
+            //traction force
+            if (ExtensionMethods.AngularDirection(gameObject.transform.right, Velocity) != 0)
+            {
+                rigidbody.AddForce(GetTractionVector(MaxTractionForce));
+            }
+        if (isPlayer)
         {
-            rigidbody.AddForce(GetTractionVector(MaxTractionForce));
-        }
+            //gas force
+            if (input.GetAccel())
+            {
+                Accelerate(Vector2.right, _currentAcceleration, MaxSpeed, AccelerationRate, rigidbody);
+            }
 
-        //gas force
-        if (input.GetAccel(DeviceType.Desktop))
-        {
-            Accelerate(Vector2.right,_currentAcceleration, MaxSpeed, AccelerationRate, rigidbody);
+
+            //brake force
+            if (Input.GetKey(KeyCode.B) && Vector2.Dot(Velocity, gameObject.transform.right) > 0.01f)
+            {
+                Accelerate(-Vector2.right, _currentBraking, MaxBrake, BrakeRate, rigidbody);
+            }
+            //steering force
+            if (input.GetSteering() > 0.2f || input.GetSteering() < -0.2f)
+            {
+                SteerTarget(input.GetSteering(), SteeringResponsiveness, rigidbody);
+            }
         }
-        
-        //brake force
-        if (Input.GetKey(KeyCode.B) && Vector2.Dot(Velocity, gameObject.transform.right) > 0.01f)
-        {
-            Accelerate(-Vector2.right,_currentBraking,MaxBrake,BrakeRate,rigidbody);
-        }
-        //steering force
-        if (input.GetSteering() >0.2f || input.GetSteering() < -0.2f)
-        {
-            SteerTarget(input.GetSteering(), SteeringResponsiveness, rigidbody);
-        }
-        
     }
 
     //___________________________________________________________________________________________________________________

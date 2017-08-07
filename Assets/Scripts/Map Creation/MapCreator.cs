@@ -219,7 +219,22 @@ public class MapCreator : MonoBehaviour {
         return TrackPts;
     }
 
+
+    //cant find a use for this method whatsoever...
+    //public List<Vector2> ShrinkData(List<Vector2> passedData, float XShrinkFactor, float YShrinkFactor)
+    //{
+    //    List<Vector2> shrunkData = new List<Vector2>(passedData);
+
+    //    for (int i = 0; i < shrunkData.Count; i++)
+    //    {
+    //        shrunkData[i] = new Vector2(shrunkData[i].x / XShrinkFactor, shrunkData[i].y / YShrinkFactor);
+    //    }
+    //    return shrunkData;
+    //}
+
     //applies the same rotation (random) to each point in the list
+
+
     public List<Vector2> ApplyRandomRotation(List<Vector2> points)
     {
         List<Vector2> pts = new List<Vector2>(points);
