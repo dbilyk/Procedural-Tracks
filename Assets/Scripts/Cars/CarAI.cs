@@ -2,6 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+//
+//
+//
+//NOT USED ANYMORE!!!!!!!!!!!!!!!!-------------
+//
+//
+//
+
 public class CarAI : MonoBehaviour {
 
     public MapCreator MapGen;
