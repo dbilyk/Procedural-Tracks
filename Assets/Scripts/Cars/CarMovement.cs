@@ -105,7 +105,7 @@ public class CarMovement : MonoBehaviour{
                 Deccelerate(-Velocity.normalized, MaxBrake, BrakeRate, rigidbody);
             }
             //steering force
-            if (input.GetSteering() > 0.2f || input.GetSteering() < -0.2f)
+            if (input.GetSteering() > 0.05f || input.GetSteering() < -0.05f)
             {
                 SteerTarget(input.GetSteering(), SteeringResponsiveness, rigidbody);
             }

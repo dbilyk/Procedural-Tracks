@@ -10,10 +10,8 @@ public class TurnWheels : MonoBehaviour {
     public float LerpSpeed;
     public GameObject[] FrontWheels = new GameObject[2];
     
-    private float SteeringAngle;
 	// Update is called once per frame
 	void Update () {
-        SteeringAngle = CarMovement.GetSteeringAngle();
         Vector3 currentRotation;
         
         foreach (GameObject wheel in FrontWheels)

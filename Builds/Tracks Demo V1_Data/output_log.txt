@@ -2,10 +2,10 @@ Mono path[0] = 'C:/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Bui
 Mono path[1] = 'C:/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Tracks Demo V1_Data/Mono'
 Mono config path = 'C:/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Tracks Demo V1_Data/Mono/etc'
 PlayerConnection initialized from C:/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Tracks Demo V1_Data (debug = 0)
-PlayerConnection initialized network socket : 0.0.0.0 55318
-Multi-casting "[IP] 192.168.1.209 [Port] 55318 [Flags] 2 [Guid] 226897751 [EditorId] 2242178270 [Version] 1048832 [Id] WindowsPlayer(D-Recording) [Debug] 0" to [225.0.0.222:54997]...
-Started listening to [0.0.0.0:55318]
-PlayerConnection already initialized - listening to [0.0.0.0:55318]
+PlayerConnection initialized network socket : 0.0.0.0 55208
+Multi-casting "[IP] 192.168.1.209 [Port] 55208 [Flags] 2 [Guid] 3712831739 [EditorId] 4150221483 [Version] 1048832 [Id] WindowsPlayer(D-Recording) [Debug] 0" to [225.0.0.222:54997]...
+Started listening to [0.0.0.0:55208]
+PlayerConnection already initialized - listening to [0.0.0.0:55208]
 Player data archive not found at `C:/Dropbox/Code Projects/Unity Projects/Procedural Tracks v1/Builds/Tracks Demo V1_Data/data.unity3d`, using local filesystemInitialize engine version: 5.6.1f1 (2860b30f0b54)
 GfxDevice: creating device client; threaded=1
 Direct3D:
@@ -23,14 +23,14 @@ Platform assembly: C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\
 Loading C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Tracks Demo V1_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
 Platform assembly: C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Tracks Demo V1_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
 Loading C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Tracks Demo V1_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
-- Completed reload, in  0.147 seconds
+- Completed reload, in  0.026 seconds
 Platform assembly: C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Tracks Demo V1_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Tracks Demo V1_Data\Managed\System.dll (this message is harmless)
 desktop: 1920x1080 60Hz; virtual: 3840x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
 <RI> Initialized touch support.
-UnloadTime: 0.991012 ms
+UnloadTime: 0.872140 ms
 Setting up 2 worker threads for Enlighten.
-  Thread -> id: 2050 -> priority: 1 
-  Thread -> id: 2990 -> priority: 1 
+  Thread -> id: 2430 -> priority: 1 
+  Thread -> id: 2778 -> priority: 1 

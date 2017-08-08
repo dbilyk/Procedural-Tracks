@@ -124,7 +124,7 @@ public class AIInputController : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update() {
+    void FixedUpdate() {
         int CurrentNearest = GetNearestWaypoint();
         int CurrentSteering = GetSteeringWaypoint(CurrentNearest,steeringWaypointLookahead);
         SteeringTarget = RacingLine[CurrentSteering];
@@ -139,6 +139,7 @@ public class AIInputController : MonoBehaviour {
         {
             CarMovement.Deccelerate(-rigidbody.velocity.normalized * Mathf.Clamp(GetAccelerationInput(SteeringTarget), minBrakingApplication, 1), CarMovement.MaxBrake, CarMovement.BrakeRate, rigidbody);
             //ExtensionMethods.DebugPlot(rigidbody.transform.position, Data.red);
+            
         }
     }
 }
