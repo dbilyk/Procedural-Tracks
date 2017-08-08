@@ -19,6 +19,7 @@ public class CreateSkids : MonoBehaviour {
    
     void Start()
     {
+        SkidContainer = GameObject.FindGameObjectWithTag("SkidContainer");
         SkidPrefab.GetComponent<TrailRenderer>().time = skidLifetime;
         SkidPrefab.GetComponent<TrailRenderer>().widthMultiplier = skidThickness;
     }

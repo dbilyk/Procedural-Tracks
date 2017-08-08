@@ -53,7 +53,6 @@ public class GameManager : MonoBehaviour {
         InnerBarrier.CreateBarrier(Data.InnerBarrierPoints);
         OuterBarrier.CreateBarrier(Data.OuterBarrierPoints);
 
-        Data.InnerBarrierPoints.DebugPlot(Data.green);
         //positions player/AIs
         Player.transform.position = Data.CarStartingPositions[0].transform.position;
         Player.transform.rotation = Data.CarStartingPositions[0].transform.rotation;

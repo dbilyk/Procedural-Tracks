@@ -12,6 +12,7 @@ public class AIInputController : MonoBehaviour {
     public float minBrakingApplication;
     public float minAccelApplication;
 
+    public Vector2 SteeringTarget;
     private List<Vector2> RacingLine = Data.Curr_RacingLinePoints;
     private Rigidbody2D rigidbody;
 	// Use this for initialization
@@ -94,7 +95,7 @@ public class AIInputController : MonoBehaviour {
         return newPosSteer;
     }
 
-    float GetSteeringInput(Vector2 targetWaypoint)
+    public float GetSteeringInput(Vector2 targetWaypoint)
     {
         //cross product is 0 when the two vectors its perpendicular to are the same.
         Vector3 targetDelta = targetWaypoint - (Vector2)transform.position;
@@ -126,17 +127,17 @@ public class AIInputController : MonoBehaviour {
     void Update() {
         int CurrentNearest = GetNearestWaypoint();
         int CurrentSteering = GetSteeringWaypoint(CurrentNearest,steeringWaypointLookahead);
-        Vector2 steeringTarget = RacingLine[CurrentSteering];
-        float steeringInput = GetSteeringInput(steeringTarget);
+        SteeringTarget = RacingLine[CurrentSteering];
+        float steeringInput = GetSteeringInput(SteeringTarget);
         CarMovement.SteerTarget(steeringInput,CarMovement.SteeringResponsiveness,this.GetComponent<Rigidbody2D>());
         //Get Accel input is responsible for both accel and braking
-        if (GetAccelerationInput(steeringTarget) >0)
+        if (GetAccelerationInput(SteeringTarget) >0)
         {
-            CarMovement.Accelerate(Vector2.right * Mathf.Clamp(GetAccelerationInput(steeringTarget), minAccelApplication, 1), CarMovement.MaxSpeed, CarMovement.AccelerationRate, rigidbody);
+            CarMovement.Accelerate(Vector2.right * Mathf.Clamp(GetAccelerationInput(SteeringTarget), minAccelApplication, 1), CarMovement.MaxSpeed, CarMovement.AccelerationRate, rigidbody);
         }
         else
         {
-            CarMovement.Deccelerate(-rigidbody.velocity.normalized * Mathf.Clamp(GetAccelerationInput(steeringTarget), minBrakingApplication, 1), CarMovement.MaxBrake, CarMovement.BrakeRate, rigidbody);
+            CarMovement.Deccelerate(-rigidbody.velocity.normalized * Mathf.Clamp(GetAccelerationInput(SteeringTarget), minBrakingApplication, 1), CarMovement.MaxBrake, CarMovement.BrakeRate, rigidbody);
             //ExtensionMethods.DebugPlot(rigidbody.transform.position, Data.red);
         }
     }

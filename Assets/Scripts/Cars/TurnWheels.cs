@@ -5,6 +5,7 @@ using UnityEngine;
 public class TurnWheels : MonoBehaviour {
     public CarMovement CarMovement;
     public InputManager input;
+    public AIInputController AIInput;
     public float MaxRotation;
     public float LerpSpeed;
     public GameObject[] FrontWheels = new GameObject[2];
@@ -19,7 +20,17 @@ public class TurnWheels : MonoBehaviour {
         {
             CarMovement.GetSteeringAngle();
             currentRotation = wheel.transform.localRotation.eulerAngles;
-            float SteeringInput = input.GetSteering();
+            float SteeringInput;
+            if (gameObject.tag == "Player")
+            {
+                SteeringInput = input.GetSteering();
+
+            }
+            else
+            {
+                SteeringInput = AIInput.GetSteeringInput(AIInput.SteeringTarget);
+
+            }
             float desiredRotation = SteeringInput * (MaxRotation - Mathf.Clamp(CarMovement.Velocity.sqrMagnitude * CarMovement.Velocity.sqrMagnitude, 0f, MaxRotation - (MaxRotation / 2)));
             //if (CarMovement.Velocity.sqrMagnitude > 5)
             //{

@@ -152,21 +152,6 @@ public class CarMovement : MonoBehaviour{
         }
     }
 
-    void OnCollisionStay2D(Collision2D col)
-    {
-        if (col.gameObject.tag == "AI" /*|| col.gameObject.tag == "player"*/)
-        {
-            col.gameObject.GetComponent<CarMovement>().MaxTractionForce /= 2f;
-            col.gameObject.GetComponent<CarMovement>().SteeringResponsiveness/= 2f;
-        }
-    }
 
-    void OnCollisionExit2D(Collision2D col)
-    {
-        if (col.gameObject.tag == "AI" /*|| col.gameObject.tag == "player"*/)
-        {
-            col.gameObject.GetComponent<CarMovement>().MaxTractionForce = StartingTractionForce;
-            col.gameObject.GetComponent<CarMovement>().SteeringResponsiveness = StartingSteeringResponse;
-        }
-    }
+
 }
