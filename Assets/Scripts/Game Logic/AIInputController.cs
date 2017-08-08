@@ -6,13 +6,21 @@ public class AIInputController : MonoBehaviour {
     public CarMovement CarMovement;
     public int steeringWaypointLookahead = 3;
     public int throttleWaypointLookahead = 8;
+    public float minAngleToEngageBraking = 10;
+    public float minVelocityMagToStopBraking = 4;
+    [Tooltip("controls how hard cars will stomp on the brake.  set to zero for most professional braking performance")]
+    public float minBrakingApplication;
+    public float minAccelApplication;
 
     private List<Vector2> RacingLine = Data.Curr_RacingLinePoints;
     private Rigidbody2D rigidbody;
 	// Use this for initialization
 	void Start () {
         rigidbody = gameObject.transform.GetComponent<Rigidbody2D>();
-	}
+
+        //Data.Curr_RacingLinePoints.DebugPlot(Data.green);
+
+    }
 
     int GetNearestWaypoint()
     {
@@ -99,13 +107,19 @@ public class AIInputController : MonoBehaviour {
 
     }
 
-    //NEEDS WORK.
-    float GetAccelerationInput(Vector2 targetWaypoint)
+    
+    float GetAccelerationInput(Vector2 steeringTarget)
     {
-    Vector3 targetDelta = targetWaypoint - (Vector2)transform.position;
-    float angleDifference = Vector2.Angle(transform.right, targetDelta);
-    Vector3 cross = Vector3.Cross(transform.right, targetDelta);
-    return Mathf.Clamp(Mathf.Abs(angleDifference) * cross.z ,1,0);
+        Vector3 targetDelta = steeringTarget - (Vector2)transform.position;
+        float angleDifference = Mathf.Abs(Vector2.Angle(transform.right, targetDelta));
+        if (angleDifference > minAngleToEngageBraking && rigidbody.velocity.sqrMagnitude > minVelocityMagToStopBraking)
+            angleDifference = -angleDifference;
+        if (rigidbody.velocity.sqrMagnitude <= minVelocityMagToStopBraking)
+        {
+            angleDifference = 1;
+        }
+        
+        return Mathf.Clamp(minAngleToEngageBraking/angleDifference,-1,1);
     }
 
     // Update is called once per frame
@@ -114,10 +128,16 @@ public class AIInputController : MonoBehaviour {
         int CurrentSteering = GetSteeringWaypoint(CurrentNearest,steeringWaypointLookahead);
         Vector2 steeringTarget = RacingLine[CurrentSteering];
         float steeringInput = GetSteeringInput(steeringTarget);
-        
         CarMovement.SteerTarget(steeringInput,CarMovement.SteeringResponsiveness,this.GetComponent<Rigidbody2D>());
-        CarMovement.Accelerate(Vector2.right * GetAccelerationInput(steeringTarget), CarMovement._currentAcceleration,CarMovement.MaxSpeed, CarMovement.AccelerationRate, rigidbody);
-        //CarMovement.Accelerate(Vector2.right,1,1,1,this.GetComponent<Rigidbody2D>());
-        //CarMovement.SteerTarget(steeringInput,20, this.GetComponent<Rigidbody2D>());
+        //Get Accel input is responsible for both accel and braking
+        if (GetAccelerationInput(steeringTarget) >0)
+        {
+            CarMovement.Accelerate(Vector2.right * Mathf.Clamp(GetAccelerationInput(steeringTarget), minAccelApplication, 1), CarMovement.MaxSpeed, CarMovement.AccelerationRate, rigidbody);
+        }
+        else
+        {
+            CarMovement.Deccelerate(-rigidbody.velocity.normalized * Mathf.Clamp(GetAccelerationInput(steeringTarget), minBrakingApplication, 1), CarMovement.MaxBrake, CarMovement.BrakeRate, rigidbody);
+            //ExtensionMethods.DebugPlot(rigidbody.transform.position, Data.red);
+        }
     }
 }

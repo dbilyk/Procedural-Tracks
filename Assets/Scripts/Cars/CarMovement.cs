@@ -49,9 +49,25 @@ public class CarMovement : MonoBehaviour{
     }
 
     //accelerates the target
-    public void Accelerate(Vector2 direction, float currentAcceleration, float maxSpeed, float accelerationRate, Rigidbody2D target)
+    public void Accelerate(Vector2 direction, float maxSpeed, float accelerationRate, Rigidbody2D target)
     {
-        target.AddRelativeForce(direction * Mathf.Lerp(currentAcceleration, maxSpeed, accelerationRate * Time.fixedDeltaTime));
+        float velocity;
+        if (Velocity.sqrMagnitude < 0.1f)
+        {
+            velocity = 0.1f;
+        }
+        else
+        {
+            velocity = Velocity.sqrMagnitude;
+        }
+        _currentAcceleration = Mathf.Lerp(maxSpeed,Mathf.Clamp(_currentAcceleration/(velocity/50),maxSpeed,accelerationRate),0.2f);
+        target.AddRelativeForce(direction * _currentAcceleration);
+    }
+
+    public void Deccelerate(Vector2 direction, float maxSpeed, float accelerationRate, Rigidbody2D target)
+    {
+        _currentBraking = Mathf.Lerp(_currentBraking, maxSpeed, accelerationRate * Time.fixedDeltaTime);
+        target.AddForce(direction * _currentBraking);
     }
 
     //steers given normalized input and 
@@ -60,12 +76,12 @@ public class CarMovement : MonoBehaviour{
         target.AddTorque(input * responsiveness * Mathf.Clamp(Velocity.magnitude / 2f, 0, 1f) * Time.deltaTime);
     }
     //debug
-    void OnGUI()
-    {
-        GUIContent content = new GUIContent();
-        content.text = GetSteeringAngle().ToString();
-        GUI.Label(new Rect(50,50,50,50),  content);
-    }
+    //void OnGUI()
+    //{
+    //    GUIContent content = new GUIContent();
+    //    content.text = GetSteeringAngle().ToString();
+    //    GUI.Label(new Rect(50,50,50,50),  content);
+    //}
     
 	void FixedUpdate () {
             Velocity = rigidbody.velocity;
@@ -79,14 +95,14 @@ public class CarMovement : MonoBehaviour{
             //gas force
             if (input.GetAccel())
             {
-                Accelerate(Vector2.right, _currentAcceleration, MaxSpeed, AccelerationRate, rigidbody);
-            }
+                Accelerate(Vector2.right, MaxSpeed, AccelerationRate, rigidbody);
+            }else
 
 
             //brake force
             if (Input.GetKey(KeyCode.B) && Vector2.Dot(Velocity, gameObject.transform.right) > 0.01f)
             {
-                Accelerate(-Vector2.right, _currentBraking, MaxBrake, BrakeRate, rigidbody);
+                Deccelerate(-Velocity.normalized, MaxBrake, BrakeRate, rigidbody);
             }
             //steering force
             if (input.GetSteering() > 0.2f || input.GetSteering() < -0.2f)
@@ -133,6 +149,24 @@ public class CarMovement : MonoBehaviour{
             this.MaxBrake /= Data.PlayerMaxBrakeDivisor;
             this.MaxTractionForce /= Data.PlayerMaxTractionDivisor;
             this.SteeringResponsiveness /= Data.PlayerSteeringResponsivenessDivisor;
+        }
+    }
+
+    void OnCollisionStay2D(Collision2D col)
+    {
+        if (col.gameObject.tag == "AI" /*|| col.gameObject.tag == "player"*/)
+        {
+            col.gameObject.GetComponent<CarMovement>().MaxTractionForce /= 2f;
+            col.gameObject.GetComponent<CarMovement>().SteeringResponsiveness/= 2f;
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D col)
+    {
+        if (col.gameObject.tag == "AI" /*|| col.gameObject.tag == "player"*/)
+        {
+            col.gameObject.GetComponent<CarMovement>().MaxTractionForce = StartingTractionForce;
+            col.gameObject.GetComponent<CarMovement>().SteeringResponsiveness = StartingSteeringResponse;
         }
     }
 }
