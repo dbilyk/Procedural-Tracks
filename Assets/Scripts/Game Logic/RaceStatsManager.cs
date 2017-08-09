@@ -2,6 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct CarPolePositionData
+{
+    public GameObject CarObject;
+    public Vector2 NearestCheckpoint;
+    public int CurrentPolePosition;
+    public int CurrentLap;
+    public int TotalCheckpointsPassedThisLap;
+}
+
 public class RaceStatsManager : MonoBehaviour {
     public MapCreator mapCreator;
     public AIInputController aIInputController;
@@ -10,18 +19,26 @@ public class RaceStatsManager : MonoBehaviour {
     public int CheckpointFreq =3;
     public bool RaceStarted;
     //opponets and lap map 1 to 1 to each other
-    private List<GameObject> Opponents = new List<GameObject>();
-    private List<int> CurrentAILap = new List<int>();
     private List<Vector2> Checkpoints = new List<Vector2>();
+    private List<AIPolePositionData> Opponents = new List<AIPolePositionData>();
+    private int TotalCheckpointsOnMap;
+
+
+
 
 	// Use this for initialization
 	void Start () {
+        Checkpoints = mapCreator.CreateTrackPoints(Data.Curr_ControlPoints, CheckpointFreq);
+        TotalCheckpointsOnMap = Checkpoints.Count;
 		for(int i = 0; i < AIContainer.transform.childCount; i++)
         {
-            Opponents.Add(AIContainer.transform.GetChild(i).gameObject);
+            CarPolePositionData AIData = new CarPolePositionData();
+            AIData.CarObject =AIContainer.transform.GetChild(i).gameObject;
+            AIData.CurrentLap = 1;
+            AIData.NearestCheckpoint = aIInputController.GetNearestWaypoint(AIData.CarObject.transform,Checkpoints);
+            Opponents.Add(AIData);
         }
 
-        Checkpoints = mapCreator.CreateTrackPoints(Data.Curr_ControlPoints, CheckpointFreq);
 
 	}
 
@@ -44,7 +61,7 @@ public class RaceStatsManager : MonoBehaviour {
         yield return new WaitForSeconds(0.2f);   
     }
 
-
+    IEnumerator CheckAI
 	
 	// Update is called once per frame
 	void Update () {
