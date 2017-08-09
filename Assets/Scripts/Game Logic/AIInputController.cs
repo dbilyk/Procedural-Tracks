@@ -8,7 +8,7 @@ public class AIInputController : MonoBehaviour {
     public int throttleWaypointLookahead = 8;
     public float minAngleToEngageBraking = 10;
     public float minVelocityMagToStopBraking = 4;
-    [Tooltip("controls how hard cars will stomp on the brake.  set to zero for most professional braking performance")]
+    [Tooltip("controls how hard cars will stomp on the brake.  set to zero for most 'professional' braking performance")]
     public float minBrakingApplication;
     public float minAccelApplication;
 
@@ -23,59 +23,61 @@ public class AIInputController : MonoBehaviour {
 
     }
 
-    int GetNearestWaypoint()
+    public int GetNearestWaypoint(Transform item, List<Vector2> waypointList)
     {
-        int ArraySearchStartLocation;
-        int ArraySearchEndLocation;
-        int WaypointCount = RacingLine.Count;
-        int QuarterOfArray;
-        int closestWaypointIndex = -1;
-        //check if array count is divisible evenly into quadrants for looping.
-        if (WaypointCount % 4 != 0)
-        {
-            QuarterOfArray = Mathf.RoundToInt(WaypointCount / 4);
-        }
-        else
-        {
-            QuarterOfArray = WaypointCount / 4;
-        }
+        //int ArraySearchStartLocation;
+        //int ArraySearchEndLocation;
+        //int QuarterOfArray;
 
-        if (transform.position.x > 0 && transform.position.y > 0)
-        {
-            ArraySearchStartLocation = 0;
-            ArraySearchEndLocation = QuarterOfArray;
-        }
-        else if (transform.position.x > 0 && transform.position.y < 0)
-        {
-            ArraySearchStartLocation = QuarterOfArray;
-            ArraySearchEndLocation = QuarterOfArray * 2;
-        }
-        else if (transform.position.x < 0 && transform.position.y < 0)
-        {
-            ArraySearchStartLocation = QuarterOfArray * 2;
-            ArraySearchEndLocation = QuarterOfArray * 3;
-        }
-        else
-        {
-            ArraySearchStartLocation = QuarterOfArray * 3;
-            ArraySearchEndLocation = WaypointCount;
-        }
+        //This can probably be deleted!-----------------------------
+
+        //check if array count is divisible evenly into quadrants for looping.
+        //if (WaypointCount % 4 != 0)
+        //{
+        //    QuarterOfArray = Mathf.RoundToInt(WaypointCount / 4);
+        //}
+        //else
+        //{
+        //    QuarterOfArray = WaypointCount / 4;
+        //}
+
+        //if (transform.position.x > 0 && transform.position.y > 0)
+        //{
+        //    ArraySearchStartLocation = 0;
+        //    ArraySearchEndLocation = QuarterOfArray;
+        //}
+        //else if (transform.position.x > 0 && transform.position.y < 0)
+        //{
+        //    ArraySearchStartLocation = QuarterOfArray;
+        //    ArraySearchEndLocation = QuarterOfArray * 2;
+        //}
+        //else if (transform.position.x < 0 && transform.position.y < 0)
+        //{
+        //    ArraySearchStartLocation = QuarterOfArray * 2;
+        //    ArraySearchEndLocation = QuarterOfArray * 3;
+        //}
+        //else
+        //{
+        //    ArraySearchStartLocation = QuarterOfArray * 3;
+        //    ArraySearchEndLocation = WaypointCount;
+        //}
 
         //find closest point to my transform
         //for (int i = ArraySearchStartLocation + 1; i < ArraySearchEndLocation; i++)
+
+        int WaypointCount = waypointList.Count;
+        int closestWaypointIndex = -1;
         for (int i = 1; i < WaypointCount; i++)
-
         {
-
             if (closestWaypointIndex == -1)
             {
-                if (((Vector2)transform.position - RacingLine[i]).sqrMagnitude < ((Vector2)transform.position - RacingLine[i - 1]).sqrMagnitude)
+                if (((Vector2)item.position - waypointList[i]).sqrMagnitude < ((Vector2)item.position - waypointList[i - 1]).sqrMagnitude)
                     closestWaypointIndex = i;
                 else closestWaypointIndex = i - 1;
             }
             else
             {
-                if (((Vector2)transform.position - RacingLine[i]).sqrMagnitude < ((Vector2)transform.position - RacingLine[closestWaypointIndex]).sqrMagnitude)
+                if (((Vector2)item.position - waypointList[i]).sqrMagnitude < ((Vector2)item.position - waypointList[closestWaypointIndex]).sqrMagnitude)
                 {
                     closestWaypointIndex = i;
                 }
@@ -125,7 +127,7 @@ public class AIInputController : MonoBehaviour {
 
     // Update is called once per frame
     void FixedUpdate() {
-        int CurrentNearest = GetNearestWaypoint();
+        int CurrentNearest = GetNearestWaypoint(transform, RacingLine);
         int CurrentSteering = GetSteeringWaypoint(CurrentNearest,steeringWaypointLookahead);
         SteeringTarget = RacingLine[CurrentSteering];
         float steeringInput = GetSteeringInput(SteeringTarget);

@@ -69,7 +69,13 @@ public class Data : MonoBehaviour {
     public static float PlayerMaxBrakeDivisor = 1.5f;
     public static float PlayerMaxTractionDivisor = 1.5f;
     public static float PlayerSteeringResponsivenessDivisor = 1.2f;
-    
+
+    //Current race stats 
+    public static float Curr_LapTime;
+    public static float Curr_PolePosition;
+    public static float Curr_Lap;
+    public static float Curr_NumberOfLapsInRace;
+
 
     //saved game data
     public static List<SavedTrack> Svd_Tracks;
