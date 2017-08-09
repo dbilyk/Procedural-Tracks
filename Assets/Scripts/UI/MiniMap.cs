@@ -13,7 +13,7 @@ public class MiniMap : MonoBehaviour {
         //this is shit, need to redo this into a pool.
         for (int i = MinimapContainer.transform.childCount -1; i >0; i--)
         {
-            Destroy(MinimapContainer.transform.GetChild(i));
+            Destroy(MinimapContainer.transform.GetChild(i).gameObject);
         }
         List<Vector2> passedData = new List<Vector2>(passedControlPoints);
         passedData = MapCreator.CreateTrackPoints(passedData, minimapResolution);

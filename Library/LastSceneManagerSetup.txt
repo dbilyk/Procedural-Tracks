@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/ActiveGame Scene/ActiveGame v2.3 mesh mountain test.unity
+- path: Assets/Scenes/ActiveGame Scene/ActiveGame v2.3 AI Controller Works.unity
   isLoaded: 1
   isActive: 1

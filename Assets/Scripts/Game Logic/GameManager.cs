@@ -4,16 +4,19 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
-    public Canvas Canvas;
-    public GameObject Player;
-    public MapCreator MapCreator;
-    public GameObject ActiveGameTrack;
+    //script objects
     public BarrierCreator InnerBarrier;
     public BarrierCreator OuterBarrier;
+    public MapCreator MapCreator;
+    public MiniMap MiniMapScript;
+    //game objects
+    public Canvas Canvas;
+    public GameObject Player;
+    public GameObject ActiveGameTrack;
     public GameObject AIContainer;
+    public GameObject StartingGridContainer;
     public GameObject newAI;
     public GameObject MiniMapGroup;
-    public MiniMap MiniMapScript;
 
     private void StartNewGame()
     {
@@ -68,9 +71,24 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    //destroys stuff that gets recreated in StartNewGame
+    void ResetGame()
+    {
+        for(int i = 0; i < StartingGridContainer.transform.childCount; i++)
+        {
+            Destroy(StartingGridContainer.transform.GetChild(i).gameObject);
+
+        }
+        for (int i = 0; i< AIContainer.transform.childCount; i++)
+        {
+            Destroy(AIContainer.transform.GetChild(i).gameObject);
+        }
+    }
+
 
     public void StartNewGameButton()
     {
+        ResetGame();
         StartNewGame();
     }	
 }
