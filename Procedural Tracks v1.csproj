@@ -91,6 +91,8 @@
     <Compile Include="Assets\Scripts\Game Logic\FlagForScenePersistence.cs" />
     <Compile Include="Assets\Scripts\Game Logic\GameManager.cs" />
     <Compile Include="Assets\Scripts\Game Logic\InputManager.cs" />
+    <Compile Include="Assets\Scripts\Game Logic\LapTrigger.cs" />
+    <Compile Include="Assets\Scripts\Game Logic\RaceStatsManager.cs" />
     <Compile Include="Assets\Scripts\Map Creation\BarrierCreator.cs" />
     <Compile Include="Assets\Scripts\Map Creation\EnvironmentCreator.cs" />
     <Compile Include="Assets\Scripts\Map Creation\MapCreator.cs" />
