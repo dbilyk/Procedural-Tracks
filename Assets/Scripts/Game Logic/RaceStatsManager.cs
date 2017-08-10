@@ -24,10 +24,11 @@ public class RaceStatsManager : MonoBehaviour {
     public LapTrigger lapTrigger;
     public GameObject AIContainer;
     public GameObject Player;
+    public float PctOfCheckpointsThatConstitutesALap = 90f;
     public int CheckpointFreq =1;
-    public bool RaceStarted;
     public CarPolePositionData PlayerPoleData = new CarPolePositionData();
 
+    private bool UpdatePoleData = false;
     private List<Vector2> Checkpoints = new List<Vector2>();
     private List<CarPolePositionData> CarsOnTrack = new List<CarPolePositionData>();
     private int TotalCheckpointsOnMap;
@@ -58,7 +59,7 @@ public class RaceStatsManager : MonoBehaviour {
         PlayerPoleData.IndexInDataArray = 0;
 
         //AI struct creation
-		for(int i = 1; i == AIContainer.transform.childCount; i++)
+		for(int i = 0; i < AIContainer.transform.childCount; i++)
         {
             CarPolePositionData AIData = new CarPolePositionData();
             AIData.CarObject =AIContainer.transform.GetChild(i).gameObject;
@@ -75,7 +76,7 @@ public class RaceStatsManager : MonoBehaviour {
             AIData.LastValidCheckpointIndex = AIData.Curr_CheckpointIndex;
             AIData.Curr_LapNumber = 0;
             AIData.TotalCheckpointsPassedThisLap = 1;
-            AIData.IndexInDataArray = i;
+            AIData.IndexInDataArray = i+1;
             CarsOnTrack.Add(AIData);
         }
         Data.CarPoleData = CarsOnTrack;
@@ -89,17 +90,44 @@ public class RaceStatsManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (Data.Curr_RaceBegun && !RaceStarted)
+        if (Data.Curr_RaceBegun && !UpdatePoleData)
         {
             CurrentPoleDataInit();
-            //StartCoroutine("CheckPlayerPosition");
-            RaceStarted = true;
+            StartCoroutine("RecalculatePoleData");
+            UpdatePoleData = true;
         }
 
 	}
+
+    IEnumerator RecalculatePoleData()
+    {
+        Debug.Log("heythere");
+
+        yield return new WaitForSeconds(0.2f);
+        UpdatePoleData = false;
+    }
+
+    
+
+    //this delegate subscriber is called each time a car passes the lap line.
     void LapComplete(int PoleDataIndex)
     {
-        Debug.Log("Car number " + PoleDataIndex + " passed the starting line");
+        CarPolePositionData thisCar = Data.CarPoleData[PoleDataIndex];
+
+        if (thisCar.Curr_LapNumber == 0)
+        {
+            thisCar.Curr_LapNumber += 1;
+            thisCar.Curr_LapStartTime = Time.time;
+            Debug.Log(Time.time);
+        }
+
+        if (thisCar.TotalCheckpointsPassedThisLap >= Data.Curr_PoleCheckpoints.Count * (PctOfCheckpointsThatConstitutesALap / 100))
+        {
+            thisCar.Curr_LapNumber += 1;
+            thisCar.Curr_LapStartTime = Time.time;
+            Debug.Log("time:" + Time.time + "  Lap#:" + thisCar.Curr_LapNumber);
+
+        }
 
     }
 }
