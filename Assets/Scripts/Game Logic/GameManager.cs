@@ -69,6 +69,7 @@ public class GameManager : MonoBehaviour {
             Ai.transform.rotation = Data.CarStartingPositions[i].transform.rotation;
 
         }
+        Data.Curr_RaceBegun = true;
     }
 
     //destroys stuff that gets recreated in StartNewGame
