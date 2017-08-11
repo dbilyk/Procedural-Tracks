@@ -112,33 +112,41 @@ public class RaceStatsManager : MonoBehaviour {
     private bool CheckFacingForward = false;
     // Update is called once per frame
     void Update () {
+        //perioodically checking if player is facing forward
+        if (!CheckFacingForward && Data.Curr_RaceBegun)
+        {
+            StartCoroutine("CheckFacingForward");
+            CheckFacingForward = true;
+        }
+        //periodically recalculating player checkpoints
         if (!UpdatePoleData && Data.Curr_RaceBegun)
         {
             CurrentPoleDataInit();
             StartCoroutine("RecalculatePoleData");
             UpdatePoleData = true;
         }
-        if{
 
-        }
+        
 
 	}
 
     IEnumerator CheckFacingForward()
     {
-        List<CarPolePositionData> carData = Data.CarPoleData;
+        CarPolePositionData player = Data.CarPoleData[0];
         List<Vector2> ChkPts = Data.Curr_PoleCheckpoints;
 
-        if (Vector2.Dot(carData[0].CarObject.GetComponent<Rigidbody2D>().velocity, ChkPts[carData[0].Curr_CheckpointIndex] - ChkPts[carData[0].PrevCheckpointIndex]) > 0f)
+        if (Vector2.Dot(player.CarObject.GetComponent<Rigidbody2D>().velocity, ChkPts[player.Curr_CheckpointIndex] - ChkPts[player.PrevCheckpointIndex]) > 0f)
         {
-            carData[0].FacingForward = true;
+            player.FacingForward = true;
         }
         else
         {
-            carData[0].FacingForward = false;
+            player.FacingForward = false;
+            player.AllowCheckpointUpdates = false;
 
         }
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.2f);
+        CheckFacingForward = false;
     }
 
 
@@ -147,40 +155,38 @@ public class RaceStatsManager : MonoBehaviour {
     {
         //player is index 0
         List<CarPolePositionData> carData = Data.CarPoleData;
+        CarPolePositionData player = carData[0];
         List<Vector2> ChkPts = Data.Curr_PoleCheckpoints;
         //IF facing forward 
         
-        if (carData[0].FacingForward)
+        if (!player.AllowCheckpointUpdates && player.FacingForward)
         {
             //check that the most recent checkpoint is the same as the last valid checkpoint
-            if (carData[0].Curr_CheckpointIndex == carData[0].LastValidCheckpointIndex)
+            if (player.Curr_CheckpointIndex == player.LastValidCheckpointIndex)
             {
-                carData[0].AllowCheckpointUpdates = true;
+                player.AllowCheckpointUpdates = true;
             }
             
             else
             {
                 //update current nearest checkpoint
-                carData[0].Curr_CheckpointIndex = ExtensionMethods.GetNearestInList(carData[0].CarObject,Data.Curr_PoleCheckpoints);
+                player.Curr_CheckpointIndex = ExtensionMethods.GetNearestInList(player.CarObject,Data.Curr_PoleCheckpoints);
             }
         }
 
-        else
+        if (player.AllowCheckpointUpdates)
         {
-            return;
-        }
+            player.Curr_CheckpointIndex = ExtensionMethods.GetNearestInList(player.CarObject, Data.Curr_PoleCheckpoints);
+            if (player.Curr_CheckpointIndex != player.LastValidCheckpointIndex)
+            {
+                player.TotalCheckpointsPassedThisLap += 1;
+            }
 
-        if (carData[0].AllowCheckpointUpdates)
-        {
-            carData[0].Curr_CheckpointIndex = ExtensionMethods.GetNearestInList(carData[0].CarObject, Data.Curr_PoleCheckpoints);
-            carData[0].PrevCheckpointIndex = 
-
-        }
-
-        for (int i = 1; i < carData.Count; i++)
-        {
-            //insert logic for updating all checkpts, and pole positions
+            player.PrevCheckpointIndex = player.Curr_CheckpointIndex -1;
+            player.LastValidCheckpointIndex = player.Curr_CheckpointIndex;
             
+            player.TotalCheckpointsPassedThisLap;
+            Debug.Log("Here");
 
         }
 
@@ -205,6 +211,7 @@ public class RaceStatsManager : MonoBehaviour {
 
         if (thisCar.TotalCheckpointsPassedThisLap >= Data.Curr_PoleCheckpoints.Count * (PctOfCheckpointsThatConstitutesALap / 100))
         {
+            thisCar.TotalCheckpointsPassedThisLap = 0;
             thisCar.Curr_LapNumber += 1;
             thisCar.Curr_LapStartTime = Time.time;
             Debug.Log("time:" + Time.time + "  Lap#:" + thisCar.Curr_LapNumber);
