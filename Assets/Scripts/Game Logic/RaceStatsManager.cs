@@ -99,9 +99,23 @@ public class RaceStatsManager : MonoBehaviour {
 
 	}
 
+    //this thing is BAD
     IEnumerator RecalculatePoleData()
     {
-        Debug.Log("heythere");
+        //player is index 0
+        List<CarPolePositionData> carData = Data.CarPoleData;
+        for (int i = 1; i < carData.Count; i++)
+        {
+            if (Vector2.Dot(carData[0].CarObject.GetComponent<Rigidbody2D>().velocity, Data.Curr_PoleCheckpoints[carData[0].Curr_CheckpointIndex] - Data.Curr_PoleCheckpoints[carData[0].PrevCheckpointIndex]) < 0f)
+            {
+                Debug.Log("facing the correct way");
+            }
+            else
+            {
+                Debug.Log("WRONG");
+            }
+
+        }
 
         yield return new WaitForSeconds(0.2f);
         UpdatePoleData = false;

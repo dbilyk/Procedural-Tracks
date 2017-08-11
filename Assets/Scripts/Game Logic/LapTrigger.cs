@@ -9,13 +9,12 @@ public class LapTrigger : MonoBehaviour {
     void OnTriggerEnter2D(Collider2D col)
     {
 
-         for (int i = 0; i < Data.CarPoleData.Count; i++)
+        for (int i = 0; i < Data.CarPoleData.Count; i++)
         {
             if (col.gameObject == Data.CarPoleData[i].CarObject) {
                 OnLapComplete(i);
-
+                break;
             }
-
         }
         
         
