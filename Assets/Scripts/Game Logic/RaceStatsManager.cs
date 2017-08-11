@@ -4,11 +4,22 @@ using UnityEngine;
 
 public class CarPolePositionData
 {
-    public GameObject CarObject;
-    public int IndexInDataArray;
-    public int Curr_CheckpointIndex;
-    public int PrevCheckpointIndex;
-    public int LastValidCheckpointIndex;
+    public GameObject CarObject;//constant
+    public int IndexInDataArray;//constant
+    public bool FacingForward;//check this on a slower schedule
+    public bool AllowCheckpointUpdates;
+    public int Curr_CheckpointIndex;//needs to be updated on schedule
+    public int PrevCheckpointIndex {
+        get {
+            return PrevCheckpointIndex;
+        }
+        set {
+            if(value == -1)
+            {
+                value = Data.Curr_PoleCheckpoints.Count - 1;
+            }
+        } }
+    public int LastValidCheckpointIndex;//needs to be updated on schedule
     public int Curr_PolePosition;
     public int Curr_LapNumber;
     public float Curr_LapStartTime;
@@ -18,6 +29,10 @@ public class CarPolePositionData
 
 
 }
+/*
+ if NOT  facingforward, dont enter into collect checkpoint logic
+     */
+
 
 public class RaceStatsManager : MonoBehaviour {
     public MapCreator mapCreator;
@@ -28,7 +43,6 @@ public class RaceStatsManager : MonoBehaviour {
     public int CheckpointFreq =1;
     public CarPolePositionData PlayerPoleData = new CarPolePositionData();
 
-    private bool UpdatePoleData = false;
     private List<Vector2> Checkpoints = new List<Vector2>();
     private List<CarPolePositionData> CarsOnTrack = new List<CarPolePositionData>();
     private int TotalCheckpointsOnMap;
@@ -55,8 +69,10 @@ public class RaceStatsManager : MonoBehaviour {
         PlayerPoleData.LastValidCheckpointIndex = PlayerPoleData.Curr_CheckpointIndex;
         PlayerPoleData.Curr_LapNumber = 0;
         PlayerPoleData.TotalCheckpointsPassedThisLap = 0;
-        CarsOnTrack.Add(PlayerPoleData);
+        PlayerPoleData.FacingForward = true;
         PlayerPoleData.IndexInDataArray = 0;
+        PlayerPoleData.AllowCheckpointUpdates = true;
+        CarsOnTrack.Add(PlayerPoleData);
 
         //AI struct creation
 		for(int i = 0; i < AIContainer.transform.childCount; i++)
@@ -77,7 +93,11 @@ public class RaceStatsManager : MonoBehaviour {
             AIData.Curr_LapNumber = 0;
             AIData.TotalCheckpointsPassedThisLap = 1;
             AIData.IndexInDataArray = i+1;
+            AIData.FacingForward = true;
+            AIData.AllowCheckpointUpdates = true;
+
             CarsOnTrack.Add(AIData);
+
         }
         Data.CarPoleData = CarsOnTrack;
 
@@ -88,32 +108,79 @@ public class RaceStatsManager : MonoBehaviour {
         LapTrigger.OnLapComplete += LapComplete;
     }
 
+    private bool UpdatePoleData = false;
+    private bool CheckFacingForward = false;
     // Update is called once per frame
     void Update () {
-        if (Data.Curr_RaceBegun && !UpdatePoleData)
+        if (!UpdatePoleData && Data.Curr_RaceBegun)
         {
             CurrentPoleDataInit();
             StartCoroutine("RecalculatePoleData");
             UpdatePoleData = true;
         }
+        if{
+
+        }
 
 	}
 
-    //this thing is BAD
+    IEnumerator CheckFacingForward()
+    {
+        List<CarPolePositionData> carData = Data.CarPoleData;
+        List<Vector2> ChkPts = Data.Curr_PoleCheckpoints;
+
+        if (Vector2.Dot(carData[0].CarObject.GetComponent<Rigidbody2D>().velocity, ChkPts[carData[0].Curr_CheckpointIndex] - ChkPts[carData[0].PrevCheckpointIndex]) > 0f)
+        {
+            carData[0].FacingForward = true;
+        }
+        else
+        {
+            carData[0].FacingForward = false;
+
+        }
+        yield return new WaitForSeconds(0.4f);
+    }
+
+
+
     IEnumerator RecalculatePoleData()
     {
         //player is index 0
         List<CarPolePositionData> carData = Data.CarPoleData;
-        for (int i = 1; i < carData.Count; i++)
+        List<Vector2> ChkPts = Data.Curr_PoleCheckpoints;
+        //IF facing forward 
+        
+        if (carData[0].FacingForward)
         {
-            if (Vector2.Dot(carData[0].CarObject.GetComponent<Rigidbody2D>().velocity, Data.Curr_PoleCheckpoints[carData[0].Curr_CheckpointIndex] - Data.Curr_PoleCheckpoints[carData[0].PrevCheckpointIndex]) < 0f)
+            //check that the most recent checkpoint is the same as the last valid checkpoint
+            if (carData[0].Curr_CheckpointIndex == carData[0].LastValidCheckpointIndex)
             {
-                Debug.Log("facing the correct way");
+                carData[0].AllowCheckpointUpdates = true;
             }
+            
             else
             {
-                Debug.Log("WRONG");
+                //update current nearest checkpoint
+                carData[0].Curr_CheckpointIndex = ExtensionMethods.GetNearestInList(carData[0].CarObject,Data.Curr_PoleCheckpoints);
             }
+        }
+
+        else
+        {
+            return;
+        }
+
+        if (carData[0].AllowCheckpointUpdates)
+        {
+            carData[0].Curr_CheckpointIndex = ExtensionMethods.GetNearestInList(carData[0].CarObject, Data.Curr_PoleCheckpoints);
+            carData[0].PrevCheckpointIndex = 
+
+        }
+
+        for (int i = 1; i < carData.Count; i++)
+        {
+            //insert logic for updating all checkpts, and pole positions
+            
 
         }
 
@@ -122,6 +189,7 @@ public class RaceStatsManager : MonoBehaviour {
     }
 
     
+
 
     //this delegate subscriber is called each time a car passes the lap line.
     void LapComplete(int PoleDataIndex)
