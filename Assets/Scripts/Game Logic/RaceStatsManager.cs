@@ -35,17 +35,14 @@ public class CarPolePositionData
 
 
 }
-/*
- if NOT  facingforward, dont enter into collect checkpoint logic
-     */
-
 
 public class RaceStatsManager : MonoBehaviour {
     public MapCreator mapCreator;
     public LapTrigger lapTrigger;
     public GameObject AIContainer;
+    public GameObject StartingGridContainer;
     public GameObject Player;
-    public float PctOfCheckpointsThatConstitutesALap = 90f;
+    public float PctOfCheckpointsThatConstitutesALap = 80f;
     public int CheckpointFreq =1;
     public CarPolePositionData PlayerPoleData = new CarPolePositionData();
 
@@ -56,7 +53,34 @@ public class RaceStatsManager : MonoBehaviour {
     //call at the start of a race ot populate currentPoleData list
     void CurrentPoleDataInit() {
         Checkpoints = mapCreator.CreateTrackPoints(Data.Curr_ControlPoints, CheckpointFreq);
-        Data.Curr_PoleCheckpoints = Checkpoints;
+
+        int closestChkptToStartingLine = ExtensionMethods.GetNearestInList(GameObject.FindGameObjectWithTag("StartingLine").transform.position, Checkpoints);
+        if (closestChkptToStartingLine != Checkpoints.Count - 1)
+        {
+            closestChkptToStartingLine += 1;
+        }
+        else
+        {
+            closestChkptToStartingLine = 0;
+        }
+        List<Vector2> RearrangeCheckpoints = new List<Vector2>();
+        
+
+        for (int i = closestChkptToStartingLine; i < Checkpoints.Count; i ++)
+        {
+            RearrangeCheckpoints.Add(Checkpoints[i]);
+        }
+        for (int i = 0; i < closestChkptToStartingLine; i ++)
+        {
+            RearrangeCheckpoints.Add(Checkpoints[i]);
+
+        }
+        Data.Curr_PoleCheckpoints = RearrangeCheckpoints;
+
+        Data.Curr_PoleCheckpoints[0].DebugPlot(Data.yellow);
+        Data.Curr_PoleCheckpoints[Data.Curr_PoleCheckpoints.Count -1].DebugPlot(Data.red);
+
+
         TotalCheckpointsOnMap = Checkpoints.Count;
 
         //populate player struct and push to list
@@ -83,7 +107,7 @@ public class RaceStatsManager : MonoBehaviour {
            
             AIData.LastValidCheckpointIndex = AIData.Curr_CheckpointIndex;
             AIData.Curr_LapNumber = 0;
-            AIData.TotalCheckpointsPassedThisLap = 1;
+            AIData.TotalCheckpointsPassedThisLap = 0;
             AIData.IndexInDataArray = i+1;
             AIData.FacingForward = true;
             AIData.AllowCheckpointUpdates = true;
@@ -104,8 +128,12 @@ public class RaceStatsManager : MonoBehaviour {
     {
         if (Data.Curr_RaceBegun)
         {
-            GUI.Label(new Rect(40, 40, 100, 20), "Lap #: " + Data.CarPoleData[0].Curr_LapNumber.ToString() + "/" + Data.Curr_NumberOfLapsInRace);
-            GUI.Label(new Rect(40, 60, 100, 20), "Pole Position: " + Data.CarPoleData[0].Curr_PolePosition.ToString());
+            GUI.TextField(new Rect(40, 40, 100, 20), "AI Lap #: " + Data.CarPoleData[1].Curr_LapNumber.ToString() + "/" + Data.Curr_NumberOfLapsInRace);
+            GUI.TextField(new Rect(40, 60, 100, 20), "Plr Lap #: " + Data.CarPoleData[0].Curr_LapNumber.ToString() + "/" + Data.Curr_NumberOfLapsInRace);
+            GUI.TextField(new Rect(40, 80, 100, 20), "AI Chkpts: " + Data.CarPoleData[1].TotalCheckpointsPassedThisLap.ToString());
+            GUI.TextField(new Rect(40, 100, 100, 20), "Plr Chkpts: " + Data.CarPoleData[0].TotalCheckpointsPassedThisLap.ToString());
+            GUI.TextField(new Rect(40, 120, 100, 20), "Plr Pole: " + Data.CarPoleData[0].Curr_PolePosition.ToString());
+            GUI.TextField(new Rect(40, 140, 100, 20), "Dot: " + Vector2.Dot(Data.CarPoleData[0].CarObject.transform.position - Data.CarPoleData[1].CarObject.transform.position, Data.CarPoleData[1].CarObject.transform.right));
         }
     }
 
@@ -118,6 +146,7 @@ public class RaceStatsManager : MonoBehaviour {
         if (!initComplete && Data.Curr_RaceBegun)
         {
             CurrentPoleDataInit();
+            
             initComplete = true;
         }
 
@@ -220,7 +249,7 @@ public class RaceStatsManager : MonoBehaviour {
             }
 
         }
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.1f);
         UpdateAICheckpoints = false;
     }
 
@@ -235,7 +264,7 @@ public class RaceStatsManager : MonoBehaviour {
             {
                 CarsAheadOfPlayer += 1;
             }
-            else if(AIData.TotalCheckpointsPassedThisLap >PlayerData.TotalCheckpointsPassedThisLap)
+            else if(AIData.Curr_LapNumber == PlayerData.Curr_LapNumber && AIData.Curr_CheckpointIndex > PlayerData.Curr_CheckpointIndex)
             {
                 
                 CarsAheadOfPlayer += 1;
@@ -245,15 +274,16 @@ public class RaceStatsManager : MonoBehaviour {
             {
                 Transform pPos = PlayerData.CarObject.transform;
                 Transform aiPos = AIData.CarObject.transform;
-                if (Vector2.Dot(pPos.position - aiPos.position, aiPos.right) <0)
+                if (AIData.Curr_CheckpointIndex == PlayerData.Curr_CheckpointIndex && Vector2.Dot(pPos.position - aiPos.position, aiPos.right) <0)
                 {
                     CarsAheadOfPlayer += 1;
+                    
                 }
             }
         }
         PlayerData.Curr_PolePosition = CarsAheadOfPlayer + 1;
 
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.1f);
         UpdatePolePos = false;
     }
 

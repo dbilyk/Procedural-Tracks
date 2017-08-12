@@ -70,6 +70,7 @@ public class GameManager : MonoBehaviour {
 
         }
         Data.Curr_RaceBegun = true;
+        
     }
 
     //destroys stuff that gets recreated in StartNewGame
