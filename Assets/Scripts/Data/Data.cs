@@ -72,7 +72,7 @@ public class Data : MonoBehaviour {
 
     //Current race stats 
     public static bool Curr_RaceBegun = false;
-    public static float Curr_NumberOfLapsInRace = 1;
+    public static float Curr_NumberOfLapsInRace = 2;
     public static List<Vector2> Curr_PoleCheckpoints = new List<Vector2>();
     //player is always index 0
     public static List<CarPolePositionData> CarPoleData = new List<CarPolePositionData>();
