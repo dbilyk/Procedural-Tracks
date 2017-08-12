@@ -89,7 +89,7 @@ public class RaceStatsManager : MonoBehaviour {
         PlayerPoleData.Curr_CheckpointIndex = playerNearestWPindex;
         //make sure we get both the current closest and WP before this one so that we can use that vector to make sure the player is driving the right way.
        
-        PlayerPoleData.LastValidCheckpointIndex = PlayerPoleData.Curr_CheckpointIndex;
+        PlayerPoleData.LastValidCheckpointIndex = 0;
         PlayerPoleData.Curr_LapNumber = 0;
         PlayerPoleData.TotalCheckpointsPassedThisLap = 0;
         PlayerPoleData.FacingForward = true;
