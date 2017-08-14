@@ -35,15 +35,18 @@ public class InputManager : MonoBehaviour
 
     public bool GetBraking()
     {
-        if (Input.touchCount > 1 || Input.GetKey(KeyCode.B))
-            return true;
-        else
+        if (Input.touchCount > 1 || Input.GetKey(KeyCode.B)) {
+        return true;
+        Debug.Log("BRAKING");
+    }
+        else{
             return false;
+    }
     }
 
     public bool GetAccel()
     {
-        if (Input.touchCount > 0 || Input.GetKey(KeyCode.Space))
+        if (Input.touchCount == 1 || Input.GetKey(KeyCode.Space))
             return true;
         else
             return false;
@@ -64,4 +67,9 @@ public class InputManager : MonoBehaviour
         }
     }
     
+
+    void OnGUI()
+    {
+        GUI.TextField(new Rect(50,50,140,20),"Touch Count: " + Input.touchCount);
+    }
 }
