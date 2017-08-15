@@ -35,9 +35,8 @@ public class InputManager : MonoBehaviour
 
     public bool GetBraking()
     {
-        if (Input.touchCount > 1 || Input.GetKey(KeyCode.B)) {
+        if (Input.touchCount == 2 || Input.GetKey(KeyCode.B)) {
         return true;
-        Debug.Log("BRAKING");
     }
         else{
             return false;
