@@ -100,7 +100,7 @@ public class CarMovement : MonoBehaviour{
 
 
             //brake force
-            if (Input.GetKey(KeyCode.B) && Vector2.Dot(Velocity, gameObject.transform.right) > 0.01f)
+            if (input.GetBraking() && Vector2.Dot(Velocity, gameObject.transform.right) > 0.01f)
             {
                 Deccelerate(-Velocity.normalized, MaxBrake, BrakeRate, rigidbody);
             }
