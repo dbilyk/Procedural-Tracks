@@ -24,6 +24,7 @@ public class InputManager : MonoBehaviour
     public void BrakeButtonDown()
     {
         _brake = true;
+        Debug.Log("BRAKE");
     }
     public void BrakeButtonUp()
     {
@@ -64,21 +65,23 @@ public class InputManager : MonoBehaviour
 
     public bool GetBraking()
     {
-        if (Input.touchCount == 2 || Input.GetKey(KeyCode.B)) {
-        return true;
-    }
-        else{
-            return false;
-    }
+        //if (Input.touchCount == 2 || Input.GetKey(KeyCode.B)) {
+        //    return true;
+        //}
+        //else
+        //{
+        //    return false;
+        //}
+        return _brake;
     }
 
     public bool GetAccel()
     {
-        if (Input.touchCount == 1 || Input.GetKey(KeyCode.Space))
-            return true;
-        else
-            return false;
-
+        //if (Input.touchCount == 1 || Input.GetKey(KeyCode.Space))
+        //    return true;
+        //else
+        //    return false;
+        return _accel;
 
     }
 
@@ -96,8 +99,5 @@ public class InputManager : MonoBehaviour
     }
     
 
-    void OnGUI()
-    {
-        GUI.TextField(new Rect(50,50,140,20),"Touch Count: " + Input.touchCount);
-    }
+   
 }
