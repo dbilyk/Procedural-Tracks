@@ -30,7 +30,7 @@ public class CarPolePositionData
     public int Curr_LapNumber;
     public float Curr_LapStartTime;
     public float Curr_LapTime;
-    public float LastLapTime;
+    public float LastLapTime=-1;
     public float FastestLapTime =-1;
     public int TotalCheckpointsPassedThisLap;
 
@@ -123,19 +123,6 @@ public class RaceStatsManager : MonoBehaviour {
     public void Start()
     {
         LapTrigger.OnLapComplete += LapComplete;
-    }
-
-    void OnGUI()
-    {
-        if (Data.Curr_RaceBegun)
-        {
-            GUI.TextField(new Rect(20, 60, 100, 40), "Plr Lap #: " + Data.CarPoleData[0].Curr_LapNumber.ToString() + "/" + Data.Curr_NumberOfLapsInRace);
-            GUI.TextField(new Rect(20, 80, 100, 40), "Plr Pole: " + Data.CarPoleData[0].Curr_PolePosition.ToString());
-            GUI.TextField(new Rect(20, 100, 120, 40), "Plr LapTime: " + Data.CarPoleData[0].Curr_LapTime.ToString("F2"));
-            GUI.TextField(new Rect(20, 120, 120, 40), "Plr BestLap: " + Data.CarPoleData[0].FastestLapTime.ToString("F2"));
-            GUI.TextField(new Rect(20, 140, 120, 40), "Plr LastLap: " + Data.CarPoleData[0].LastLapTime.ToString("F2"));
-
-        }
     }
 
     private bool initComplete = false;

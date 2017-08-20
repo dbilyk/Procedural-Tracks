@@ -4,26 +4,20 @@ using UnityEngine;
 
 public class MiniMap : MonoBehaviour {
     public MapCreator MapCreator;
-    public GameObject MinimapContainer;
-    public GameObject MinimapPoint;
     public int minimapResolution;
+    public LineRenderer minimapLine;
 
     //redo this either as a mesh or by pooling the minimap sprites
     public void CreateMinimap (List<Vector2> passedControlPoints) {
-        //this is shit, need to redo this into a pool.
-        for (int i = MinimapContainer.transform.childCount -1; i >0; i--)
-        {
-            Destroy(MinimapContainer.transform.GetChild(i).gameObject);
-        }
+        
         List<Vector2> passedData = new List<Vector2>(passedControlPoints);
         passedData = MapCreator.CreateTrackPoints(passedData, minimapResolution);
-        MapCreator.CreateOrSetMeshHelperObjects(passedData);
-         
-        foreach (GameObject pt in Data.CurrentMeshHelperObjects)
+        minimapLine.positionCount = passedData.Count;
+        for(int i =0; i <passedData.Count; i ++)
         {
-            GameObject newPt = Instantiate(MinimapPoint, MinimapContainer.transform);
-            newPt.transform.position = pt.transform.position;
+            minimapLine.SetPosition(i, new Vector3(passedData[i].x, passedData[i].y, 0));
         }
+        
 }
 
 

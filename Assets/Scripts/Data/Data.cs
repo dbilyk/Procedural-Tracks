@@ -65,10 +65,10 @@ public class Data : MonoBehaviour {
     public static float RacingLineWaypointFreq = 10;
 
     //car off-track performance reduction variables
-    public static float PlayerAccelerationDivisor = 1.5f;
-    public static float PlayerMaxBrakeDivisor = 1.5f;
-    public static float PlayerMaxTractionDivisor = 1.5f;
-    public static float PlayerSteeringResponsivenessDivisor = 1.2f;
+    public static float PlayerAccelerationDivisor = 2f;
+    public static float PlayerMaxBrakeDivisor = 2f;
+    public static float PlayerMaxTractionDivisor = 2f;
+    public static float PlayerSteeringResponsivenessDivisor = 1.4f;
 
     //Current race stats 
     public static bool Curr_RaceBegun = false;

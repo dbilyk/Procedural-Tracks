@@ -46,6 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\RaceStatsUIUpdate.cs" />
      <Compile Include="Assets\Scripts\Camera\FollowCar.cs" />
      <Compile Include="Assets\Scripts\Camera\SmoothFollowCam.cs" />
      <Compile Include="Assets\Scripts\Cars\CarAI.cs" />
@@ -66,6 +67,7 @@
      <Compile Include="Assets\Scripts\Map Creation\MapCreator.cs" />
      <Compile Include="Assets\Scripts\Map Creation\MapGraphics.cs" />
      <Compile Include="Assets\Scripts\UI\MiniMap.cs" />
+     <None Include="Assets\Fonts\OFL.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

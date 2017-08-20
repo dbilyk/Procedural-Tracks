@@ -67,7 +67,7 @@ public class CarMovement : MonoBehaviour{
     public void Deccelerate(Vector2 direction, float maxSpeed, float accelerationRate, Rigidbody2D target)
     {
         _currentBraking = Mathf.Lerp(_currentBraking, maxSpeed, accelerationRate * Time.fixedDeltaTime);
-        target.AddForce(direction * _currentBraking);
+        target.AddRelativeForce(direction * _currentBraking);
     }
 
     //steers given normalized input and 
@@ -103,6 +103,11 @@ public class CarMovement : MonoBehaviour{
             if (input.GetBraking() && Vector2.Dot(Velocity, gameObject.transform.right) > 0.01f)
             {
                 Deccelerate(-Velocity.normalized, MaxBrake, BrakeRate, rigidbody);
+            }
+            if (input.GetReverse() && Velocity.SqrMagnitude() < 4f)
+            {
+                Deccelerate(-Vector2.right, MaxBrake, BrakeRate, rigidbody);
+
             }
             //steering force
             if (input.GetSteering() > 0.05f || input.GetSteering() < -0.05f)

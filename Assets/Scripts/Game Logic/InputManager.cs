@@ -9,44 +9,18 @@ public class InputManager : MonoBehaviour
 {
     private static InputManager _instance;
     public InputManager Data;
-    public Slider SteeringSlider; 
+    public float steeringTouchWidth = 200;
     private float _steering;
     private bool _accel;
     private bool _brake;
-    public void AccelButtonDown()
-    {
-        _accel = true;
-    }
-    public void AccelButtonUp()
-    {
-        _accel = false;
-    }
-    public void BrakeButtonDown()
-    {
-        _brake = true;
-        Debug.Log("BRAKE");
-    }
-    public void BrakeButtonUp()
-    {
-        _brake = false;
-    }
-    public void SetSteering() 
-    {
-        _steering = SteeringSlider.value;
-    }
-    public void ReleaseSteering()
-    {
-
-    }
-
 
     public float GetSteering()
     {
         float val = 0;
-        if (Input.touchCount > 0)
+        if (Input.touchCount >0 && Input.touches[0].position.x <= steeringTouchWidth)
         {
-            //val = -(Input.touches[0].position.x - (Screen.width / 2)) / (Screen.width / 2);
-            val = -((SteeringSlider.value - 0.5f) *2);
+            val = -(Input.touches[0].position.x - (steeringTouchWidth / 2)) / (steeringTouchWidth/ 2);
+            //val = -((SteeringSlider.value - 0.5f) *2);
         }
         else if (Input.anyKey)
         {
@@ -77,12 +51,23 @@ public class InputManager : MonoBehaviour
 
     public bool GetAccel()
     {
-        //if (Input.touchCount == 1 || Input.GetKey(KeyCode.Space))
-        //    return true;
-        //else
-        //    return false;
-        return _accel;
+        if (Input.touchCount > 1 || Input.GetKey(KeyCode.Space))
+            return true;
+        else
+            return false;
+       
 
+    }
+    public bool GetReverse()
+    {
+        if (Input.touchCount > 1 && Input.touches[1].tapCount == 2  || Input.GetKey(KeyCode.R))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
    void Awake()
