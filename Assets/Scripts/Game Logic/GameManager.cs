@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour {
     public Canvas Canvas;
     public GameObject Player;
     public GameObject ActiveGameTrack;
+    public GameObject BermDecals;
     public GameObject AIContainer;
     public GameObject StartingGridContainer;
     public GameObject newAI;
@@ -38,9 +39,12 @@ public class GameManager : MonoBehaviour {
         MapCreator.CreateOrSetMeshHelperObjects(Data.Curr_TrackPoints);
         MapCreator.RotateTrackObjectsAlongCurves(Data.CurrentMeshHelperObjects);
         MapCreator.CreateStartingGrid(Data.CurrentMeshHelperObjects,Data.StartingGridLength, Data.StartingGridWidth, Data.NumberOfGridPositions);
-       
+
+        MapCreator.CreateTrackCornerDecals(Data.CurrentMeshHelperObjects,Data.BermWidth,Data.BermOffset,Data.BermLength,BermDecals.GetComponent<MeshFilter>());
+
         MapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects, Data.TrackMeshThickness, ActiveGameTrack.gameObject.GetComponent<MeshFilter>());
         MapCreator.CreateColliderForTrack(Data.Curr_OuterTrackPoints, Data.Curr_InnerTrackPoints, Data.TrackColliderResolution, ActiveGameTrack.GetComponent<PolygonCollider2D>());
+
 
         //populates current racing line with correct data
         Data.Curr_RacingLinePoints = MapCreator.CreateRacingLinePoints(Data.Curr_RawPoints, Data.RacingLineWaypointFreq, Data.RacingLineTightness);
@@ -76,6 +80,7 @@ public class GameManager : MonoBehaviour {
     //destroys stuff that gets recreated in StartNewGame
     void ResetGame()
     {
+        Data.Curr_RaceBegun = false;
         for(int i = 0; i < StartingGridContainer.transform.childCount; i++)
         {
             Destroy(StartingGridContainer.transform.GetChild(i).gameObject);

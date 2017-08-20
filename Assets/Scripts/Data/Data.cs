@@ -26,6 +26,12 @@ public class Data : MonoBehaviour {
     public static List<Vector2> Curr_OuterTrackPoints = new List<Vector2>();
     public static List<Vector2> Curr_InnerTrackPoints = new List<Vector2>();
     public static float MeshTrackPointFreq = 30;
+
+    //berm Decal creation settings
+    public static int BermLength = 20;
+    public static float BermWidth = 0.2f;
+    public static float BermOffset = 1.2f;
+
     public static float TrackMeshThickness = 1.2f;
     public static int TrackColliderResolution = 13;
 

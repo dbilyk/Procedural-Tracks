@@ -199,6 +199,11 @@ public class MapCreator : MonoBehaviour {
 
         }
 
+        if (newPoints[newPoints.Count - 1] != newPoints[0])
+        {
+            newPoints[newPoints.Count -1] =newPoints[0];
+        }
+
         return newPoints;
     }
 
@@ -412,6 +417,158 @@ public class MapCreator : MonoBehaviour {
         }
 
     }
+
+    public void CreateTrackCornerDecals(List<GameObject> TPs, float Thickness, float OffsetFromTrack, int LengthInPoints, MeshFilter targetMeshFilter)
+    {
+        List<GameObject> passedData = new List<GameObject>(TPs);
+        List<float[]> CornerAngles = new List<float[]>();
+        Data.Curr_RawPoints.DebugPlot(Data.green);
+        Mesh mesh = new Mesh();
+        List<Vector3> vertices = new List<Vector3>();
+        List<Vector3> normals = new List<Vector3>();
+        List<Vector2> UVs = new List<Vector2>();
+        List<int> indicies = new List<int>();
+
+        //create corner angles list 
+        for (int i =0; i < Data.Curr_RawPoints.Count-1; i ++)
+        {
+            int ptA = i;
+            int ptB = i+1;
+            int ptC = i+2;
+            if (i == Data.Curr_RawPoints.Count - 2)
+            {
+                ptC = 0;
+            }
+           
+            float ang = AngleBetweenThreePoints(Data.Curr_RawPoints[ptA], Data.Curr_RawPoints[ptB], Data.Curr_RawPoints[ptC]);
+
+            float angDir = ExtensionMethods.AngularDirection(Data.Curr_RawPoints[ptC] - Data.Curr_RawPoints[ptA], Data.Curr_RawPoints[ptB] - Data.Curr_RawPoints[ptA]);
+            float[] val = new float[2] {ang, angDir };
+            CornerAngles.Add(val);
+        }
+        //at this point, we have an array of corner data with corner width, and direction of each corner
+
+
+        for (int i = 0; i < passedData.Count - Data.MeshTrackPointFreq; i += (int)Data.MeshTrackPointFreq)
+        {
+            //check if corner is narrow enough for decal
+            if (Mathf.Abs(CornerAngles[i/(int)Data.MeshTrackPointFreq][0]) < Data.MinCornerWidth + 60)
+            {
+                float sign;
+                if (CornerAngles[i/(int) Data.MeshTrackPointFreq][1] < 0)
+                {
+                    sign = -1;
+                    ExtensionMethods.DebugPlot((Vector2)passedData[i + 15].transform.position, Data.blue);
+                    
+                }
+                else
+                {
+                    ExtensionMethods.DebugPlot((Vector2)passedData[i + 15].transform.position, Data.red);
+
+                    sign = 1;
+                }
+                if (LengthInPoints > Data.MeshTrackPointFreq)
+                {
+                    LengthInPoints = (int)Data.MeshTrackPointFreq;
+                }
+                    for (int j = ((int)Data.MeshTrackPointFreq - LengthInPoints)/2; j < LengthInPoints + ((int)Data.MeshTrackPointFreq - LengthInPoints) / 2; j++)
+                {
+                    //POPULATE VERTS and OTHER STUFF
+                    if (j == ((int)Data.MeshTrackPointFreq - LengthInPoints) / 2)
+                    {
+                        vertices.Add(passedData[i + j].transform.position + (passedData[i+j].transform.up * sign * OffsetFromTrack));
+                        vertices.Add(passedData[i + j].transform.position + (passedData[i+j].transform.up * sign * OffsetFromTrack));
+                        UVs.Add(new Vector2(0, 0));
+                        UVs.Add(new Vector2(0, 1));
+
+                        normals.Add(Vector3.back);
+                        normals.Add(Vector3.back);
+                    }
+                    if (j != LengthInPoints / 2 || j != (LengthInPoints / 2) + LengthInPoints)
+                    {
+                        vertices.Add(passedData[i + j].transform.position + (passedData[i+j].transform.up * sign * OffsetFromTrack));
+                        vertices.Add(passedData[i + j].transform.position + (passedData[i+j].transform.up * sign * (OffsetFromTrack + Thickness)));
+                        UVs.Add(new Vector2((j - LengthInPoints / 2) / LengthInPoints, 0));
+                        UVs.Add(new Vector2((j - LengthInPoints / 2) / LengthInPoints, 1));
+                        normals.Add(Vector3.back);
+                        normals.Add(Vector3.back);
+
+                        if (sign >=0)
+                        {
+                            //triangle 1 vertex indicies
+                            indicies.Add(vertices.Count - 4);
+                            indicies.Add(vertices.Count - 3);
+                            indicies.Add(vertices.Count - 1);
+                            //triangle 2 vertex indicies
+                            indicies.Add(vertices.Count - 4);
+                            indicies.Add(vertices.Count - 1);
+                            indicies.Add(vertices.Count - 2);
+                        }
+                        else
+                        {
+                            //triangle 1 vertex indicies
+                            indicies.Add(vertices.Count - 4);
+                            indicies.Add(vertices.Count - 1);
+                            indicies.Add(vertices.Count - 3);
+                            //triangle 2 vertex indicies
+                            indicies.Add(vertices.Count - 4);
+                            indicies.Add(vertices.Count - 2);
+                            indicies.Add(vertices.Count - 1);
+                        }
+                        
+                        
+                    }
+                    if (j == (LengthInPoints -1))
+                    {
+                        vertices.Add(passedData[i + j].transform.position + (passedData[i+j].transform.up * sign * OffsetFromTrack));
+                        vertices.Add(passedData[i + j].transform.position + (passedData[i+j].transform.up * sign * (OffsetFromTrack + Thickness)));
+                        UVs.Add(new Vector2(1, 0));
+                        UVs.Add(new Vector2(1, 1));
+                        normals.Add(Vector3.back);
+                        normals.Add(Vector3.back);
+
+                        if (sign >= 0)
+                        {
+                            //triangle 1 vertex indicies
+                            indicies.Add(vertices.Count - 4);
+                            indicies.Add(vertices.Count - 3);
+                            indicies.Add(vertices.Count - 1);
+                            //triangle 2 vertex indicies
+                            indicies.Add(vertices.Count - 4);
+                            indicies.Add(vertices.Count - 1);
+                            indicies.Add(vertices.Count - 2);
+                        }
+                        else
+                        {
+                            //triangle 1 vertex indicies
+                            indicies.Add(vertices.Count - 4);
+                            indicies.Add(vertices.Count - 1);
+                            indicies.Add(vertices.Count - 3);
+                            //triangle 2 vertex indicies
+                            indicies.Add(vertices.Count - 4);
+                            indicies.Add(vertices.Count - 2);
+                            indicies.Add(vertices.Count - 1);
+                        }
+                    }
+                }
+            }
+        }
+        
+
+        mesh.vertices = vertices.ToArray();
+        mesh.uv = UVs.ToArray();
+        mesh.normals = normals.ToArray();
+        mesh.triangles = indicies.ToArray();
+
+        mesh.RecalculateBounds();
+
+        MeshFilter filter = targetMeshFilter;
+        if (filter != null)
+        {
+            filter.sharedMesh = mesh;
+        }
+    }
+
 
     public void CreateColliderForTrack(List<Vector2> outerColliderPath, List<Vector2> innerColliderPath, int resolution,PolygonCollider2D targetCollider)
     {

@@ -40,8 +40,8 @@ MonoBehaviour:
     y: 773
     width: 1904
     height: 197
-  m_MinSize: {x: 100, y: 121}
-  m_MaxSize: {x: 4000, y: 4021}
+  m_MinSize: {x: 100, y: 100}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 17}
@@ -89,8 +89,8 @@ MonoBehaviour:
     y: 0
     width: 384
     height: 773
-  m_MinSize: {x: 204, y: 221}
-  m_MaxSize: {x: 4004, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 18}
   m_Panes:
   - {fileID: 18}
@@ -367,14 +367,14 @@ MonoBehaviour:
     width: 434
     height: 752
   m_SceneLighting: 1
-  lastFramingTime: 5376.627819709798
+  lastFramingTime: 11561.589082180977
   m_2DMode: 1
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 186.77724, y: 469.4146, z: -1}
+    m_Target: {x: 261.23978, y: 653.6837, z: 0.65625}
     speed: 2
-    m_Value: {x: 186.77724, y: 469.4146, z: -1}
+    m_Value: {x: 261.23978, y: 653.6837, z: 0.65625}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -401,14 +401,14 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 518.58936
+    m_Target: 847.7359
     speed: 2
-    m_Value: 518.58936
+    m_Value: 847.7359
   m_Ortho:
     m_Target: 1
     speed: 2
     m_Value: 1
-  m_LastSceneViewRotation: {x: -0.08717229, y: 0.89959055, z: -0.21045254, w: -0.3726226}
+  m_LastSceneViewRotation: {x: 0.08717229, y: -0.89959055, z: 0.21045254, w: 0.3726226}
   m_LastSceneViewOrtho: 0
   m_ReplacementShader: {fileID: 0}
   m_ReplacementString: 
@@ -451,18 +451,18 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/Materials
+    - Assets/Scripts/Game Logic
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/Materials
+  - Assets/Scripts/Game Logic
   m_LastFoldersGridSize: 16
   m_LastProjectPath: C:\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1
   m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 76250000
-    m_LastClickedID: 9590
+    m_SelectedIDs: cc250000
+    m_LastClickedID: 9676
     m_ExpandedIDs: 00000000c4240000fe240000382500005a28000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -518,22 +518,22 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 0
+    m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: 8c220000a024000048050000d02000002e24000094240000822400005a220000bc2300007a230000982300004267ffffb22300009e220000062600007a220000e2250000f0250000162600001a260000de24000028060000540500001808000052050000082500002e2f00008c3000007e3000005a300000e430f8ff3a220000502200003c230000a29cc6ff723904003a3e040054220000e62e000022250000c6f6f8ff382500005ca8f0fff8b00000f4240000d4250000103a0000c2250000fa24000000000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
+      m_Name: Scripts
+      m_OriginalName: Scripts
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 0
+      m_UserData: 9528
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 11
+      m_OriginalEventType: 0
       m_IsRenamingFilename: 1
       m_ClientGUIView: {fileID: 10}
     m_CreateAssetUtility:
@@ -669,9 +669,9 @@ MonoBehaviour:
     height: 752
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: a6260000
-    m_LastClickedID: 9894
-    m_ExpandedIDs: d4fbffff0000000080260000a6260000f2260000
+    m_SelectedIDs: 
+    m_LastClickedID: 0
+    m_ExpandedIDs: 226eecff306fecff84dfecff422dedff7c35edff705fedff7489edffd2dcedff128fefffbefbffffd4fbfffff4ffffff0000000080260000a6260000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -723,7 +723,7 @@ MonoBehaviour:
   m_ScrollPosition: {x: 0, y: 0}
   m_InspectorMode: 0
   m_PreviewResizer:
-    m_CachedPref: 159
+    m_CachedPref: -148
     m_ControlHash: -371814159
     m_PrefName: Preview_InspectorPreview
   m_PreviewWindow: {fileID: 0}

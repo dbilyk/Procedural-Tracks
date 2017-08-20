@@ -78,10 +78,6 @@ public class RaceStatsManager : MonoBehaviour {
         }
         Data.Curr_PoleCheckpoints = RearrangeCheckpoints;
 
-        Data.Curr_PoleCheckpoints[0].DebugPlot(Data.yellow);
-        Data.Curr_PoleCheckpoints[Data.Curr_PoleCheckpoints.Count -1].DebugPlot(Data.red);
-
-
         TotalCheckpointsOnMap = Checkpoints.Count;
 
         //populate player struct and push to list
