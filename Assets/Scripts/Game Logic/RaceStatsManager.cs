@@ -113,7 +113,6 @@ public class RaceStatsManager : MonoBehaviour {
 
         }
         Data.CarPoleData = CarsOnTrack;
-
 	}
 
     public void Start()
@@ -133,6 +132,10 @@ public class RaceStatsManager : MonoBehaviour {
             CurrentPoleDataInit();
             
             initComplete = true;
+        }
+        if (initComplete == true && !Data.Curr_RaceBegun)
+        {
+            initComplete = false;
         }
 
         //perioodically checking if player is facing forward

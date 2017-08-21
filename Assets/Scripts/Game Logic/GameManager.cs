@@ -60,11 +60,11 @@ public class GameManager : MonoBehaviour {
         OuterBarrier.CreateBarrier(Data.OuterBarrierPoints);
 
         //positions player/AIs
-        Player.transform.position = Data.CarStartingPositions[0].transform.position;
-        Player.transform.rotation = Data.CarStartingPositions[0].transform.rotation;
+        Player.transform.position = Data.CarStartingPositions[Data.CarStartingPositions.Count-1].transform.position;
+        Player.transform.rotation = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.rotation;
 
         //creates a new AI opponent
-        for(int i = 1; i < Data.CarStartingPositions.Count; i++)
+        for(int i = 0; i < Data.CarStartingPositions.Count-1; i++)
         {
             GameObject Ai = Instantiate(newAI, AIContainer.transform);
 

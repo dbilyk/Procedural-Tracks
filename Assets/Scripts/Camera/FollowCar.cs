@@ -15,7 +15,7 @@ public class FollowCar : MonoBehaviour {
         gameObject.transform.position = (Vector2)target.transform.position;
         if (rotatesWithTarget)
         {
-            gameObject.transform.rotation = target.transform.rotation * Quaternion.Euler(0,0,-90);
+            gameObject.transform.rotation = target.transform.rotation * Quaternion.Euler(0,90,-90);
         }
 	}
 }
