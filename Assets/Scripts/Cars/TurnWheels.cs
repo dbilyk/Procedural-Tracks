@@ -35,11 +35,17 @@ public class TurnWheels : MonoBehaviour {
             //    currentRotation.z = Mathf.LerpAngle(currentRotation.z, SteeringInput *MaxRotation * Mathf.Clamp(SteeringAngle,0f,1), LerpSpeed*Time.deltaTime);
             //    wheel.transform.localEulerAngles = currentRotation;
             //}
-            if (currentRotation.z != desiredRotation)
+            float movingDirection = Vector2.Dot(CarMovement.Velocity,transform.right);
+            if (currentRotation.z != desiredRotation && movingDirection >0)
             {
                 currentRotation.z = Mathf.LerpAngle(currentRotation.z, desiredRotation, LerpSpeed * Time.deltaTime);
                 wheel.transform.localEulerAngles = currentRotation;
 
+            }
+            if (currentRotation.z != desiredRotation && movingDirection <= 0)
+            {
+                currentRotation.z = Mathf.LerpAngle(currentRotation.z, desiredRotation*0.4f, LerpSpeed * Time.deltaTime);
+                wheel.transform.localEulerAngles = currentRotation;
             }
         }
     }

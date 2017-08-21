@@ -102,11 +102,15 @@ public class CarMovement : MonoBehaviour{
                 Deccelerate(-Vector2.right, MaxBrake, BrakeRate, rigidbody);
 
             }
-
+            float movingDirection = Vector2.Dot(Velocity, rigidbody.transform.right);
             //steering force
-            if (input.GetSteering() > 0.05f || input.GetSteering() < -0.05f)
+            if ((input.GetSteering() > 0.05f || input.GetSteering() < -0.05f) && movingDirection>0)
             {
                 SteerTarget(input.GetSteering(), SteeringResponsiveness, rigidbody);
+            }
+            if ((input.GetSteering() > 0.05f || input.GetSteering() < -0.05f) && movingDirection <= 0)
+            {
+                SteerTarget(-input.GetSteering(), SteeringResponsiveness, rigidbody);
             }
         }
     }
