@@ -97,18 +97,12 @@ public class CarMovement : MonoBehaviour{
             {
                 Accelerate(Vector2.right, MaxSpeed, AccelerationRate, rigidbody);
             }
-
-
-            //brake force
-            if (input.GetBraking() && Vector2.Dot(Velocity, gameObject.transform.right) > 0.01f)
-            {
-                Deccelerate(-Velocity.normalized, MaxBrake, BrakeRate, rigidbody);
-            }
-            if (input.GetReverse() && Velocity.SqrMagnitude() < 4f)
+            if (input.GetReverse())
             {
                 Deccelerate(-Vector2.right, MaxBrake, BrakeRate, rigidbody);
 
             }
+
             //steering force
             if (input.GetSteering() > 0.05f || input.GetSteering() < -0.05f)
             {
