@@ -28,7 +28,7 @@ public class Data : MonoBehaviour {
     public static float MeshTrackPointFreq = 30;
 
     //berm Decal creation settings
-    public static int BermLength = 20;
+    public static int BermLength = 30;
     public static float BermWidth = 0.2f;
     public static float BermOffset = 1.2f;
 

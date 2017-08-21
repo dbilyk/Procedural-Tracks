@@ -422,7 +422,6 @@ public class MapCreator : MonoBehaviour {
     {
         List<GameObject> passedData = new List<GameObject>(TPs);
         List<float[]> CornerAngles = new List<float[]>();
-        Data.Curr_RawPoints.DebugPlot(Data.green);
         Mesh mesh = new Mesh();
         List<Vector3> vertices = new List<Vector3>();
         List<Vector3> normals = new List<Vector3>();
@@ -448,48 +447,59 @@ public class MapCreator : MonoBehaviour {
         }
         //at this point, we have an array of corner data with corner width, and direction of each corner
 
-
+        float prevCornerDirection = 0, currCornerDirection;
         for (int i = 0; i < passedData.Count - Data.MeshTrackPointFreq; i += (int)Data.MeshTrackPointFreq)
         {
-            //check if corner is narrow enough for decal
-            if (Mathf.Abs(CornerAngles[i/(int)Data.MeshTrackPointFreq][0]) < Data.MinCornerWidth + 60)
+            currCornerDirection = CornerAngles[i / (int)Data.MeshTrackPointFreq][1];
+                //check if corner is narrow enough for decal, currently not doing anything....
+            if (Mathf.Abs(CornerAngles[i/(int)Data.MeshTrackPointFreq][0]) < Data.MinCornerWidth + 100)
             {
                 float sign;
                 if (CornerAngles[i/(int) Data.MeshTrackPointFreq][1] < 0)
                 {
                     sign = -1;
-                    ExtensionMethods.DebugPlot((Vector2)passedData[i + 15].transform.position, Data.blue);
-                    
                 }
                 else
                 {
-                    ExtensionMethods.DebugPlot((Vector2)passedData[i + 15].transform.position, Data.red);
-
                     sign = 1;
                 }
                 if (LengthInPoints > Data.MeshTrackPointFreq)
                 {
                     LengthInPoints = (int)Data.MeshTrackPointFreq;
                 }
-                    for (int j = ((int)Data.MeshTrackPointFreq - LengthInPoints)/2; j < LengthInPoints + ((int)Data.MeshTrackPointFreq - LengthInPoints) / 2; j++)
+                if (LengthInPoints %2 != 0)
                 {
+                    LengthInPoints -= 1;
+                }
+                for (int j = ((int)Data.MeshTrackPointFreq - LengthInPoints)/2; j <= LengthInPoints + (((int)Data.MeshTrackPointFreq - LengthInPoints) / 2); j+= 2)
+                {
+                    
                     //POPULATE VERTS and OTHER STUFF
                     if (j == ((int)Data.MeshTrackPointFreq - LengthInPoints) / 2)
                     {
-                        vertices.Add(passedData[i + j].transform.position + (passedData[i+j].transform.up * sign * OffsetFromTrack));
-                        vertices.Add(passedData[i + j].transform.position + (passedData[i+j].transform.up * sign * OffsetFromTrack));
+                        //check if the current corner is on the same side of track as previous corner
+                        if (currCornerDirection >0 && prevCornerDirection > 0 || currCornerDirection < 0 && prevCornerDirection < 0)
+                        {
+                            vertices.Add(passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * OffsetFromTrack));
+                            vertices.Add(passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * (OffsetFromTrack + Thickness)));
+                        }
+                        else
+                        {
+                            vertices.Add(passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * OffsetFromTrack));
+                            vertices.Add(passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * (OffsetFromTrack + 0.05f)));
+                        }
                         UVs.Add(new Vector2(0, 0));
                         UVs.Add(new Vector2(0, 1));
 
                         normals.Add(Vector3.back);
                         normals.Add(Vector3.back);
                     }
-                    if (j != LengthInPoints / 2 || j != (LengthInPoints / 2) + LengthInPoints)
+                    if (j != ((int)Data.MeshTrackPointFreq - LengthInPoints) / 2 && j != (LengthInPoints + ((int)Data.MeshTrackPointFreq - LengthInPoints) / 2))
                     {
                         vertices.Add(passedData[i + j].transform.position + (passedData[i+j].transform.up * sign * OffsetFromTrack));
                         vertices.Add(passedData[i + j].transform.position + (passedData[i+j].transform.up * sign * (OffsetFromTrack + Thickness)));
-                        UVs.Add(new Vector2((j - LengthInPoints / 2) / LengthInPoints, 0));
-                        UVs.Add(new Vector2((j - LengthInPoints / 2) / LengthInPoints, 1));
+                        UVs.Add(new Vector2(((float)j / (float)LengthInPoints), 0));
+                        UVs.Add(new Vector2(((float)j / (float)LengthInPoints), 1));
                         normals.Add(Vector3.back);
                         normals.Add(Vector3.back);
 
@@ -518,12 +528,22 @@ public class MapCreator : MonoBehaviour {
                         
                         
                     }
-                    if (j == (LengthInPoints -1))
+                    if (j == (LengthInPoints + ((int)Data.MeshTrackPointFreq - LengthInPoints) / 2))
                     {
-                        vertices.Add(passedData[i + j].transform.position + (passedData[i+j].transform.up * sign * OffsetFromTrack));
-                        vertices.Add(passedData[i + j].transform.position + (passedData[i+j].transform.up * sign * (OffsetFromTrack + Thickness)));
+                        //check if the current corner is on the same side of track as next corner, dont put an endcap on
+                        if (currCornerDirection > 0 && CornerAngles[(i / (int)Data.MeshTrackPointFreq)+1][1] > 0 || currCornerDirection < 0 && CornerAngles[(i / (int)Data.MeshTrackPointFreq) + 1][1] < 0)
+                        {
+                            vertices.Add(passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * OffsetFromTrack));
+                            vertices.Add(passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * (OffsetFromTrack + Thickness)));
+                        }
+                        else
+                        {
+                            vertices.Add(passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * OffsetFromTrack));
+                            vertices.Add(passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * (OffsetFromTrack + 0.05f)));
+                        }
                         UVs.Add(new Vector2(1, 0));
                         UVs.Add(new Vector2(1, 1));
+
                         normals.Add(Vector3.back);
                         normals.Add(Vector3.back);
 
@@ -549,9 +569,12 @@ public class MapCreator : MonoBehaviour {
                             indicies.Add(vertices.Count - 2);
                             indicies.Add(vertices.Count - 1);
                         }
+
                     }
                 }
+                prevCornerDirection = CornerAngles[i / (int)Data.MeshTrackPointFreq][1];
             }
+            
         }
         
 
