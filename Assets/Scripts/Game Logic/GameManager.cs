@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour {
     public MiniMap MiniMapScript;
     //game objects
     public Canvas Canvas;
+    public GameObject RaceStatsManager;
     public GameObject Player;
     public GameObject ActiveGameTrack;
     public GameObject BermDecals;
@@ -40,15 +41,13 @@ public class GameManager : MonoBehaviour {
         MapCreator.RotateTrackObjectsAlongCurves(Data.CurrentMeshHelperObjects);
         MapCreator.CreateStartingGrid(Data.CurrentMeshHelperObjects,Data.StartingGridLength, Data.StartingGridWidth, Data.NumberOfGridPositions);
 
-        MapCreator.CreateTrackCornerDecals(Data.CurrentMeshHelperObjects,Data.BermWidth,Data.BermOffset,Data.BermLength,BermDecals.GetComponent<MeshFilter>());
+        MapCreator.CreateTrackBerms(Data.CurrentMeshHelperObjects,Data.BermWidth,Data.BermOffset,Data.BermLength,BermDecals.GetComponent<MeshFilter>());
 
         MapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects, Data.TrackMeshThickness, ActiveGameTrack.gameObject.GetComponent<MeshFilter>());
         MapCreator.CreateColliderForTrack(Data.Curr_OuterTrackPoints, Data.Curr_InnerTrackPoints, Data.TrackColliderResolution, ActiveGameTrack.GetComponent<PolygonCollider2D>());
 
-
         //populates current racing line with correct data
         Data.Curr_RacingLinePoints = MapCreator.CreateRacingLinePoints(Data.Curr_RawPoints, Data.RacingLineWaypointFreq, Data.RacingLineTightness);
-
        
         //enable minimap
         MiniMapGroup.SetActive(true);
@@ -73,6 +72,7 @@ public class GameManager : MonoBehaviour {
             Ai.transform.rotation = Data.CarStartingPositions[i].transform.rotation;
 
         }
+        RaceStatsManager.SetActive(true);
         Data.Curr_RaceBegun = true;
         
     }
@@ -80,11 +80,11 @@ public class GameManager : MonoBehaviour {
     //destroys stuff that gets recreated in StartNewGame
     void ResetGame()
     {
+        RaceStatsManager.SetActive(false);
         Data.Curr_RaceBegun = false;
         for(int i = 0; i < StartingGridContainer.transform.childCount; i++)
         {
             Destroy(StartingGridContainer.transform.GetChild(i).gameObject);
-
         }
         for (int i = 0; i< AIContainer.transform.childCount; i++)
         {

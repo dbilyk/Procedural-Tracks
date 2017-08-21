@@ -418,7 +418,7 @@ public class MapCreator : MonoBehaviour {
 
     }
 
-    public void CreateTrackCornerDecals(List<GameObject> TPs, float Thickness, float OffsetFromTrack, int LengthInPoints, MeshFilter targetMeshFilter)
+    public void CreateTrackBerms(List<GameObject> TPs, float Thickness, float OffsetFromTrack, int LengthInPoints, MeshFilter targetMeshFilter)
     {
         List<GameObject> passedData = new List<GameObject>(TPs);
         List<float[]> CornerAngles = new List<float[]>();
