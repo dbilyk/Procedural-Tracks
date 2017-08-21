@@ -73,7 +73,6 @@ public class GameManager : MonoBehaviour {
 
         }
         RaceStatsManager.SetActive(true);
-        Data.Curr_RaceBegun = true;
         
     }
 
@@ -81,7 +80,6 @@ public class GameManager : MonoBehaviour {
     void ResetGame()
     {
         RaceStatsManager.SetActive(false);
-        Data.Curr_RaceBegun = false;
         for(int i = 0; i < StartingGridContainer.transform.childCount; i++)
         {
             Destroy(StartingGridContainer.transform.GetChild(i).gameObject);

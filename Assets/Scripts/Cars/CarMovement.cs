@@ -96,7 +96,7 @@ public class CarMovement : MonoBehaviour{
             if (input.GetAccel())
             {
                 Accelerate(Vector2.right, MaxSpeed, AccelerationRate, rigidbody);
-            }else
+            }
 
 
             //brake force
