@@ -135,7 +135,7 @@ public class CarMovement : MonoBehaviour{
             StartingSteeringResponse = this.SteeringResponsiveness;
             TrackTriggerInit = true;
         }
-        else
+        if (TrackTriggerInit && col.gameObject.name == "ActiveGameTrack")
         {
             this.AccelerationRate = StartingAccel;
             this.MaxBrake = StartingBrakes;

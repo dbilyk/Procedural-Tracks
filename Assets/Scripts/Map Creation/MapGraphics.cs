@@ -25,7 +25,6 @@ public class MapGraphics : MonoBehaviour {
     void Start () {
         MapPoints = Data.Curr_TrackPoints;
         MeshHelperEmpties = Data.CurrentMeshHelperObjects;
-        Debug.Log("num of map points: " + MapPoints.Count);
         for(int i = 0; i< MapPoints.Count; i++)
         {
             float dirtDice = Random.value;

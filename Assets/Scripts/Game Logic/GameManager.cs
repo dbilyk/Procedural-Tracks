@@ -15,8 +15,11 @@ public class GameManager : MonoBehaviour {
     public GameObject Player;
     public GameObject ActiveGameTrack;
     public GameObject BermDecals;
+
     public GameObject AIContainer;
     public GameObject StartingGridContainer;
+    public GameObject FoliageContainer;
+
     public GameObject newAI;
     public GameObject MiniMapGroup;
 
@@ -59,6 +62,8 @@ public class GameManager : MonoBehaviour {
         InnerBarrier.CreateBarrier(Data.InnerBarrierPoints);
         OuterBarrier.CreateBarrier(Data.OuterBarrierPoints);
 
+        FoliageContainer.SetActive(true);
+
         //positions player/AIs
         Player.transform.position = Data.CarStartingPositions[Data.CarStartingPositions.Count-1].transform.position;
         Player.transform.rotation = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.rotation;
@@ -88,6 +93,7 @@ public class GameManager : MonoBehaviour {
         {
             Destroy(AIContainer.transform.GetChild(i).gameObject);
         }
+        FoliageContainer.SetActive(false);
     }
 
 

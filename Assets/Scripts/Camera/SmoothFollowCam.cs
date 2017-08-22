@@ -20,7 +20,7 @@ public class SmoothFollowCam : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
         
-        transform.position = Vector3.Lerp(transform.position, new Vector3(PlayerTrans.position.x, PlayerTrans.position.y, Mathf.Clamp(-playerRB.velocity.sqrMagnitude/3, -12, -8))/*+ PlayerTrans.right* CameraOffset*/, PosLerpRate  * Time.fixedDeltaTime);
+        transform.position = Vector3.Lerp(transform.position, new Vector3(PlayerTrans.position.x, PlayerTrans.position.y, Mathf.Clamp(-playerRB.velocity.sqrMagnitude, -25, -18))/*+ PlayerTrans.right* CameraOffset*/, PosLerpRate  * Time.fixedDeltaTime);
         //transform.position = new Vector3(transform.position.x,transform.position.y, Mathf.Clamp(-playerRB.velocity.sqrMagnitude, -10,-5));
         transform.rotation = Quaternion.Lerp(transform.rotation, PlayerTrans.rotation* Quaternion.Euler(0,0,-90), RotLerpRate * Time.fixedDeltaTime);
 	}

@@ -112,6 +112,11 @@ public class BarrierCreator : MonoBehaviour {
 
     }
 
+    public void CreateBarrierMesh()
+    {
+
+    }
+
 
 
 }
