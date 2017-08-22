@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/ActiveGame Scene/ActiveGame v2.5 newUI.unity
+- path: Assets/Scenes/ActiveGame Scene/ActiveGame v2.5 test 3d car.unity
   isLoaded: 1
   isActive: 1

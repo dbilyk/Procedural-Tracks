@@ -32,7 +32,7 @@ public class chickMove : MonoBehaviour {
 	}
     IEnumerator ChickJump()
     {
-        RB.AddRelativeForce(-Vector2.up * 0.5f,ForceMode2D.Impulse);
+        //RB.AddRelativeForce(-Vector2.up * 0.5f,ForceMode2D.Impulse);
         yield return new WaitForSeconds(0.5f);
         jumpStarted = false;
     }
@@ -40,7 +40,7 @@ public class chickMove : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D Col)
     {
-        if (Col.gameObject.tag == "Player")
+        if (Col.gameObject.tag == "Player" || Col.gameObject.tag == "AI")
         {
             GameObject bloodDecal = GameObject.Instantiate(ChickSplat);
             bloodDecal.transform.position = gameObject.transform.position;
