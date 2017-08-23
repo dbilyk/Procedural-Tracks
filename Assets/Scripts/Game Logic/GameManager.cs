@@ -48,13 +48,20 @@ public class GameManager : MonoBehaviour {
 
         MapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects, Data.TrackMeshThickness, ActiveGameTrack.gameObject.GetComponent<MeshFilter>());
 
-        //TESTING chicken spawn 
-        for(int i = 0; i < Data.CurrentMeshHelperObjects.Count; i++)
+        
+        
+        
+        //------------------TESTING chicken spawn , can delete any time------------------------
+        for(int i = 0; i < Data.CurrentMeshHelperObjects.Count; i+=4)
         {
 
             GameObject go = GameObject.Instantiate(GameObject.Find("chickModelWIthAnim"));
             go.transform.position = Data.CurrentMeshHelperObjects[i].transform.position;
+            
         }
+
+
+
 
         MapCreator.CreateColliderForTrack(Data.Curr_OuterTrackPoints, Data.Curr_InnerTrackPoints, Data.TrackColliderResolution, ActiveGameTrack.GetComponent<PolygonCollider2D>());
 
