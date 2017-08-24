@@ -30,7 +30,10 @@ public class chickMove : MonoBehaviour {
             Destroy(gameObject);
         }
 
-                   
+        if (collided && bloodSpatter.time >= 2)
+        {
+            bloodSpatter.Pause();
+        }            
 
 
 	}
@@ -52,8 +55,9 @@ public class chickMove : MonoBehaviour {
             BloodSplatterGO.transform.rotation = Quaternion.Euler(BloodSplatterGO.transform.eulerAngles.x, BloodSplatterGO.transform.eulerAngles.y, Col.transform.eulerAngles.z -45);
             BloodSplatterGO.transform.SetParent(null);
             bloodSpatter.Play();
+            
             collided = true;
-            gameObject.GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
+            GameObject.Destroy(gameObject);
             
         }
     }
