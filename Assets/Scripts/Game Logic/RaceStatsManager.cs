@@ -51,123 +51,151 @@ public class RaceStatsManager : MonoBehaviour {
     private List<CarPolePositionData> CarsOnTrack = new List<CarPolePositionData>();
     private int TotalCheckpointsOnMap;
 
+    private bool hasInitialized = false;
+
     //call at the start of a race ot populate currentPoleData list
     void CurrentPoleDataInit() {
-        Checkpoints = mapCreator.CreateTrackPoints(Data.Curr_ControlPoints, CheckpointFreq);
-
-        int closestChkptToStartingLine = ExtensionMethods.GetNearestInList(GameObject.FindGameObjectWithTag("StartingLine").transform.position, Checkpoints);
-        if (closestChkptToStartingLine != Checkpoints.Count - 1)
+        if (!hasInitialized)
         {
-            closestChkptToStartingLine += 1;
+            Debug.Log("hERE");
+            Checkpoints = mapCreator.CreateTrackPoints(Data.Curr_ControlPoints, CheckpointFreq);
+            int closestChkptToStartingLine = ExtensionMethods.GetNearestInList(GameObject.FindGameObjectWithTag("StartingLine").transform.position, Checkpoints);
+            if (closestChkptToStartingLine != Checkpoints.Count - 1)
+            {
+                closestChkptToStartingLine += 1;
+            }
+            else
+            {
+                closestChkptToStartingLine = 0;
+            }
+            List<Vector2> RearrangeCheckpoints = new List<Vector2>();
+
+
+            for (int i = closestChkptToStartingLine; i < Checkpoints.Count; i++)
+            {
+                RearrangeCheckpoints.Add(Checkpoints[i]);
+            }
+            for (int i = 0; i < closestChkptToStartingLine; i++)
+            {
+                RearrangeCheckpoints.Add(Checkpoints[i]);
+
+            }
+            Data.Curr_PoleCheckpoints = RearrangeCheckpoints;
+
+            TotalCheckpointsOnMap = Checkpoints.Count;
+
+            //populate player struct and push to list
+            PlayerPoleData.CarObject = Player.gameObject;
+            int playerNearestWPindex = ExtensionMethods.GetNearestInList(Player.transform.position, Checkpoints);
+            PlayerPoleData.Curr_CheckpointIndex = playerNearestWPindex;
+            //make sure we get both the current closest and WP before this one so that we can use that vector to make sure the player is driving the right way.
+
+            PlayerPoleData.LastValidCheckpointIndex = 0;
+            PlayerPoleData.Curr_LapNumber = 0;
+            PlayerPoleData.TotalCheckpointsPassedThisLap = 0;
+            PlayerPoleData.FacingForward = true;
+            PlayerPoleData.IndexInDataArray = 0;
+            PlayerPoleData.AllowCheckpointUpdates = true;
+            CarsOnTrack.Add(PlayerPoleData);
+
+            //AI struct creation
+            for (int i = 0; i < AIContainer.transform.childCount; i++)
+            {
+                CarPolePositionData AIData = new CarPolePositionData();
+                AIData.CarObject = AIContainer.transform.GetChild(i).gameObject;
+
+                AIData.Curr_CheckpointIndex = ExtensionMethods.GetNearestInList(AIData.CarObject.transform.position, Checkpoints);
+
+                AIData.LastValidCheckpointIndex = AIData.Curr_CheckpointIndex;
+                AIData.Curr_LapNumber = 0;
+                AIData.TotalCheckpointsPassedThisLap = 0;
+                AIData.IndexInDataArray = i + 1;
+                AIData.FacingForward = true;
+                AIData.AllowCheckpointUpdates = true;
+
+                CarsOnTrack.Add(AIData);
+
+            }
+            Data.CarPoleData = CarsOnTrack;
+            LapTrigger.OnLapComplete += LapComplete;
+            hasInitialized = true;
         }
         else
         {
-            closestChkptToStartingLine = 0;
+            //reset values of existing set of racestats classes
+            PlayerPoleData = CarsOnTrack[0];
+            int playerNearestWPindex = ExtensionMethods.GetNearestInList(Player.transform.position, Checkpoints);
+            PlayerPoleData.Curr_CheckpointIndex = playerNearestWPindex;
+            PlayerPoleData.LastValidCheckpointIndex = 0;
+            PlayerPoleData.Curr_LapTime = 0;
+            PlayerPoleData.Curr_LapNumber = 0;
+            PlayerPoleData.TotalCheckpointsPassedThisLap = 0;
+            PlayerPoleData.FacingForward = true;
+            PlayerPoleData.IndexInDataArray = 0;
+            PlayerPoleData.AllowCheckpointUpdates = true;
+
+            for (int i = 0; i < AIContainer.transform.childCount; i++)
+            {
+                CarPolePositionData AIData = CarsOnTrack[i+1];
+                AIData.CarObject = AIContainer.transform.GetChild(i).gameObject;
+
+                AIData.Curr_CheckpointIndex = ExtensionMethods.GetNearestInList(AIData.CarObject.transform.position, Checkpoints);
+
+                AIData.LastValidCheckpointIndex = AIData.Curr_CheckpointIndex;
+                AIData.Curr_LapNumber = 0;
+                AIData.TotalCheckpointsPassedThisLap = 0;
+                AIData.IndexInDataArray = i + 1;
+                AIData.FacingForward = true;
+                AIData.AllowCheckpointUpdates = true;
+            }
         }
-        List<Vector2> RearrangeCheckpoints = new List<Vector2>();
-        
 
-        for (int i = closestChkptToStartingLine; i < Checkpoints.Count; i ++)
-        {
-            RearrangeCheckpoints.Add(Checkpoints[i]);
-        }
-        for (int i = 0; i < closestChkptToStartingLine; i ++)
-        {
-            RearrangeCheckpoints.Add(Checkpoints[i]);
-
-        }
-        Data.Curr_PoleCheckpoints = RearrangeCheckpoints;
-
-        TotalCheckpointsOnMap = Checkpoints.Count;
-
-        //populate player struct and push to list
-        PlayerPoleData.CarObject = Player.gameObject;
-        int playerNearestWPindex = ExtensionMethods.GetNearestInList(Player.transform.position, Checkpoints);
-        PlayerPoleData.Curr_CheckpointIndex = playerNearestWPindex;
-        //make sure we get both the current closest and WP before this one so that we can use that vector to make sure the player is driving the right way.
        
-        PlayerPoleData.LastValidCheckpointIndex = 0;
-        PlayerPoleData.Curr_LapNumber = 0;
-        PlayerPoleData.TotalCheckpointsPassedThisLap = 0;
-        PlayerPoleData.FacingForward = true;
-        PlayerPoleData.IndexInDataArray = 0;
-        PlayerPoleData.AllowCheckpointUpdates = true;
-        CarsOnTrack.Add(PlayerPoleData);
-
-        //AI struct creation
-		for(int i = 0; i < AIContainer.transform.childCount; i++)
-        {
-            CarPolePositionData AIData = new CarPolePositionData();
-            AIData.CarObject =AIContainer.transform.GetChild(i).gameObject;
-            
-            AIData.Curr_CheckpointIndex = ExtensionMethods.GetNearestInList(AIData.CarObject.transform.position,Checkpoints);
-           
-            AIData.LastValidCheckpointIndex = AIData.Curr_CheckpointIndex;
-            AIData.Curr_LapNumber = 0;
-            AIData.TotalCheckpointsPassedThisLap = 0;
-            AIData.IndexInDataArray = i+1;
-            AIData.FacingForward = true;
-            AIData.AllowCheckpointUpdates = true;
-
-            CarsOnTrack.Add(AIData);
-
-        }
-        Data.CarPoleData = CarsOnTrack;
 	}
-
-    void OnEnable()
-    {
-        CurrentPoleDataInit();
-
-    }
-
-    public void Start()
-    {
-        LapTrigger.OnLapComplete += LapComplete;
-    }
-
     //private bool initComplete = false;
     private bool CheckFacingForward = false;
     private bool UpdatePlayerCheckpts = false;
     private bool UpdateAICheckpoints = false;
     private bool UpdatePolePos = false;
     private bool UpdateLapTimer = false;
-    void Update () {
-        //if (!initComplete && Data.Curr_RaceBegun)
-        //{
-            
-        //    initComplete = true;
-        //}
-        //if (initComplete == true && !Data.Curr_RaceBegun)
-        //{
-        //    initComplete = false;
-        //}
+    void OnEnable()
+    {
+        CurrentPoleDataInit();
 
+        CheckFacingForward = false;
+        UpdatePlayerCheckpts = false;
+        UpdateAICheckpoints = false;
+        UpdatePolePos = false;
+        UpdateLapTimer = false;
+
+    }
+    
+    void Update () {
         //perioodically checking if player is facing forward
-        if (!CheckFacingForward && Data.Curr_RaceBegun)
+        if (!CheckFacingForward)
         {
             StartCoroutine("GetFacingForward");
             CheckFacingForward = true;
         }
         //periodically recalculating player checkpoints
-        if (!UpdatePlayerCheckpts && Data.Curr_RaceBegun)
+        if (!UpdatePlayerCheckpts)
         {
             StartCoroutine("UpdatePlayerCheckpoints");
             UpdatePlayerCheckpts = true;
         }
         //recalc nearest AI WPs
-        if (!UpdateAICheckpoints && Data.Curr_RaceBegun)
+        if (!UpdateAICheckpoints)
         {
             StartCoroutine("UpdateOpponentCheckpoints");
             UpdateAICheckpoints = true;
         }
-
-        if (!UpdatePolePos && Data.Curr_RaceBegun)
+         
+        if (!UpdatePolePos)
         {
             StartCoroutine("UpdatePolePosition");
             UpdatePolePos = true;
         }
-        if (!UpdateLapTimer && Data.Curr_RaceBegun)
+        if (!UpdateLapTimer && Data.CarPoleData[0].Curr_LapNumber != 0)
         {
             StartCoroutine("UpdateLapTime");
             UpdateLapTimer = true;

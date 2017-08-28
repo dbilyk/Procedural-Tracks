@@ -44,7 +44,9 @@ public class FoliageCreator : MonoBehaviour {
                 InstantiatedFoliage.Add(newItem);
 
             }
-        } 
+        }
+        
+         
     }
     void OnDisable()
     {

@@ -25,22 +25,16 @@ public class RaceStatsUIUpdate : MonoBehaviour {
    
     private CarPolePositionData PlayerRaceStats;
 
-
-    void Start()
-    {
-        
-    }
-
     bool UpdateUI = false;
-    bool setPlayerDataVar = false;
-    void Update () {
-        if (!setPlayerDataVar && Data.CarPoleData.Count > 0)
-        {
-            PlayerRaceStats = Data.CarPoleData[0];
-            setPlayerDataVar = true;
-        }
+    void OnEnable()
+    {
+        UpdateUI = false;
+        PlayerRaceStats = Data.CarPoleData[0];
 
-        if (!UpdateUI && Data.Curr_RaceBegun && setPlayerDataVar)
+    } 
+
+    void Update () {
+        if (!UpdateUI)
         {
             StartCoroutine("UpdateUIStats");
             UpdateUI = true;

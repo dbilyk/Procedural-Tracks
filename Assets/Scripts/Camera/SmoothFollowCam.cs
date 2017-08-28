@@ -9,18 +9,24 @@ public class SmoothFollowCam : MonoBehaviour {
     public float RotLerpRate;
     private Transform PlayerTrans;
     private Rigidbody2D playerRB;
-    public float CameraOffset;
-    
+    public float YOffset = 1f;
+    public float MinVertOffset = -18;
+    public float MaxVertOffset = -25;
+    public Vector3 CurrentDesiredPosition;
 	// Use this for initialization
 	void Start () {
         PlayerTrans = Player.transform;
         playerRB = Player.gameObject.GetComponent<Rigidbody2D>();
-	}
-	
-	// Update is called once per frame
-	void FixedUpdate () {
-        
-        transform.position = Vector3.Lerp(transform.position, new Vector3(PlayerTrans.position.x, PlayerTrans.position.y, Mathf.Clamp(-playerRB.velocity.sqrMagnitude, -25, -18))/*+ PlayerTrans.right* CameraOffset*/, PosLerpRate  * Time.fixedDeltaTime);
+        CurrentDesiredPosition = new Vector3(PlayerTrans.position.x, PlayerTrans.position.y, Mathf.Clamp(-playerRB.velocity.sqrMagnitude, -25, -18));
+
+    }
+
+    // Update is called once per frame
+    void FixedUpdate () {
+        CurrentDesiredPosition = new Vector3(PlayerTrans.position.x, PlayerTrans.position.y, Mathf.Clamp(-playerRB.velocity.sqrMagnitude, -25, -18));
+        Debug.Log(Vector3.Cross(Player.transform.right, playerRB.velocity).z);
+        transform.position = Vector3.Lerp(transform.position, CurrentDesiredPosition, PosLerpRate  * Time.fixedDeltaTime);
+        //transform.position = Vector3.Lerp(transform.position, transform.position * ((PlayerTrans.right * Vector3.Cross(Player.transform.right, playerRB.velocity).z).sqrMagnitude /4),Time.fixedDeltaTime);
         //transform.position = new Vector3(transform.position.x,transform.position.y, Mathf.Clamp(-playerRB.velocity.sqrMagnitude, -10,-5));
         transform.rotation = Quaternion.Lerp(transform.rotation, PlayerTrans.rotation* Quaternion.Euler(0,0,-90), RotLerpRate * Time.fixedDeltaTime);
 	}
