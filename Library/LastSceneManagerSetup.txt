@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/ActiveGame Scene/ActiveGame v2.5 add 3d to AI test.unity
+- path: Assets/Scenes/ActiveGame Scene/ActiveGame v2.6 clean up.unity
   isLoaded: 1
   isActive: 1

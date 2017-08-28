@@ -8,11 +8,11 @@ public class GameManager : MonoBehaviour {
     public BarrierCreator InnerBarrier;
     public BarrierCreator OuterBarrier;
     public MapCreator MapCreator;
-    public MiniMap MiniMapScript;
+
     //game objects
-    public Canvas Canvas;
     public GameObject RaceStatsManager;
     public GameObject Player;
+    public GameObject newAI;
     public GameObject ActiveGameTrack;
     public GameObject BermDecals;
 
@@ -20,17 +20,20 @@ public class GameManager : MonoBehaviour {
     public GameObject StartingGridContainer;
     public GameObject FoliageContainer;
 
-    public GameObject newAI;
+    public GameObject GameLoopUI;
     public GameObject MiniMapGroup;
 
-    private void StartNewGame()
+    public List<AIInputController> AIInputs = new List<AIInputController>();
+    
+
+    void GenerateNewTrackData()
     {
         Data.Curr_RawPoints = new List<Vector2>();
 
         Data.Curr_RawPoints = MapCreator.CreateRawUnsortedPoints();
         Data.Curr_RawPoints = MapCreator.SortPoints(Data.Curr_RawPoints);
         //have to run point thinning and angle adjustment several times because they recursively affect each other.
-        for(int i = 0; i < 50; i++)
+        for (int i = 0; i < 50; i++)
         {
             Data.Curr_RawPoints = MapCreator.RemovePointsTooClose(Data.Curr_RawPoints, Data.PointSpacing);
             Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
@@ -39,60 +42,69 @@ public class GameManager : MonoBehaviour {
         //Data.Curr_RawPoints = MapCreator.ApplyRandomRotation(Data.Curr_RawPoints);
         Data.Curr_ControlPoints = MapCreator.CreateControlPoints(Data.Curr_RawPoints);
         Data.Curr_TrackPoints = MapCreator.CreateTrackPoints(Data.Curr_ControlPoints, Data.MeshTrackPointFreq);
+    }
+
+    void GenerateLevel()
+    {
+       
         //mesh creation
         MapCreator.CreateOrSetMeshHelperObjects(Data.Curr_TrackPoints);
         MapCreator.RotateTrackObjectsAlongCurves(Data.CurrentMeshHelperObjects);
-        MapCreator.CreateStartingGrid(Data.CurrentMeshHelperObjects,Data.StartingGridLength, Data.StartingGridWidth, Data.NumberOfGridPositions);
+        MapCreator.CreateStartingGrid(Data.CurrentMeshHelperObjects, Data.StartingGridLength, Data.StartingGridWidth, Data.NumberOfGridPositions);
 
-        MapCreator.CreateTrackBerms(Data.CurrentMeshHelperObjects,Data.BermWidth,Data.BermOffset,Data.BermLength,BermDecals.GetComponent<MeshFilter>());
+        MapCreator.CreateTrackBerms(Data.CurrentMeshHelperObjects, Data.BermWidth, Data.BermOffset, Data.BermLength, BermDecals.GetComponent<MeshFilter>());
 
         MapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects, Data.TrackMeshThickness, ActiveGameTrack.gameObject.GetComponent<MeshFilter>());
-
-        
-        
-        
-        //------------------TESTING chicken spawn , can delete any time------------------------
-        for(int i = 0; i < Data.CurrentMeshHelperObjects.Count; i+=4)
-        {
-
-            GameObject go = GameObject.Instantiate(GameObject.Find("chickModelWIthAnim"));
-            go.transform.position = Data.CurrentMeshHelperObjects[i].transform.position;
-            
-        }
-
-
-
 
         MapCreator.CreateColliderForTrack(Data.Curr_OuterTrackPoints, Data.Curr_InnerTrackPoints, Data.TrackColliderResolution, ActiveGameTrack.GetComponent<PolygonCollider2D>());
 
         //populates current racing line with correct data
         Data.Curr_RacingLinePoints = MapCreator.CreateRacingLinePoints(Data.Curr_RawPoints, Data.RacingLineWaypointFreq, Data.RacingLineTightness);
-       
-        //enable minimap
-        MiniMapGroup.SetActive(true);
-        MiniMapScript.CreateMinimap(Data.Curr_ControlPoints);
 
         //create barriers
         Data.InnerBarrierPoints = InnerBarrier.CreateOutline(Data.Curr_RawPoints, Data.InnerBarrierOffset, "inner");
         Data.OuterBarrierPoints = OuterBarrier.CreateOutline(Data.Curr_RawPoints, Data.OuterBarrierOffset, "outer");
         InnerBarrier.CreateBarrier(Data.InnerBarrierPoints);
         OuterBarrier.CreateBarrier(Data.OuterBarrierPoints);
-
+        
         FoliageContainer.SetActive(true);
 
-        //positions player/AIs
-        Player.transform.position = Data.CarStartingPositions[Data.CarStartingPositions.Count-1].transform.position;
-        Player.transform.rotation = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.rotation;
+        StaticBatchingUtility.Combine(FoliageContainer);
+    }
 
+    private void GenerateAI()
+    {
         //creates a new AI opponent
-        for(int i = 0; i < Data.CarStartingPositions.Count-1; i++)
+        for (int i = 0; i < Data.CarStartingPositions.Count - 1; i++)
         {
             GameObject Ai = Instantiate(newAI, AIContainer.transform);
 
             Ai.transform.position = Data.CarStartingPositions[i].transform.position;
             Ai.transform.rotation = Data.CarStartingPositions[i].transform.rotation;
-
+            AIInputController aiInput = Ai.GetComponent<AIInputController>();
+            aiInput.enabled = false;
+            AIInputs.Add(aiInput);
         }
+    }
+
+    private void StartingCountdown()
+    {
+        //positions player/AIs
+        Player.transform.position = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.position;
+        Player.transform.rotation = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.rotation;
+        Player.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+
+
+
+    }
+
+
+    private void StartRace()
+    {
+        //Enable gameloop UI
+        GameLoopUI.SetActive(true);
+        MiniMapGroup.SetActive(true);
+        
         RaceStatsManager.SetActive(true);
         Data.Curr_RaceBegun = true;
     }
@@ -115,7 +127,17 @@ public class GameManager : MonoBehaviour {
 
     public void StartNewGameButton()
     {
+        //ResetGame();
+        GenerateNewTrackData();
+        GenerateLevel();
+        GenerateAI();
+        StartingCountdown();
+        StartRace();
+    }
+
+    public void RestartLevelButton()
+    {
         ResetGame();
-        StartNewGame();
-    }	
+        StartRace();
+    }
 }

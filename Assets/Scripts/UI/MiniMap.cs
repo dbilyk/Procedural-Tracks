@@ -7,7 +7,12 @@ public class MiniMap : MonoBehaviour {
     public int minimapResolution;
     public LineRenderer minimapLine;
 
-    //redo this either as a mesh or by pooling the minimap sprites
+
+    void OnEnable()
+    {
+        CreateMinimap(Data.Curr_ControlPoints);
+    }
+
     public void CreateMinimap (List<Vector2> passedControlPoints) {
         
         List<Vector2> passedData = new List<Vector2>(passedControlPoints);
@@ -15,10 +20,9 @@ public class MiniMap : MonoBehaviour {
         minimapLine.positionCount = passedData.Count;
         for(int i =0; i <passedData.Count; i ++)
         {
-            minimapLine.SetPosition(i, new Vector3(passedData[i].x, passedData[i].y, 0));
+            minimapLine.SetPosition(i, new Vector3(passedData[i].x, passedData[i].y, 10));
         }
-        
-}
+    }
 
 
 }

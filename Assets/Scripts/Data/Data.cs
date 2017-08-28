@@ -91,7 +91,7 @@ public class Data : MonoBehaviour {
 }
 
 //data structure for saving a track
-public struct SavedTrack 
+public class SavedTrack 
 {
     public List<Vector2> RawPoints;
     public string name;

@@ -115,28 +115,33 @@ public class RaceStatsManager : MonoBehaviour {
         Data.CarPoleData = CarsOnTrack;
 	}
 
+    void OnEnable()
+    {
+        CurrentPoleDataInit();
+
+    }
+
     public void Start()
     {
         LapTrigger.OnLapComplete += LapComplete;
     }
 
-    private bool initComplete = false;
+    //private bool initComplete = false;
     private bool CheckFacingForward = false;
     private bool UpdatePlayerCheckpts = false;
     private bool UpdateAICheckpoints = false;
     private bool UpdatePolePos = false;
     private bool UpdateLapTimer = false;
     void Update () {
-        if (!initComplete && Data.Curr_RaceBegun)
-        {
-            CurrentPoleDataInit();
+        //if (!initComplete && Data.Curr_RaceBegun)
+        //{
             
-            initComplete = true;
-        }
-        if (initComplete == true && !Data.Curr_RaceBegun)
-        {
-            initComplete = false;
-        }
+        //    initComplete = true;
+        //}
+        //if (initComplete == true && !Data.Curr_RaceBegun)
+        //{
+        //    initComplete = false;
+        //}
 
         //perioodically checking if player is facing forward
         if (!CheckFacingForward && Data.Curr_RaceBegun)
@@ -156,6 +161,7 @@ public class RaceStatsManager : MonoBehaviour {
             StartCoroutine("UpdateOpponentCheckpoints");
             UpdateAICheckpoints = true;
         }
+
         if (!UpdatePolePos && Data.Curr_RaceBegun)
         {
             StartCoroutine("UpdatePolePosition");

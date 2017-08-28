@@ -1,5 +1,5 @@
 5.6.1f1:3.1.0.0
-StandaloneWindows64
+StandaloneWindows
 C:/SD Card/Unity/Editor/Data/Managed/UnityEngine.dll
 C:/SD Card/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll
 C:/SD Card/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll
