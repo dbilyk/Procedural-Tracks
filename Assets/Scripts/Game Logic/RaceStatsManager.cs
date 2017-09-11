@@ -57,7 +57,6 @@ public class RaceStatsManager : MonoBehaviour {
     void CurrentPoleDataInit() {
         if (!hasInitialized)
         {
-            Debug.Log("hERE");
             Checkpoints = mapCreator.CreateTrackPoints(Data.Curr_ControlPoints, CheckpointFreq);
             int closestChkptToStartingLine = ExtensionMethods.GetNearestInList(GameObject.FindGameObjectWithTag("StartingLine").transform.position, Checkpoints);
             if (closestChkptToStartingLine != Checkpoints.Count - 1)

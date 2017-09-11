@@ -12,12 +12,14 @@ public class GameManager : MonoBehaviour {
     public BarrierCreator OuterBarrier;
     public MapCreator MapCreator;
     public SmoothFollowCam FollowCam;
+
     //game objects
     public GameObject RaceStatsManager;
     public GameObject Player;
     public GameObject newAI;
     public GameObject ActiveGameTrack;
     public GameObject BermDecals;
+    public GameObject chickenTest;
 
     public GameObject AIContainer;
     public GameObject StartingGridContainer;
@@ -25,9 +27,15 @@ public class GameManager : MonoBehaviour {
 
     public GameObject GameLoopUI;
     public GameObject MiniMapGroup;
+    public GameObject StartingLights;
 
     public List<AIInputController> AIInputs = new List<AIInputController>();
     
+
+    void Awake()
+    {
+        Application.targetFrameRate = 60;
+    }
 
     //small helper to toggle AI input
     void SetAIInput(bool isActive)
@@ -59,10 +67,21 @@ public class GameManager : MonoBehaviour {
 
     void GenerateLevel()
     {
+
        
         //mesh creation
         MapCreator.CreateOrSetMeshHelperObjects(Data.Curr_TrackPoints);
         MapCreator.RotateTrackObjectsAlongCurves(Data.CurrentMeshHelperObjects);
+
+        foreach(GameObject helper in Data.CurrentMeshHelperObjects)
+        {
+            GameObject chicken = Instantiate(chickenTest);
+            chickenTest.transform.position = helper.transform.position;
+            chickenTest.transform.rotation = helper.transform.rotation;
+
+        }
+
+
         MapCreator.CreateStartingGrid(Data.CurrentMeshHelperObjects, Data.StartingGridLength, Data.StartingGridWidth, Data.NumberOfGridPositions);
 
         MapCreator.CreateTrackBerms(Data.CurrentMeshHelperObjects, Data.BermWidth, Data.BermOffset, Data.BermLength, BermDecals.GetComponent<MeshFilter>());
@@ -106,7 +125,7 @@ public class GameManager : MonoBehaviour {
         Player.transform.position = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.position;
         Player.transform.rotation = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.rotation;
         Player.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-
+        Player.GetComponent<CarMovement>().enabled = false;
         //disable UI before start of race
         GameLoopUI.SetActive(false);
 
@@ -127,8 +146,10 @@ public class GameManager : MonoBehaviour {
 
     IEnumerator StartRace()
     {
+        StartingLights.SetActive(true);
         yield return new WaitForSeconds(CountdownLength);
         CancelInvoke("StartingCam");
+        FollowCam.enabled = true;
 
         //must activate before GameloopUI
         RaceStatsManager.SetActive(true);
@@ -139,12 +160,16 @@ public class GameManager : MonoBehaviour {
 
         //enables AI input
         SetAIInput(true);
+        //enables player movement
+        Player.GetComponent<CarMovement>().enabled = true;
+
     }
 
     //destroys stuff that gets recreated in StartNewGame
     void ResetGame()
     {
-
+        StopCoroutine("StartRace");
+        StartingLights.SetActive(false);
         SetAIInput(false);
         //setting these false will re-trigger Initialization in their respective OnEnable functions
         GameLoopUI.SetActive(false);

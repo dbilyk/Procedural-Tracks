@@ -24,7 +24,6 @@ public class SmoothFollowCam : MonoBehaviour {
     // Update is called once per frame
     void FixedUpdate () {
         CurrentDesiredPosition = new Vector3(PlayerTrans.position.x, PlayerTrans.position.y, Mathf.Clamp(-playerRB.velocity.sqrMagnitude, -25, -18));
-        Debug.Log(Vector3.Cross(Player.transform.right, playerRB.velocity).z);
         transform.position = Vector3.Lerp(transform.position, CurrentDesiredPosition, PosLerpRate  * Time.fixedDeltaTime);
         //transform.position = Vector3.Lerp(transform.position, transform.position * ((PlayerTrans.right * Vector3.Cross(Player.transform.right, playerRB.velocity).z).sqrMagnitude /4),Time.fixedDeltaTime);
         //transform.position = new Vector3(transform.position.x,transform.position.y, Mathf.Clamp(-playerRB.velocity.sqrMagnitude, -10,-5));

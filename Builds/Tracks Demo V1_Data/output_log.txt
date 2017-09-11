@@ -15,7 +15,7 @@ Platform assembly: C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural T
 Loading C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Tracks Demo V1_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
 Platform assembly: C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Tracks Demo V1_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
 Loading C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Tracks Demo V1_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
-- Completed reload, in  0.084 seconds
+- Completed reload, in  0.097 seconds
 Platform assembly: C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Tracks Demo V1_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: C:\Users\DB\Dropbox\Code Projects\Unity Projects\Procedural Tracks v1\Builds\Tracks Demo V1_Data\Managed\System.dll (this message is harmless)
 desktop: 1366x768 60Hz; virtual: 1366x768 at 0,0
@@ -23,7 +23,7 @@ desktop: 1366x768 60Hz; virtual: 1366x768 at 0,0
 XInput1_3.dll not found. Trying XInput9_1_0.dll instead...
 <RI> Input initialized.
 <RI> Initialized touch support.
-UnloadTime: 6.342140 ms
+UnloadTime: 3.536643 ms
 Setting up 2 worker threads for Enlighten.
-  Thread -> id: 14e4 -> priority: 1 
-  Thread -> id: 1684 -> priority: 1 
+  Thread -> id: 2468 -> priority: 1 
+  Thread -> id: 11d4 -> priority: 1 
