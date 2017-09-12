@@ -7,10 +7,13 @@ public class AnimalController : MonoBehaviour {
     public List<Rigidbody> Bones = new List<Rigidbody>();
     public Animator AnimControl;
     public ParticleSystem BloodSplatter;
+    bool animalHit = false;
+
 	void OnTriggerEnter2D(Collider2D col)
     {
 
         if (col.tag == "Player" || col.tag == "AI")
+            
             AnimControl.enabled = false;
         StartCoroutine("DelayedBlood");
         {
@@ -28,6 +31,7 @@ public class AnimalController : MonoBehaviour {
     IEnumerator DelayedBlood()
     {
         yield return new WaitForSeconds(0.02f);
+        animalHit = true;
         BloodSplatter.Play();
        
 
@@ -38,7 +42,6 @@ public class AnimalController : MonoBehaviour {
     void FixedUpdate()
     {
         Vector3 AnimalVelocity = Bones[0].GetComponent<Rigidbody>().velocity;
-
         if (BloodSplatter.isPlaying)
         {
             ParticleSystem.Particle[] BloodParticles = new ParticleSystem.Particle[BloodSplatter.particleCount];
@@ -51,7 +54,7 @@ public class AnimalController : MonoBehaviour {
 
                 }
                 //turn off emission when critter slows down
-                if(Bones[0].velocity.sqrMagnitude < 0.5f)
+                if(animalHit && Bones[0].velocity.sqrMagnitude < 0.5f)
                 {
                     ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
                     emmiter.enabled = false;
