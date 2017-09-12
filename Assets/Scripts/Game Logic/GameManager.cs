@@ -73,11 +73,11 @@ public class GameManager : MonoBehaviour {
         MapCreator.CreateOrSetMeshHelperObjects(Data.Curr_TrackPoints);
         MapCreator.RotateTrackObjectsAlongCurves(Data.CurrentMeshHelperObjects);
 
-        foreach(GameObject helper in Data.CurrentMeshHelperObjects)
+        for(int i = 0; i < Data.CurrentMeshHelperObjects.Count; i+=4)
         {
             GameObject chicken = Instantiate(chickenTest);
-            chickenTest.transform.position = helper.transform.position;
-            chickenTest.transform.rotation = helper.transform.rotation;
+            chickenTest.transform.position = Data.CurrentMeshHelperObjects[i].transform.position;
+            chickenTest.transform.rotation = Data.CurrentMeshHelperObjects[i].transform.rotation;
 
         }
 
