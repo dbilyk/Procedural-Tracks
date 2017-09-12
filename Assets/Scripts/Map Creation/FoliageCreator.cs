@@ -39,7 +39,7 @@ public class FoliageCreator : MonoBehaviour {
             if (rand < FoliageDensity)
             {
                 int randIndex = Random.Range(0, Foliage.Count);
-                GameObject newItem = GameObject.Instantiate(Foliage[randIndex], gameObject.transform);
+                GameObject newItem = Instantiate(Foliage[randIndex], gameObject.transform);
                 newItem.transform.position = OuterFoliagePath[i] + Random.insideUnitCircle * 0.2f;
                 InstantiatedFoliage.Add(newItem);
 
