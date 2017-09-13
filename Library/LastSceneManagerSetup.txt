@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/ActiveGame Scene/ActiveGame v2.7 lost chicken particles.unity
+- path: Assets/Scenes/ActiveGame Scene/ActiveGame v2.9.unity
   isLoaded: 1
   isActive: 1
