@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/ActiveGame Scene/ActiveGame v2.9.unity
+- path: Assets/Scenes/ActiveGame Scene/ActiveGame v3 Sheep RagdollsCreated.unity
   isLoaded: 1
   isActive: 1

@@ -21,7 +21,7 @@ public class AnimalController : MonoBehaviour {
             {
                 GameObject player = col.gameObject;
                 RB.isKinematic = false;
-                RB.AddForce(((gameObject.transform.position - player.transform.position).normalized + new Vector3(0,0,1f)) * player.GetComponent<Rigidbody2D>().velocity.magnitude*1.3f, ForceMode.Impulse);
+                RB.AddForce(((gameObject.transform.position - (player.transform.position- player.transform.right)).normalized + new Vector3(0,0,0.5f)) * player.GetComponent<Rigidbody2D>().velocity.magnitude * 2, ForceMode.Impulse);
             }
             gameObject.GetComponent<CircleCollider2D>().enabled = false;
 
@@ -32,6 +32,8 @@ public class AnimalController : MonoBehaviour {
     {
         yield return new WaitForSeconds(0.02f);
         animalHit = true;
+        ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
+        emmiter.enabled = true;
         BloodSplatter.Play();
        
 

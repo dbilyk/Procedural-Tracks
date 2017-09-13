@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour {
 
     //game objects
     public GameObject RaceStatsManager;
+    public GameObject MobManager;
     public GameObject Player;
     public GameObject newAI;
     public GameObject ActiveGameTrack;
@@ -67,20 +68,9 @@ public class GameManager : MonoBehaviour {
 
     void GenerateLevel()
     {
-
-       
         //mesh creation
         MapCreator.CreateOrSetMeshHelperObjects(Data.Curr_TrackPoints);
         MapCreator.RotateTrackObjectsAlongCurves(Data.CurrentMeshHelperObjects);
-
-        for(int i = 0; i < Data.CurrentMeshHelperObjects.Count; i+=4)
-        {
-            GameObject chicken = Instantiate(chickenTest);
-            chickenTest.transform.position = Data.CurrentMeshHelperObjects[i].transform.position;
-            chickenTest.transform.rotation = Data.CurrentMeshHelperObjects[i].transform.rotation;
-
-        }
-
 
         MapCreator.CreateStartingGrid(Data.CurrentMeshHelperObjects, Data.StartingGridLength, Data.StartingGridWidth, Data.NumberOfGridPositions);
 
@@ -163,6 +153,9 @@ public class GameManager : MonoBehaviour {
         //enables player movement
         Player.GetComponent<CarMovement>().enabled = true;
 
+        //Start Spawning Critters
+        MobManager.SetActive(true);
+
     }
 
     //destroys stuff that gets recreated in StartNewGame
@@ -184,6 +177,8 @@ public class GameManager : MonoBehaviour {
             AI.transform.position = StartingGridContainer.transform.GetChild(i).transform.position;
             AI.transform.rotation = StartingGridContainer.transform.GetChild(i).transform.rotation;
         }
+        //
+        MobManager.SetActive(false);
 
     }
 

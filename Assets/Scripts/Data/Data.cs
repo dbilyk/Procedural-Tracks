@@ -96,7 +96,7 @@ public class Data : MonoBehaviour {
 }
 
 public enum TrackSkins
-{ Farm, Mountains, Desert, Snow }
+{Farm, Mountains, Desert, Snow }
 
 //data structure for saving a track
 public class SavedTrack 

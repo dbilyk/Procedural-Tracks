@@ -664,8 +664,8 @@ public class MapCreator : MonoBehaviour {
                 Vector2 outerPos = passedData[i].transform.position + (passedData[i].transform.up * gridWidth);
                 Quaternion rotation = passedData[i].transform.rotation;
 
-                innerGO.transform.position = innerPos;
-                outerGO.transform.position = outerPos;
+                innerGO.transform.position = (Vector3)innerPos + new Vector3(0, 0, -0.001f);
+                outerGO.transform.position = (Vector3)outerPos + new Vector3(0, 0, -0.001f);
                 innerGO.transform.rotation = rotation;
                 outerGO.transform.rotation = rotation;
                 Data.CarStartingPositions.Add(innerGO);
@@ -685,7 +685,7 @@ public class MapCreator : MonoBehaviour {
 
         GameObject startingLine = Instantiate(StartingLineObject, StartingGridContainer.transform);
         Data.StartingLine = startingLine;
-        Data.StartingLine.transform.position = passedData[randomStartingPointIndex].transform.position;
+        Data.StartingLine.transform.position = passedData[randomStartingPointIndex].transform.position + new Vector3(0,0,-0.001f);
         Data.StartingLine.transform.rotation= passedData[randomStartingPointIndex].transform.rotation;
         
         
