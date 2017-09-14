@@ -46,15 +46,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\AnimalController.cs" />
-     <Compile Include="Assets\CritterMobManager.cs" />
      <Compile Include="Assets\Scripts\Camera\FollowCar.cs" />
      <Compile Include="Assets\Scripts\Camera\SmoothFollowCam.cs" />
+     <Compile Include="Assets\Scripts\Cars\BodyRoll.cs" />
      <Compile Include="Assets\Scripts\Cars\CarAI.cs" />
      <Compile Include="Assets\Scripts\Cars\CarMovement.cs" />
      <Compile Include="Assets\Scripts\Cars\CreateSkids.cs" />
      <Compile Include="Assets\Scripts\Cars\RandomAIColor.cs" />
      <Compile Include="Assets\Scripts\Cars\TurnWheels.cs" />
+     <Compile Include="Assets\Scripts\Critters\AnimalController.cs" />
+     <Compile Include="Assets\Scripts\Critters\CritterMobManager.cs" />
      <Compile Include="Assets\Scripts\Critters\chickMove.cs" />
      <Compile Include="Assets\Scripts\Data\Data.cs" />
      <Compile Include="Assets\Scripts\Debug\ExtensionMethods.cs" />
@@ -72,6 +73,9 @@
      <Compile Include="Assets\Scripts\UI\MiniMap.cs" />
      <Compile Include="Assets\Scripts\UI\RaceStatsUIUpdate.cs" />
      <Compile Include="Assets\Scripts\UI\StartingLight.cs" />
+     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
+     <Compile Include="Assets\Scripts\UI\UpdateCurrencyUI.cs" />
+     <Compile Include="Assets\User.cs" />
      <None Include="Assets\Fonts\OFL.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

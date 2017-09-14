@@ -20,7 +20,6 @@ public class GameManager : MonoBehaviour {
     public GameObject newAI;
     public GameObject ActiveGameTrack;
     public GameObject BermDecals;
-    public GameObject chickenTest;
 
     public GameObject AIContainer;
     public GameObject StartingGridContainer;
@@ -31,6 +30,8 @@ public class GameManager : MonoBehaviour {
     public GameObject StartingLights;
 
     public List<AIInputController> AIInputs = new List<AIInputController>();
+
+    
     
 
     void Awake()
@@ -39,7 +40,7 @@ public class GameManager : MonoBehaviour {
     }
 
     //small helper to toggle AI input
-    void SetAIInput(bool isActive)
+    private void SetAIInput(bool isActive)
     {
         for (int i = 0; i < AIInputs.Count; i++)
         {
@@ -48,7 +49,7 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    void GenerateNewTrackData()
+    public void GenerateNewTrackData()
     {
         Data.Curr_RawPoints = new List<Vector2>();
 
@@ -66,7 +67,7 @@ public class GameManager : MonoBehaviour {
         Data.Curr_TrackPoints = MapCreator.CreateTrackPoints(Data.Curr_ControlPoints, Data.MeshTrackPointFreq);
     }
 
-    void GenerateLevel()
+    public void GenerateLevel()
     {
         //mesh creation
         MapCreator.CreateOrSetMeshHelperObjects(Data.Curr_TrackPoints);
@@ -94,7 +95,7 @@ public class GameManager : MonoBehaviour {
         StaticBatchingUtility.Combine(FoliageContainer);
     }
 
-    private void GenerateAI()
+    public void GenerateAI()
     {
         //creates a new AI opponent
         for (int i = 0; i < Data.CarStartingPositions.Count - 1; i++)
@@ -109,7 +110,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    private void StartingCountdown()
+    public void StartingCountdown()
     {
         //positions player/AIs
         Player.transform.position = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.position;
@@ -127,7 +128,7 @@ public class GameManager : MonoBehaviour {
         InvokeRepeating("StartingCam",0,0.02f);
     }
 
-    void StartingCam()
+    public void StartingCam()
     {
         GameObject cam = FollowCam.gameObject;
             cam.transform.position = Vector3.Lerp(cam.transform.position, new Vector3(Player.transform.position.x, Player.transform.position.y, -18), 0.05f);
@@ -159,7 +160,7 @@ public class GameManager : MonoBehaviour {
     }
 
     //destroys stuff that gets recreated in StartNewGame
-    void ResetGame()
+    public void ResetGame()
     {
         StopCoroutine("StartRace");
         StartingLights.SetActive(false);
@@ -177,26 +178,8 @@ public class GameManager : MonoBehaviour {
             AI.transform.position = StartingGridContainer.transform.GetChild(i).transform.position;
             AI.transform.rotation = StartingGridContainer.transform.GetChild(i).transform.rotation;
         }
-        //
         MobManager.SetActive(false);
 
     }
-
-
-    //
-    public void StartRaceButton()
-    {
-        ResetGame();
-        GenerateNewTrackData();
-        GenerateLevel();
-        GenerateAI();
-        StartingCountdown();
-        StartRace();
-    }
-
-    public void RestartLevelButton()
-    {
-        ResetGame();
-        StartingCountdown();
-    }
+   
 }

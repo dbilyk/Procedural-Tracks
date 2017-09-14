@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class AnimalController : MonoBehaviour {
+    public User user;
     public Rigidbody2D Player;
     public List<Rigidbody> Bones = new List<Rigidbody>();
     public Animator AnimControl;
@@ -14,9 +15,9 @@ public class AnimalController : MonoBehaviour {
 
         if (col.tag == "Player" || col.tag == "AI")
             
+        {
             AnimControl.enabled = false;
         StartCoroutine("DelayedBlood");
-        {
             foreach (Rigidbody RB in Bones)
             {
                 GameObject player = col.gameObject;
@@ -25,6 +26,11 @@ public class AnimalController : MonoBehaviour {
             }
             gameObject.GetComponent<CircleCollider2D>().enabled = false;
 
+        }
+        if (col.tag == "Player")
+        {
+            user.UserCurrency += 1;
+            gameObject.GetComponent<CircleCollider2D>().enabled = false;
         }
     }
 

@@ -80,19 +80,19 @@ public class Data : MonoBehaviour {
     public static bool Curr_RaceBegun = false;
     public static float Curr_NumberOfLapsInRace = 2;
     public static List<Vector2> Curr_PoleCheckpoints = new List<Vector2>();
-    
+
     //All Data Classes of all Cars on Track (player is always index 0)
     public static List<CarPolePositionData> CarPoleData = new List<CarPolePositionData>();
 
     //currently selected track skin  FARM is TEMP
-    public static int Curr_TrackSkin = (int) TrackSkins.Farm;
-    
+    public static int Curr_TrackSkin = (int)TrackSkins.Farm;
 
-    //saved game data
+
+    //saved track data
     public static List<SavedTrack> Svd_Tracks;
 
+   
     
-
 }
 
 public enum TrackSkins
