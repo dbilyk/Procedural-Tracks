@@ -9,24 +9,20 @@ public class User : MonoBehaviour
     public event CurrencyAdded OnCurrencyAdded;
     
     //player currency
-    private static int _userCurrency;
+    private int _userCurrency = 1;
     public int UserCurrency
     {
         get
         {
-
             return _userCurrency;
         }
         set
         {
             _userCurrency = value;
-            OnCurrencyAdded(value);
+            if (OnCurrencyAdded != null)
+            {
+                OnCurrencyAdded(value);
+            }
         }
     }
-
-    void Awake()
-    {
-        _userCurrency = 0;
-    }
-
 }

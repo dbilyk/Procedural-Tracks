@@ -10,6 +10,11 @@ public class AnimalController : MonoBehaviour {
     public ParticleSystem BloodSplatter;
     bool animalHit = false;
 
+    void Awake()
+    {
+        user = FindObjectOfType<User>();
+    }
+
 	void OnTriggerEnter2D(Collider2D col)
     {
 

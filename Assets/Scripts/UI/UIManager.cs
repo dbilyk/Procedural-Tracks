@@ -15,6 +15,7 @@ public class UIManager : MonoBehaviour {
     public GameObject SettingsBtn;
     public GameObject RestartRaceBtn;
     public GameObject ClosePauseMenuBtn;
+    public Text Currency;
 
     //use this to pause game
     private float targetTimescale=1f;
@@ -66,7 +67,7 @@ public class UIManager : MonoBehaviour {
     //stuff to update when currency QTY is updated
     void UpdateCurrency(int passedValue)
     {
-        gameObject.GetComponent<Text>().text = passedValue.ToString();
+        Currency.GetComponent<Text>().text = passedValue.ToString();
     }
 
 }
