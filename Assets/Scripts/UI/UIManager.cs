@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour {
     public GameManager gameManager;
     public RaceStatsManager raceStatsManager;
-
+    public LapTrigger lapTrigger;
     public GameObject StartRaceBtn;
 
     //Pause Menu elements
@@ -68,6 +68,7 @@ public class UIManager : MonoBehaviour {
         //wrong way blinker
         raceStatsManager.OnFacingWrongWay += FacingWrongWay;
         raceStatsManager.OnFacingForward += FacingForward;
+
     }
 
    
@@ -110,7 +111,6 @@ public class UIManager : MonoBehaviour {
         {
             StopCoroutine(blinkReference);
         }
-        Debug.Log("here");
         WrongWayIndicator.SetActive(false);
     }
     //--------------------------------------------------

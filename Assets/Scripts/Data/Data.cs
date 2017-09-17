@@ -63,7 +63,7 @@ public class Data : MonoBehaviour {
     public static float StartingGridLength = 3;
     public static float StartingGridWidth = 0.5f;
     //also controls how many AI are on the track
-    public static int NumberOfGridPositions = 6;
+    public static int NumberOfGridPositions = 3;
 
     //racing line settings + data
     public static List<Vector2> Curr_RacingLinePoints;

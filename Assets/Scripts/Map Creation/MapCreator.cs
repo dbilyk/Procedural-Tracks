@@ -8,8 +8,7 @@ public class MapCreator : MonoBehaviour {
     public GameObject MeshHelperContainer;
     public GameObject MeshHelperObject;
     public GameObject StartingGridContainer;
-    public GameObject StartingGridObject;
-    public GameObject StartingLineObject;
+    public List<GameObject> StartingOutlines = new List<GameObject>();
     public GameObject ActiveGameTrack;
     
     // HELPER : Creates Random Points based on specs-----------------------------------------------------------------
@@ -646,44 +645,58 @@ public class MapCreator : MonoBehaviour {
     public void CreateStartingGrid(List<GameObject> TrackMeshHelpers, float gridLength, float gridWidth, int numberOfPositions)
     {
         List<GameObject> passedData = new List<GameObject>(TrackMeshHelpers);
-       
         Data.CarStartingPositions = new List<GameObject>();
         int randomStartingPointIndex = Random.Range((int)Data.MeshTrackPointFreq* 2, (int)passedData.Count - (int)(Data.MeshTrackPointFreq *2));
         bool firstLoop = true;
         
-            Vector2 CurrentGridPairCenterpoint = passedData[randomStartingPointIndex - (int)Data.MeshTrackPointFreq / 6].transform.position;
-        for (int i = randomStartingPointIndex-(int)Data.MeshTrackPointFreq/6; i > 0/*(int)Data.MeshTrackPointFreq*2*/; i --)
+        Vector2 CurrentGridPairCenterpoint = passedData[randomStartingPointIndex - (int)Data.MeshTrackPointFreq / 6].transform.position;
+
+        bool reachedTargetPosQty = false;
+        for (int i = randomStartingPointIndex-(int)Data.MeshTrackPointFreq/6; i > 0; i --)
         {
-
-
-            if((CurrentGridPairCenterpoint - (Vector2)passedData[i].transform.position).sqrMagnitude > gridLength || firstLoop)
+            GameObject innerGO;
+            GameObject outerGO;
+            if ((CurrentGridPairCenterpoint - (Vector2)passedData[i].transform.position).sqrMagnitude > gridLength || firstLoop)
             {
-                GameObject innerGO = Instantiate(StartingGridObject, StartingGridContainer.transform);
-                GameObject outerGO = Instantiate(StartingGridObject, StartingGridContainer.transform);
-                Vector2 innerPos = passedData[i].transform.position + (passedData[i].transform.up * -gridWidth);
-                Vector2 outerPos = passedData[i].transform.position + (passedData[i].transform.up * gridWidth);
-                Quaternion rotation = passedData[i].transform.rotation;
+                for (int j = 0; j < numberOfPositions; j++)
+                {
+                    if (StartingOutlines[j].gameObject.activeSelf == false && StartingOutlines[j+1].gameObject.activeSelf == false)
+                    {
+                        innerGO = StartingOutlines[j].gameObject;
+                        outerGO = StartingOutlines[j+1].gameObject;
+                        Vector2 innerPos = passedData[i].transform.position + (passedData[i].transform.up * -gridWidth);
+                        Vector2 outerPos = passedData[i].transform.position + (passedData[i].transform.up * gridWidth);
+                        Quaternion rotation = passedData[i].transform.rotation;
 
-                innerGO.transform.position = (Vector3)innerPos + new Vector3(0, 0, -0.001f);
-                outerGO.transform.position = (Vector3)outerPos + new Vector3(0, 0, -0.001f);
-                innerGO.transform.rotation = rotation;
-                outerGO.transform.rotation = rotation;
-                Data.CarStartingPositions.Add(innerGO);
-                if (Data.CarStartingPositions.Count == numberOfPositions) break;
+                        innerGO.transform.position = (Vector3)innerPos + new Vector3(0, 0, -0.001f);
+                        outerGO.transform.position = (Vector3)outerPos + new Vector3(0, 0, -0.001f);
+                        innerGO.transform.rotation = rotation;
+                        outerGO.transform.rotation = rotation;
 
-                Data.CarStartingPositions.Add(outerGO);
-                if (Data.CarStartingPositions.Count == numberOfPositions) break;
+                        innerGO.SetActive(true);
+                        Data.CarStartingPositions.Add(innerGO);
+                        if (Data.CarStartingPositions.Count == numberOfPositions) { reachedTargetPosQty = true; break; }
 
-                CurrentGridPairCenterpoint = passedData[i].transform.position;
+                        outerGO.SetActive(true);
+                        Data.CarStartingPositions.Add(outerGO);
+                        if (Data.CarStartingPositions.Count == numberOfPositions) { reachedTargetPosQty = true; break; }
+                        
+                        CurrentGridPairCenterpoint = passedData[i].transform.position;
 
-
+                        break;
+                    }
+                }
             }
-            
 
+            if (reachedTargetPosQty)
+            {
+                break;
+            }
             firstLoop = false;
         }
 
-        GameObject startingLine = Instantiate(StartingLineObject, StartingGridContainer.transform);
+        GameObject startingLine = StartingGridContainer.transform.Find("StartingLine").gameObject;
+        startingLine.SetActive(true);
         Data.StartingLine = startingLine;
         Data.StartingLine.transform.position = passedData[randomStartingPointIndex].transform.position + new Vector3(0,0,-0.001f);
         Data.StartingLine.transform.rotation= passedData[randomStartingPointIndex].transform.rotation;

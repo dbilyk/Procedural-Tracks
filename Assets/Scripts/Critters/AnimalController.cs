@@ -21,6 +21,7 @@ public class AnimalController : MonoBehaviour {
         if (col.tag == "Player" || col.tag == "AI")
             
         {
+            AnimatorUtility.DeoptimizeTransformHierarchy(AnimControl.gameObject);
             AnimControl.enabled = false;
         StartCoroutine("DelayedBlood");
             foreach (Rigidbody RB in Bones)
@@ -63,11 +64,11 @@ public class AnimalController : MonoBehaviour {
             {
                 if (BloodParticles[i].startLifetime - BloodParticles[i].remainingLifetime <0.05f)
                 {
-                    BloodParticles[i].velocity= Quaternion.Euler(0, 0, Random.Range(40, -40)) * Bones[0].GetComponent<Rigidbody>().velocity* Random.Range(5,20);
+                    BloodParticles[i].velocity= Quaternion.Euler(0, 0, Random.Range(10, -10)) * Bones[0].GetComponent<Rigidbody>().velocity* Random.Range(5,20);
 
                 }
                 //turn off emission when critter slows down
-                if(animalHit && Bones[0].velocity.sqrMagnitude < 0.5f)
+                if(animalHit && Bones[0].velocity.sqrMagnitude < 0.2f)
                 {
                     ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
                     emmiter.enabled = false;

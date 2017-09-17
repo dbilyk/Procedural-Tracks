@@ -205,6 +205,8 @@ public class RaceStatsManager : MonoBehaviour {
     public event FacingWrongWay OnFacingWrongWay;
     public delegate void FacingForward();
     public event FacingForward OnFacingForward;
+    public delegate void LapAlert(int lapNumber);
+    public event LapAlert OnLapAlert;
 
     IEnumerator GetFacingForward()
     {
@@ -225,7 +227,6 @@ public class RaceStatsManager : MonoBehaviour {
             //call delegate to turn on Wrong Way blinker in UI MANAGER the first time that this is false
             if (player.FacingForward && playerVelocity.sqrMagnitude > 0.01f)
             {
-                Debug.Log("Race Stats wrong way triggered");
                 OnFacingWrongWay();
             }
             player.FacingForward = false;
@@ -341,6 +342,11 @@ public class RaceStatsManager : MonoBehaviour {
     void LapComplete(int PoleDataIndex)
     {
         CarPolePositionData thisCar = Data.CarPoleData[PoleDataIndex];
+        //if the player completes lap, trigger UI event
+        if (PoleDataIndex ==0)
+        {
+            OnLapAlert(thisCar.Curr_LapNumber +1);
+        }
 
         if (thisCar.Curr_LapNumber == 0)
         {

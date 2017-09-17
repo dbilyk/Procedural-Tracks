@@ -22,16 +22,34 @@ public class RaceStatsUIUpdate : MonoBehaviour {
     
     public float IndentCurrentTime;
     public float IndentBestAndLastTime;
-   
+
+    public Text LapCompleteAlert;
+    public RaceStatsManager raceStatsManager;
     private CarPolePositionData PlayerRaceStats;
 
     bool UpdateUI = false;
     void OnEnable()
     {
+        raceStatsManager.OnLapAlert += TriggerLapAlert;
         UpdateUI = false;
         PlayerRaceStats = Data.CarPoleData[0];
 
     } 
+
+    void TriggerLapAlert(int newLapNumber)
+    {
+        Debug.Log("Trigger Alert");
+        LapCompleteAlert.gameObject.SetActive(true);
+        if (newLapNumber == Data.Curr_NumberOfLapsInRace)
+        {
+            LapCompleteAlert.text = "Final Lap";
+
+        }
+        else
+        {
+            LapCompleteAlert.text = "Lap " + newLapNumber.ToString();
+        }
+    }
 
     void Update () {
         if (!UpdateUI)

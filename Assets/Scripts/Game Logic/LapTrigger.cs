@@ -6,6 +6,8 @@ public class LapTrigger : MonoBehaviour {
     public delegate void LapCompleteDel(int CarIndex);
     public static event LapCompleteDel OnLapComplete;
 
+    
+
     void OnTriggerEnter2D(Collider2D col)
     {
         for (int i = 0; i < Data.CarPoleData.Count; i++)
@@ -14,6 +16,7 @@ public class LapTrigger : MonoBehaviour {
                 OnLapComplete(i);
                 break;
             }
+           
         }
         
         

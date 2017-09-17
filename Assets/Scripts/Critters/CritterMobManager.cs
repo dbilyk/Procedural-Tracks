@@ -41,6 +41,11 @@ public class CritterMobManager : MonoBehaviour {
     public GameObject Player;
 
     public GameObject CritterContainer;
+
+    private List<GameObject> SmlCritterPool = new List<GameObject>();
+    private List<GameObject> MedCritterPool = new List<GameObject>();
+    private List<GameObject> LgCritterPool = new List<GameObject>();
+    private List<GameObject> LegendaryCritterPool = new List<GameObject>();
     private List<Vector2> thinnedTrackPoints = new List<Vector2>();
     private int LastNearestPointToPlayer;
     void OnEnable()
@@ -90,6 +95,7 @@ public class CritterMobManager : MonoBehaviour {
 
 
         List<GameObject> TargetCritterType = new List<GameObject>();
+        List<GameObject> TargetCritterPool = new List<GameObject>();
         int TargetCritterDensity;
         float targetSpawnAreaWidth;
 
@@ -100,31 +106,40 @@ public class CritterMobManager : MonoBehaviour {
             TargetCritterType = SmlCritters;
             TargetCritterDensity = SmlCritterDensity;
             targetSpawnAreaWidth = SmlCritterSpawnAreaWidth;
+            TargetCritterPool = SmlCritterPool;
         }
 
-        else if (RandomCritterSelector > SmlCritterOdds && RandomCritterSelector < MedCritterOdds)
+        else if (RandomCritterSelector > SmlCritterOdds && RandomCritterSelector < SmlCritterOdds + MedCritterOdds)
         {
             TargetCritterType = MedCritters;
             TargetCritterDensity = MedCritterDensity;
             targetSpawnAreaWidth = MedCritterSpawnAreaWidth;
+            TargetCritterPool = MedCritterPool;
         }
-        else if (RandomCritterSelector > MedCritterOdds && RandomCritterSelector < LgCritterOdds)
+        else if (RandomCritterSelector > MedCritterOdds + SmlCritterOdds && RandomCritterSelector < LgCritterOdds + MedCritterOdds + SmlCritterOdds)
         {
             TargetCritterType = LgCritters;
             TargetCritterDensity = LgCritterDensity;
             targetSpawnAreaWidth = LgCritterSpawnAreaWidth;
+            TargetCritterPool = LgCritterPool;
         }
         else
         {
             TargetCritterType = LegendaryCritters;
             TargetCritterDensity = LegendaryCritterDensity;
             targetSpawnAreaWidth = LegendarySpawnAreaWidth;
+            TargetCritterPool = LegendaryCritterPool;
         }
 
         //trigger
         for (int i =0; i < TargetCritterDensity; i++)
         {
+            if (TargetCritterPool.Count < 0)
+            {
+
+            }
             
+
             Vector2 SpawnPosition = Random.insideUnitCircle* targetSpawnAreaWidth;
             GameObject newCritter = Instantiate(TargetCritterType[Data.Curr_TrackSkin],CritterContainer.transform);
             newCritter.transform.position = SpawnPosition + thinnedTrackPoints[mobSpawnIndex];
