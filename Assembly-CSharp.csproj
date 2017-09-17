@@ -74,7 +74,6 @@
      <Compile Include="Assets\Scripts\UI\RaceStatsUIUpdate.cs" />
      <Compile Include="Assets\Scripts\UI\StartingLight.cs" />
      <Compile Include="Assets\Scripts\UI\UIManager.cs" />
-     <Compile Include="Assets\Scripts\UI\UpdateCurrencyUI.cs" />
      <Compile Include="Assets\User.cs" />
      <None Include="Assets\Fonts\OFL.txt" />
  <Reference Include="UnityEngine.UI">

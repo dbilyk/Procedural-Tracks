@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LapTrigger : MonoBehaviour {
     public delegate void LapCompleteDel(int CarIndex);
-    public static LapCompleteDel OnLapComplete;
+    public static event LapCompleteDel OnLapComplete;
 
     void OnTriggerEnter2D(Collider2D col)
     {

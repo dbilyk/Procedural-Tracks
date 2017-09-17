@@ -7,7 +7,7 @@ public class User : MonoBehaviour
     //currency update delegate
     public delegate void CurrencyAdded(int newValue);
     public event CurrencyAdded OnCurrencyAdded;
-    
+
     //player currency
     private int _userCurrency = 1;
     public int UserCurrency
@@ -19,10 +19,7 @@ public class User : MonoBehaviour
         set
         {
             _userCurrency = value;
-            if (OnCurrencyAdded != null)
-            {
-                OnCurrencyAdded(value);
-            }
+            OnCurrencyAdded(value);
         }
     }
 }

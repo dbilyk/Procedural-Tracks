@@ -39,7 +39,6 @@ public class CarPolePositionData
 
 public class RaceStatsManager : MonoBehaviour {
     public MapCreator mapCreator;
-    public LapTrigger lapTrigger;
     public GameObject AIContainer;
     public GameObject StartingGridContainer;
     public GameObject Player;
@@ -202,21 +201,39 @@ public class RaceStatsManager : MonoBehaviour {
 
     }
 
+    public delegate void FacingWrongWay();
+    public event FacingWrongWay OnFacingWrongWay;
+    public delegate void FacingForward();
+    public event FacingForward OnFacingForward;
+
     IEnumerator GetFacingForward()
     {
         CarPolePositionData player = Data.CarPoleData[0];
         List<Vector2> ChkPts = Data.Curr_PoleCheckpoints;
-
-        if (Vector2.Dot(player.CarObject.GetComponent<Rigidbody2D>().velocity, ChkPts[player.Curr_CheckpointIndex] - ChkPts[player.PrevCheckpointIndex]) > 0f)
+        Vector2 playerVelocity = player.CarObject.GetComponent<Rigidbody2D>().velocity;
+        if (Vector2.Dot(playerVelocity, ChkPts[player.Curr_CheckpointIndex] - ChkPts[player.PrevCheckpointIndex]) > 0f)
         {
+                //call delegate to turn off wrong way blinker the first time that this turns true
+            if (!player.FacingForward)
+            {
+                OnFacingForward();
+            }
             player.FacingForward = true;
         }
         else
         {
+            //call delegate to turn on Wrong Way blinker in UI MANAGER the first time that this is false
+            if (player.FacingForward && playerVelocity.sqrMagnitude > 0.01f)
+            {
+                Debug.Log("Race Stats wrong way triggered");
+                OnFacingWrongWay();
+            }
             player.FacingForward = false;
             player.AllowCheckpointUpdates = false;
 
+
         }
+       
         yield return new WaitForSeconds(0.1f);
         CheckFacingForward = false;
     }

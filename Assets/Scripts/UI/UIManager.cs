@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour {
-    public GameManager GM;
+    public GameManager gameManager;
+    public RaceStatsManager raceStatsManager;
 
     public GameObject StartRaceBtn;
 
@@ -25,18 +26,18 @@ public class UIManager : MonoBehaviour {
         StartRaceBtn.SetActive(false);
         PauseMenuBtn.SetActive(true);
 
-        GM.ResetGame();
-        GM.GenerateNewTrackData();
-        GM.GenerateLevel();
-        GM.GenerateAI();
-        GM.StartingCountdown();
+        gameManager.ResetGame();
+        gameManager.GenerateNewTrackData();
+        gameManager.GenerateLevel();
+        gameManager.GenerateAI();
+        gameManager.StartingCountdown();
     }
 
     public void RestartLevel()
     {
         Time.timeScale = 1;
-        GM.ResetGame();
-        GM.StartingCountdown();
+        gameManager.ResetGame();
+        gameManager.StartingCountdown();
         PauseMenu.SetActive(false);
         PauseMenuBtn.SetActive(true);
     }
@@ -62,12 +63,58 @@ public class UIManager : MonoBehaviour {
     public User user;
     void Awake()
     {
+        //subscribe to Delegates here
         user.OnCurrencyAdded += UpdateCurrency;
+        //wrong way blinker
+        raceStatsManager.OnFacingWrongWay += FacingWrongWay;
+        raceStatsManager.OnFacingForward += FacingForward;
     }
+
+   
+
     //stuff to update when currency QTY is updated
     void UpdateCurrency(int passedValue)
     {
         Currency.GetComponent<Text>().text = passedValue.ToString();
     }
+
+    //Wrong way flashing functionality----------   Must unsubscribe after game is done!
+    public GameObject WrongWayIndicator;
+    IEnumerator blinkReference;
+    void FacingWrongWay()
+    {
+        blinkReference = blinkWrongWay();
+        StartCoroutine(blinkReference);
+    }
+
+    IEnumerator blinkWrongWay()
+    {
+        while (true)
+        {
+            yield return new WaitForSecondsRealtime(1f);
+            if (WrongWayIndicator.activeSelf)
+            {
+                WrongWayIndicator.SetActive(false);
+            }
+            else
+            {
+                WrongWayIndicator.SetActive(true);
+            }
+        }
+        
+    }
+
+    void FacingForward()
+    {
+        if (blinkReference != null)
+        {
+            StopCoroutine(blinkReference);
+        }
+        Debug.Log("here");
+        WrongWayIndicator.SetActive(false);
+    }
+    //--------------------------------------------------
+    
+
 
 }
