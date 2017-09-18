@@ -39,8 +39,12 @@ public class CritterMobManager : MonoBehaviour {
     public float SecsBetweenSpawns = 10f;
 
     public GameObject Player;
+    Camera cam;
 
     public GameObject CritterContainer;
+    //for baked meshes
+    public GameObject BakedCritters;
+    public GameObject BakedCritterInstance;
 
     private List<GameObject> SmlCritterPool = new List<GameObject>();
     private List<GameObject> MedCritterPool = new List<GameObject>();
@@ -50,6 +54,7 @@ public class CritterMobManager : MonoBehaviour {
     private int LastNearestPointToPlayer;
     void OnEnable()
     {
+        cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         Spawned = false;
         for(int i = 0; i<Data.Curr_TrackPoints.Count; i += Mathf.RoundToInt((int)Data.MeshTrackPointFreq/4))
         {
@@ -96,7 +101,7 @@ public class CritterMobManager : MonoBehaviour {
 
         List<GameObject> TargetCritterType = new List<GameObject>();
         List<GameObject> TargetCritterPool = new List<GameObject>();
-        int TargetCritterDensity;
+        int TargetCritterDensity; 
         float targetSpawnAreaWidth;
 
         //picks the type of critter and density for the current Mob.
@@ -131,17 +136,69 @@ public class CritterMobManager : MonoBehaviour {
             TargetCritterPool = LegendaryCritterPool;
         }
 
+        for (int i = 0; i<TargetCritterPool.Count; i++)
+        {
+            Vector2 AnimalInScreenCoords = cam.WorldToScreenPoint(TargetCritterPool[i].transform.position);
+            if ((AnimalInScreenCoords.x> Screen.width + 50 || AnimalInScreenCoords.y > Screen.height + 50) && (AnimalInScreenCoords.x < -50 || AnimalInScreenCoords.y < -0))
+            {
+                GameObject CritterChild = TargetCritterPool[i].transform.GetChild(0).gameObject;
+                //NEED TO FIX THIS CHECK TO DEFINITIVELY DETERMIN THAT THE ANIMAL WAS HIT< AND NOT JUST OUT OF VIEW
+                if (!CritterChild.GetComponent<AnimalController>().Bones[0].isKinematic)
+                {
+                    Mesh bakedCarcass = new Mesh();
+                    try
+                    {
+                        SkinnedMeshRenderer skin = CritterChild.GetComponent<SkinnedMeshRenderer>();
+                        CritterChild.transform.localPosition = Vector3.zero;
+                        CritterChild.transform.rotation= TargetCritterPool[i].transform.rotation;
+                        CritterChild.GetComponent<SkinnedMeshRenderer>().BakeMesh(bakedCarcass);
+
+                        
+                    }
+                    catch
+                    {
+                        CritterChild.transform.localPosition = Vector3.zero;
+                        CritterChild.transform.rotation = Quaternion.Euler(0, 0, 0);
+                        CritterChild.gameObject.GetComponentInChildren<SkinnedMeshRenderer>().BakeMesh(bakedCarcass);
+                    }
+                    GameObject newBakedCritter = Instantiate(BakedCritterInstance, BakedCritters.transform);
+                    newBakedCritter.transform.position = TargetCritterPool[i].transform.position;
+                    newBakedCritter.transform.rotation = TargetCritterPool[i].transform.rotation;
+                    newBakedCritter.GetComponent<MeshFilter>().mesh = bakedCarcass;
+                    
+                    GameObject[] preptoBake = new GameObject[1];
+                    preptoBake[0] = newBakedCritter;
+                    StaticBatchingUtility.Combine(preptoBake, BakedCritters);
+                    
+                }
+
+                CritterChild.SetActive(false);
+            }
+        }
+
         //trigger
         for (int i =0; i < TargetCritterDensity; i++)
         {
-            if (TargetCritterPool.Count < 0)
-            {
-
-            }
-            
-
+            GameObject newCritter;
             Vector2 SpawnPosition = Random.insideUnitCircle* targetSpawnAreaWidth;
-            GameObject newCritter = Instantiate(TargetCritterType[Data.Curr_TrackSkin],CritterContainer.transform);
+
+            if (TargetCritterPool.Count < TargetCritterDensity)
+            {
+                newCritter = Instantiate(TargetCritterType[Data.Curr_TrackSkin],CritterContainer.transform);
+                TargetCritterPool.Add(newCritter);
+            }
+            else
+            {
+                newCritter = TargetCritterPool.Find(x => x.transform.GetChild(0).gameObject.activeInHierarchy == false);
+                //if there's not enough disabled critters after the check, add some more to the pool
+                if (newCritter == null)
+                {
+                    newCritter = Instantiate(TargetCritterType[Data.Curr_TrackSkin], CritterContainer.transform);
+                    TargetCritterPool.Add(newCritter);
+                }
+            }
+
+            newCritter.transform.GetChild(0).gameObject.SetActive(true);
             newCritter.transform.position = SpawnPosition + thinnedTrackPoints[mobSpawnIndex];
             newCritter.transform.rotation = Quaternion.Euler(0,0,Random.Range(0,300));
             yield return new WaitForSeconds(0.1f);

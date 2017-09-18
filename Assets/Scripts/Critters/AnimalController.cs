@@ -5,14 +5,43 @@ using UnityEngine;
 public class AnimalController : MonoBehaviour {
     public User user;
     public Rigidbody2D Player;
+    public Camera cam;
     public List<Rigidbody> Bones = new List<Rigidbody>();
     public Animator AnimControl;
     public ParticleSystem BloodSplatter;
     bool animalHit = false;
 
-    void Awake()
+    void OnEnable()
     {
+
+        //reoptimizes hierarchy for animation playback when the object is reinstantiated from the pool
+        Rigidbody[] ExposedBones = AnimControl.gameObject.transform.GetComponentsInChildren<Rigidbody>();
+        if (animalHit == true)
+        {
+            AnimControl.enabled = true;
+            gameObject.GetComponent<CircleCollider2D>().enabled = true;
+            ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
+            emmiter.enabled = false;
+            for (int i = 0; i < ExposedBones.Length; i ++)
+            {
+                ExposedBones[i].isKinematic = true;
+
+            }
+        }
+
+        string[] RBNames = new string[ExposedBones.Length];
+        for (int i = 0; i < ExposedBones.Length; i++)
+        {
+            RBNames[i] = ExposedBones[i].gameObject.name;
+
+        }
+        AnimatorUtility.OptimizeTransformHierarchy(AnimControl.gameObject, RBNames);
         user = FindObjectOfType<User>();
+        Player = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
+        cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        animalHit = false;
+        StartCoroutine(CheckPlayerPassedAnimal());
+
     }
 
 	void OnTriggerEnter2D(Collider2D col)
@@ -47,40 +76,75 @@ public class AnimalController : MonoBehaviour {
         ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
         emmiter.enabled = true;
         BloodSplatter.Play();
-       
+        StartCoroutine(SetObjectState());
 
 
     }
 
-    
-    void FixedUpdate()
+    IEnumerator SetObjectState()
     {
-        Vector3 AnimalVelocity = Bones[0].GetComponent<Rigidbody>().velocity;
         if (BloodSplatter.isPlaying)
         {
             ParticleSystem.Particle[] BloodParticles = new ParticleSystem.Particle[BloodSplatter.particleCount];
             BloodSplatter.GetParticles(BloodParticles);
             for (int i = 0; i < BloodParticles.Length; i++)
             {
-                if (BloodParticles[i].startLifetime - BloodParticles[i].remainingLifetime <0.05f)
+                if (BloodParticles[i].startLifetime - BloodParticles[i].remainingLifetime < 0.05f)
                 {
-                    BloodParticles[i].velocity= Quaternion.Euler(0, 0, Random.Range(10, -10)) * Bones[0].GetComponent<Rigidbody>().velocity* Random.Range(5,20);
+                    BloodParticles[i].velocity = Quaternion.Euler(0, 0, Random.Range(10, -10)) * Bones[0].GetComponent<Rigidbody>().velocity * Random.Range(5, 20);
 
                 }
-                //turn off emission when critter slows down
-                if(animalHit && Bones[0].velocity.sqrMagnitude < 0.2f)
-                {
-                    ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
-                    emmiter.enabled = false;
-                }
+                
 
                 BloodParticles[i].position = new Vector3(BloodParticles[i].position.x, BloodParticles[i].position.y, -0.01f);
-                
+
             }
             BloodSplatter.SetParticles(BloodParticles, BloodParticles.Length);
             //setParticleVelocity = true;
 
         }
+
+        yield return null;
+        StartCoroutine(BakeDeadCritter());
+    }
+
+    IEnumerator BakeDeadCritter()
+    {
+        while (true)
+        {
+            //turn off emission when critter slows down
+            if (animalHit && Bones[0].velocity.sqrMagnitude < 0.2f)
+            {
+                ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
+                emmiter.enabled = false;
+                
+            }
+            Vector3 AnimalPixelLoc = cam.WorldToScreenPoint(Bones[0].transform.position);
+            if (animalHit && Bones[0].velocity.sqrMagnitude < 0.001f && AnimalPixelLoc.x > Screen.width + 20 || AnimalPixelLoc.x < -20 || AnimalPixelLoc.y > Screen.height + 20 || AnimalPixelLoc.y < -20)
+            {
+                gameObject.SetActive(false);
+                break;
+            }
+        yield return new WaitForSeconds(1f);
+        }
+    }
+
+    IEnumerator CheckPlayerPassedAnimal()
+    {
+        while (true)
+        {
+
+            Vector3 AnimalPixelLoc = cam.WorldToScreenPoint(Bones[0].transform.position);
+            if (Vector2.Dot(Player.transform.position.normalized, (Bones[0].transform.position - Player.transform.position).normalized) > 0  && AnimalPixelLoc.x > Screen.width + 20 || AnimalPixelLoc.x < -20 || AnimalPixelLoc.y > Screen.height + 20 || AnimalPixelLoc.y < -20)
+            {
+                //Debug.Log("PASSED AN ANIMAL AND ITS OFF SCREEN: " + Vector2.Dot(Player.transform.position.normalized, (Bones[0].transform.position - Player.transform.position).normalized));
+
+                //gameObject.SetActive(false);
+            }
+            yield return new WaitForSeconds(0.1f);
+        }
+        
+
     }
 
 }
