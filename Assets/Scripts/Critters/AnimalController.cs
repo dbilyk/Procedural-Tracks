@@ -40,7 +40,6 @@ public class AnimalController : MonoBehaviour {
         Player = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
         cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         animalHit = false;
-        StartCoroutine(CheckPlayerPassedAnimal());
 
     }
 
@@ -96,7 +95,7 @@ public class AnimalController : MonoBehaviour {
                 }
                 
 
-                BloodParticles[i].position = new Vector3(BloodParticles[i].position.x, BloodParticles[i].position.y, -0.01f);
+                BloodParticles[i].position = new Vector3(BloodParticles[i].position.x, BloodParticles[i].position.y, 0f);
 
             }
             BloodSplatter.SetParticles(BloodParticles, BloodParticles.Length);
@@ -113,7 +112,7 @@ public class AnimalController : MonoBehaviour {
         while (true)
         {
             //turn off emission when critter slows down
-            if (animalHit && Bones[0].velocity.sqrMagnitude < 0.2f)
+            if (animalHit && Bones[0].velocity.sqrMagnitude < 0.01f)
             {
                 ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
                 emmiter.enabled = false;
@@ -127,24 +126,6 @@ public class AnimalController : MonoBehaviour {
             }
         yield return new WaitForSeconds(1f);
         }
-    }
-
-    IEnumerator CheckPlayerPassedAnimal()
-    {
-        while (true)
-        {
-
-            Vector3 AnimalPixelLoc = cam.WorldToScreenPoint(Bones[0].transform.position);
-            if (Vector2.Dot(Player.transform.position.normalized, (Bones[0].transform.position - Player.transform.position).normalized) > 0  && AnimalPixelLoc.x > Screen.width + 20 || AnimalPixelLoc.x < -20 || AnimalPixelLoc.y > Screen.height + 20 || AnimalPixelLoc.y < -20)
-            {
-                //Debug.Log("PASSED AN ANIMAL AND ITS OFF SCREEN: " + Vector2.Dot(Player.transform.position.normalized, (Bones[0].transform.position - Player.transform.position).normalized));
-
-                //gameObject.SetActive(false);
-            }
-            yield return new WaitForSeconds(0.1f);
-        }
-        
-
     }
 
 }
