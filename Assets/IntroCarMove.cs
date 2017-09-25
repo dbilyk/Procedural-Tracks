@@ -23,12 +23,24 @@ public class IntroCarMove : MonoBehaviour {
 
 
     bool initialAccel = false;
+
+    void OnEnable()
+    {
+        CarBody.constraints = RigidbodyConstraints.None;
+        CarBody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionY;
+        for (int i = 0; i < WheelCols.Count; i++)
+        {
+            WheelCols[i].motorTorque = 0;
+            WheelCols[i].enabled = true;
+        }
+
+    }
+
 	void Update () {
         if (ApplyAccel)
         {
             WheelCols[0].motorTorque = 100;
             WheelCols[1].motorTorque = 100;
-           
             if (!initialAccel)
             {
                 StartCoroutine(ForcePushCarBody());
@@ -71,6 +83,16 @@ public class IntroCarMove : MonoBehaviour {
         }
     }
 
+    void OnDisable()
+    {
+        initialAccel = false;
+        ApplyAccel = false;
+        FirstCollisionDone = false;
+        for (int i = 0; i< WheelCols.Count; i ++)
+        {
+            WheelCols[i].enabled = false;
+        }
+    }
 
 
 }

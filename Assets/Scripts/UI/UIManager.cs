@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour {
     public RaceStatsManager raceStatsManager;
     public LapTrigger lapTrigger;
     public GameObject StartRaceBtn;
+    public GameObject StartScreen;
 
     //Pause Menu elements
     public GameObject PauseMenu;
@@ -25,7 +26,7 @@ public class UIManager : MonoBehaviour {
     {
         StartRaceBtn.SetActive(false);
         PauseMenuBtn.SetActive(true);
-
+        StartScreen.SetActive(false);
 
 
 

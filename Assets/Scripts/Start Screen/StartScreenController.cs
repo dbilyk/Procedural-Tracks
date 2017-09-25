@@ -17,20 +17,51 @@ public class StartScreenController : MonoBehaviour {
     public List<Rigidbody> CowFeet = new List<Rigidbody>();
 
     public Camera Cam;
+    public Camera MainCam;
+    public GameObject GameLoopLight;
     public GameObject CarShotStart;
     public GameObject CarShotEnd;
     public GameObject CowShotStart;
     public GameObject CowShotEnd;
-    public GameObject CrashShotStart;
-    public GameObject CrashShotEnd;
 
+    public GameObject IntroRabbit;
 
     Vector3 CarInitialPosition;
-    Vector3 CowInitialPosition;
+    Quaternion CarInitialRotation;
     Vector3 RabbitInitialPosition;
+    Quaternion RabbitInitialRotation;
+
+    Vector3 CarCamInitialPosition;
+    Quaternion CarCamInitialRotation;
+
     void OnEnable()
     {
-        CarInitialPosition = CarController.CarBody.gameObject.transform.position;
+        GameLoopLight.SetActive(false);
+        CrashCamTarget.transform.parent = CarController.transform;
+
+        if (CarInitialPosition == Vector3.zero)
+        {
+            CarInitialPosition = CarController.CarBody.gameObject.transform.localPosition;
+            CarInitialRotation = CarController.CarBody.gameObject.transform.localRotation;
+            RabbitInitialPosition = IntroRabbit.transform.localPosition;
+            RabbitInitialRotation = IntroRabbit.transform.localRotation;
+            CarCamInitialPosition = CrashCamTarget.transform.localPosition;
+            CarCamInitialRotation = CrashCamTarget.transform.localRotation;
+
+        }
+        else
+        {
+            CarController.CarBody.isKinematic = true;
+            CarController.CarBody.gameObject.transform.localPosition = CarInitialPosition;
+            CarController.CarBody.gameObject.transform.localRotation = CarInitialRotation;
+
+            IntroRabbit.transform.localPosition = RabbitInitialPosition;
+            IntroRabbit.transform.localRotation = RabbitInitialRotation;
+
+            CrashCamTarget.transform.localPosition = CarCamInitialPosition;
+            CrashCamTarget.transform.localRotation = CarCamInitialRotation;
+
+        }
         CowAnimController.enabled = false;
         for (int i = 0; i < AllCowRBs.Count; i++)
         {
@@ -40,6 +71,7 @@ public class StartScreenController : MonoBehaviour {
         CarController.CarBody.isKinematic = false;
         RenderSettings.fogEndDistance = introFogDistance;
         RenderSettings.fogColor = Cam.backgroundColor;
+        MainCam.enabled = false;
         StartCoroutine(CarShot());
     }
 
@@ -106,7 +138,6 @@ public class StartScreenController : MonoBehaviour {
     public bool CarCollidedWIthCow = false;
     public bool StartSlowMo = false;
     public GameObject CrashCamTarget;
-    public float SlowMoSpeed;
     IEnumerator CrashShot()
     {
         Cam.fieldOfView = 60;
@@ -130,35 +161,37 @@ public class StartScreenController : MonoBehaviour {
 
                 for (int i = 0; i< CowSpine.Count; i++)
                 {
-                    CowSpine[i].AddForce(-7, 0, -2f, ForceMode.Impulse);
+                    CowSpine[i].AddForce(-7, 0, -4f, ForceMode.Impulse);
 
                 }
                 for (int i = 0; i < CowFeet.Count; i++)
                 {
                     CowFeet[i].AddRelativeForce(0, 0, -10, ForceMode.Impulse);
                 }
-                CowSpine[CowSpine.Count - 1].AddRelativeForce(0,5,10,ForceMode.Impulse);
                 
+                //CowSpine[CowSpine.Count - 1].AddRelativeForce(0,0,10,ForceMode.Impulse);
+                CowSpine[CowSpine.Count - 1].AddRelativeTorque(new Vector3(0,5,0),ForceMode.Impulse);
+
                 Time.timeScale = 0.02f;
                 Time.fixedDeltaTime /= 50;
                 CrashCamTarget.transform.localPosition = new Vector3(147.3f,8f,20);
                 CrashCamTarget.transform.localRotation = Quaternion.Euler(8,-115,0);
-                Debug.Log(true);
             }
-            if (StartSlowMo)
+            if (StartSlowMo && !AddedExplosionToCow)
             {
                 for (int i = 0; i < AllCowRBs.Count; i++)
                 {
                     CowAnimController.enabled = false;
                     AllCowRBs[i].isKinematic = false;
                     CrashCamTarget.transform.parent = gameObject.transform;
-
-
                 }
-                
-                    CowSpine[1].AddRelativeTorque(new Vector3(50, 0, 0), ForceMode.Acceleration);
+            }
+            else
+            {
+                //CowSpine[1].AddRelativeTorque(new Vector3(0.2f, 0, 0), ForceMode.Impulse);
+                //CowSpine[5].AddRelativeTorque(new Vector3(3, 0.7f, 0), ForceMode.Acceleration);
+                //CowSpine[CowSpine.Count - 1].AddRelativeTorque(new Vector3(0.1f, 0f, 0), ForceMode.Impulse);
 
-                
             }
 
 
@@ -167,11 +200,14 @@ public class StartScreenController : MonoBehaviour {
 
     void OnDisable()
     {
-        CarController.CarBody.isKinematic = false;
-
+        GameLoopLight.SetActive(true);
+        MainCam.enabled = true;
+        Time.timeScale = 1;
+        Time.fixedDeltaTime = 0.02f;
+        CarCollidedWIthCow = false;
+        
+        StartSlowMo = false;
         RenderSettings.fogEndDistance = GameloopFogDistance;
         RenderSettings.fogColor = GameloopFogColor;
-
-
     }
 }
