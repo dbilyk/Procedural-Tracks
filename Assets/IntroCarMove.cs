@@ -6,11 +6,11 @@ public class IntroCarMove : MonoBehaviour {
     public List<WheelCollider> WheelCols = new List<WheelCollider>();
     public List<GameObject> VisualWheels = new List<GameObject>();
 
-    // Use this for initialization
-    void OnEnable () {
-		
-	}
+    public float initialCarBodyAccel;
+    public Rigidbody CarBody;
+    public bool ApplyAccel = false;
 	
+    public StartScreenController StartScreenCtrl;
     public void ApplyRotationToVisualWheels(WheelCollider collider, GameObject visualWheel)
     {
         Vector3 position;
@@ -22,25 +22,22 @@ public class IntroCarMove : MonoBehaviour {
     }
 
 
-	// Update is called once per frame
+    bool initialAccel = false;
 	void Update () {
-
-
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (ApplyAccel)
         {
-            WheelCols[0].motorTorque = -500f;
-            WheelCols[1].motorTorque = -500f;
-
+            WheelCols[0].motorTorque = 100;
+            WheelCols[1].motorTorque = 100;
+           
+            if (!initialAccel)
+            {
+                StartCoroutine(ForcePushCarBody());
+                initialAccel = true;
+            }
 
 
         }
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            WheelCols[0].motorTorque = 500f;
-            WheelCols[1].motorTorque = 500f;
-
-        }
-
+        
 
         for (int i = 0; i < 4; i++)
         {
@@ -48,6 +45,30 @@ public class IntroCarMove : MonoBehaviour {
         }
 
 
+    }
+
+    IEnumerator ForcePushCarBody()
+    {
+        CarBody.velocity = new Vector3(-initialCarBodyAccel,0,0);
+        yield return new WaitForSeconds(1f);
+        CarBody.constraints -= RigidbodyConstraints.FreezeRotationX;
+    }
+    bool FirstCollisionDone = false;
+    void OnTriggerEnter(Collider col)
+    {
+        if (col.gameObject.name == "Intro Cow")
+        {
+            if (!FirstCollisionDone)
+            {
+                StartScreenCtrl.StartSlowMo = true;
+                FirstCollisionDone = true;
+            }
+            else
+            {
+                StartScreenCtrl.CarCollidedWIthCow = true;
+
+            }
+        }
     }
 
 

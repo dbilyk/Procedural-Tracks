@@ -112,6 +112,9 @@ public class GameManager : MonoBehaviour {
 
     public void StartingCountdown()
     {
+
+
+
         //positions player/AIs
         Player.transform.position = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.position;
         Player.transform.rotation = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.rotation;

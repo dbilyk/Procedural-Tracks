@@ -26,6 +26,9 @@ public class UIManager : MonoBehaviour {
         StartRaceBtn.SetActive(false);
         PauseMenuBtn.SetActive(true);
 
+
+
+
         gameManager.ResetGame();
         gameManager.GenerateNewTrackData();
         gameManager.GenerateLevel();
@@ -41,6 +44,13 @@ public class UIManager : MonoBehaviour {
         PauseMenu.SetActive(false);
         PauseMenuBtn.SetActive(true);
     }
+
+    public void QuitRace()
+    {
+        Debug.Log("Just called Quit race on UIManager, take me back to start screen?");
+
+    }
+
 
     public void OpenPauseMenu()
     {

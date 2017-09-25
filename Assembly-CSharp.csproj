@@ -47,7 +47,6 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\IntroCarMove.cs" />
-     <Compile Include="Assets\NewLapAlert.cs" />
      <Compile Include="Assets\Scripts\Camera\FollowCar.cs" />
      <Compile Include="Assets\Scripts\Camera\SmoothFollowCam.cs" />
      <Compile Include="Assets\Scripts\Cars\BodyRoll.cs" />
@@ -60,6 +59,7 @@
      <Compile Include="Assets\Scripts\Critters\CritterMobManager.cs" />
      <Compile Include="Assets\Scripts\Critters\chickMove.cs" />
      <Compile Include="Assets\Scripts\Data\Data.cs" />
+     <Compile Include="Assets\Scripts\Data\User.cs" />
      <Compile Include="Assets\Scripts\Debug\ExtensionMethods.cs" />
      <Compile Include="Assets\Scripts\Game Logic\AIInputController.cs" />
      <Compile Include="Assets\Scripts\Game Logic\FlagForScenePersistence.cs" />
@@ -72,11 +72,13 @@
      <Compile Include="Assets\Scripts\Map Creation\FoliageCreator.cs" />
      <Compile Include="Assets\Scripts\Map Creation\MapCreator.cs" />
      <Compile Include="Assets\Scripts\Map Creation\MapGraphics.cs" />
+     <Compile Include="Assets\Scripts\Start Screen\IntroCritterAnimDelay.cs" />
+     <Compile Include="Assets\Scripts\Start Screen\StartScreenController.cs" />
      <Compile Include="Assets\Scripts\UI\MiniMap.cs" />
+     <Compile Include="Assets\Scripts\UI\NewLapAlert.cs" />
      <Compile Include="Assets\Scripts\UI\RaceStatsUIUpdate.cs" />
      <Compile Include="Assets\Scripts\UI\StartingLight.cs" />
      <Compile Include="Assets\Scripts\UI\UIManager.cs" />
-     <Compile Include="Assets\User.cs" />
      <None Include="Assets\Fonts\OFL.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

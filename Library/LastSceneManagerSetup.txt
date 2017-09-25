@@ -1,5 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/ActiveGame Scene/ActiveGame v3.6 Critter Pooling not complete
-    plus StartScreen.unity
+- path: Assets/Scenes/ActiveGame Scene/ActiveGame v3.7 Start Screen MuscleCar.unity
   isLoaded: 1
   isActive: 1
