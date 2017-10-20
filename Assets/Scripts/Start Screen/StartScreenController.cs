@@ -174,7 +174,7 @@ public class StartScreenController : MonoBehaviour {
 
                 Time.timeScale = 0.02f;
                 Time.fixedDeltaTime /= 50;
-                CrashCamTarget.transform.localPosition = new Vector3(147.3f,8f,20);
+                CrashCamTarget.transform.localPosition = new Vector3(162.3f,8f,20);
                 CrashCamTarget.transform.localRotation = Quaternion.Euler(8,-115,0);
             }
             if (StartSlowMo && !AddedExplosionToCow)
@@ -200,7 +200,11 @@ public class StartScreenController : MonoBehaviour {
 
     void OnDisable()
     {
-        GameLoopLight.SetActive(true);
+        if (GameLoopLight != null)
+        {
+            GameLoopLight.SetActive(true);
+
+        }
         MainCam.enabled = true;
         Time.timeScale = 1;
         Time.fixedDeltaTime = 0.02f;
