@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/ActiveGame Scene/ActiveGame v4 StartScreenAlmostDone.unity
+- path: Assets/Scenes/ActiveGame Scene/ActiveGame v4.1FMOD Integration.unity
   isLoaded: 1
   isActive: 1

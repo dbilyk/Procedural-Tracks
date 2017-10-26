@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="AudioFile" id="{19bffe45-7449-454f-ab01-95393f87543c}">
+        <property name="assetPath">
+            <value>MECK CLICK Metal Ratchet Small Handling Open Close Fast.wav</value>
+        </property>
+        <property name="isStreaming">
+            <value>true</value>
+        </property>
+        <property name="frequencyInKHz">
+            <value>44.0999985</value>
+        </property>
+        <property name="channelCount">
+            <value>2</value>
+        </property>
+        <property name="length">
+            <value>14.064875283446712</value>
+        </property>
+        <relationship name="masterAssetFolder">
+            <destination>{59ced7d4-76ff-4d67-96b9-a0c4d62cec3a}</destination>
+        </relationship>
+    </object>
+</objects>

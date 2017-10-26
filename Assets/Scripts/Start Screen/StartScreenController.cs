@@ -138,6 +138,7 @@ public class StartScreenController : MonoBehaviour {
     public bool CarCollidedWIthCow = false;
     public bool StartSlowMo = false;
     public GameObject CrashCamTarget;
+    public GameObject HomeScreenUI;
     IEnumerator CrashShot()
     {
         Cam.fieldOfView = 60;
@@ -158,6 +159,9 @@ public class StartScreenController : MonoBehaviour {
                     AllCowRBs[i].isKinematic = false;
                     AddedExplosionToCow = true;
                 }
+                //enable the home screen UI
+                HomeScreenUI.SetActive(true);
+                
 
                 for (int i = 0; i< CowSpine.Count; i++)
                 {

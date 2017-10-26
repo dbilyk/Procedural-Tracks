@@ -81,6 +81,8 @@
      <Compile Include="Assets\Scripts\UI\RaceStatsUIUpdate.cs" />
      <Compile Include="Assets\Scripts\UI\StartingLight.cs" />
      <Compile Include="Assets\Scripts\UI\UIManager.cs" />
+     <Compile Include="Assets\Scripts\UI\UIScreenIntroToggle.cs" />
+     <Compile Include="Assets\Scripts\UI\UISlideScreens.cs" />
      <None Include="Assets\Fonts\OFL.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
