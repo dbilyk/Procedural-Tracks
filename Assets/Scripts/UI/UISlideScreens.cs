@@ -11,7 +11,7 @@ public class UISlideScreens : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	 Update () {
+	void Update () {
 		
 	}
 }
