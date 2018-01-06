@@ -19,6 +19,8 @@ public class RaceStatsUIUpdate : MonoBehaviour {
     public Text CurrentLap;
     public Text TotalLaps;
 
+    [SerializeField]
+    int poop;
     
     public float IndentCurrentTime;
     public float IndentBestAndLastTime;
@@ -58,7 +60,7 @@ public class RaceStatsUIUpdate : MonoBehaviour {
             UpdateUI = true;
         }
 
-
+    
     }
     IEnumerator UpdateUIStats()
     {
