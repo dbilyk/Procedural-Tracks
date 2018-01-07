@@ -76,13 +76,13 @@
      <Compile Include="Assets\Scripts\Map Creation\MapGraphics.cs" />
      <Compile Include="Assets\Scripts\Start Screen\IntroCritterAnimDelay.cs" />
      <Compile Include="Assets\Scripts\Start Screen\StartScreenController.cs" />
+     <Compile Include="Assets\Scripts\UI\HomeScreen.cs" />
      <Compile Include="Assets\Scripts\UI\MiniMap.cs" />
      <Compile Include="Assets\Scripts\UI\NewLapAlert.cs" />
      <Compile Include="Assets\Scripts\UI\RaceStatsUIUpdate.cs" />
      <Compile Include="Assets\Scripts\UI\StartingLight.cs" />
      <Compile Include="Assets\Scripts\UI\UIManager.cs" />
-     <Compile Include="Assets\Scripts\UI\UIScreenIntroToggle.cs" />
-     <Compile Include="Assets\Scripts\UI\UISlideScreens.cs" />
+     <Compile Include="Assets\Scripts\UI\UI_Home.cs" />
      <None Include="Assets\Fonts\OFL.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

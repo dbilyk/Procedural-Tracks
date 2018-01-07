@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/ActiveGame Scene/ActiveGame v4.2 mocking up UI animations.unity
+- path: Assets/Scenes/Main 2018/Core Gameplay v1 UI Branch.unity
   isLoaded: 1
   isActive: 1

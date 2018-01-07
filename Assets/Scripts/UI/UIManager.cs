@@ -7,7 +7,6 @@ public class UIManager : MonoBehaviour {
     public GameManager gameManager;
     public RaceStatsManager raceStatsManager;
     public LapTrigger lapTrigger;
-    public GameObject StartRaceBtn;
     public GameObject StartScreen;
 
     //Pause Menu elements
@@ -20,60 +19,49 @@ public class UIManager : MonoBehaviour {
     public Text Currency;
 
     //use this to pause game
-    private float targetTimescale=1f;
+    private float targetTimescale = 1f;
 
-    public void StartRace()
-    {
-        StartRaceBtn.SetActive(false);
-        PauseMenuBtn.SetActive(true);
-        StartScreen.SetActive(false);
+    public void StartRace () {
+        PauseMenuBtn.SetActive (true);
+        StartScreen.SetActive (false);
 
-
-
-        gameManager.ResetGame();
-        gameManager.GenerateNewTrackData();
-        gameManager.GenerateLevel();
-        gameManager.GenerateAI();
-        gameManager.StartingCountdown();
+        gameManager.ResetGame ();
+        gameManager.GenerateNewTrackData ();
+        gameManager.GenerateLevel ();
+        gameManager.GenerateAI ();
+        gameManager.StartingCountdown ();
     }
 
-    public void RestartLevel()
-    {
+    public void RestartLevel () {
         Time.timeScale = 1;
-        gameManager.ResetGame();
-        gameManager.StartingCountdown();
-        PauseMenu.SetActive(false);
-        PauseMenuBtn.SetActive(true);
+        gameManager.ResetGame ();
+        gameManager.StartingCountdown ();
+        PauseMenu.SetActive (false);
+        PauseMenuBtn.SetActive (true);
     }
 
-    public void QuitRace()
-    {
-        Debug.Log("Just called Quit race on UIManager, take me back to start screen?");
+    public void QuitRace () {
+        Debug.Log ("Just called Quit race on UIManager, take me back to start screen?");
 
     }
 
-
-    public void OpenPauseMenu()
-    {
-        PauseMenu.SetActive(true);
-        PauseMenuBtn.SetActive(false);
+    public void OpenPauseMenu () {
+        PauseMenu.SetActive (true);
+        PauseMenuBtn.SetActive (false);
         targetTimescale = 0f;
         Time.timeScale = 0;
 
     }
 
-    public void ClosePauseMenu()
-    {
-        PauseMenu.SetActive(false);
-        PauseMenuBtn.SetActive(true);
+    public void ClosePauseMenu () {
+        PauseMenu.SetActive (false);
+        PauseMenuBtn.SetActive (true);
         targetTimescale = 1f;
         Time.timeScale = 1;
     }
 
-
     public User user;
-    void Awake()
-    {
+    void Awake () {
         //subscribe to Delegates here
         user.OnCurrencyAdded += UpdateCurrency;
         //wrong way blinker
@@ -82,50 +70,37 @@ public class UIManager : MonoBehaviour {
 
     }
 
-   
-
     //stuff to update when currency QTY is updated
-    void UpdateCurrency(int passedValue)
-    {
-        Currency.GetComponent<Text>().text = passedValue.ToString();
+    void UpdateCurrency (int passedValue) {
+        Currency.GetComponent<Text> ().text = passedValue.ToString ();
     }
 
     //Wrong way flashing functionality----------   Must unsubscribe after game is done!
     public GameObject WrongWayIndicator;
     IEnumerator blinkReference;
-    void FacingWrongWay()
-    {
-        blinkReference = blinkWrongWay();
-        StartCoroutine(blinkReference);
+    void FacingWrongWay () {
+        blinkReference = blinkWrongWay ();
+        StartCoroutine (blinkReference);
     }
 
-    IEnumerator blinkWrongWay()
-    {
-        while (true)
-        {
-            yield return new WaitForSecondsRealtime(1f);
-            if (WrongWayIndicator.activeSelf)
-            {
-                WrongWayIndicator.SetActive(false);
-            }
-            else
-            {
-                WrongWayIndicator.SetActive(true);
+    IEnumerator blinkWrongWay () {
+        while (true) {
+            yield return new WaitForSecondsRealtime (1f);
+            if (WrongWayIndicator.activeSelf) {
+                WrongWayIndicator.SetActive (false);
+            } else {
+                WrongWayIndicator.SetActive (true);
             }
         }
-        
+
     }
 
-    void FacingForward()
-    {
-        if (blinkReference != null)
-        {
-            StopCoroutine(blinkReference);
+    void FacingForward () {
+        if (blinkReference != null) {
+            StopCoroutine (blinkReference);
         }
-        WrongWayIndicator.SetActive(false);
+        WrongWayIndicator.SetActive (false);
     }
     //--------------------------------------------------
-    
-
 
 }
