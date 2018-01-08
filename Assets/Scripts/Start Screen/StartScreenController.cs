@@ -31,7 +31,13 @@ public class StartScreenController : MonoBehaviour {
     Vector3 CarCamInitialPosition;
     Quaternion CarCamInitialRotation;
 
+    public event EndIntro OnEndIntro;
+    public delegate void EndIntro ();
+
+    private bool homeUIOn = false;
+
     void OnEnable () {
+        HomeScreenUI.SetActive (false);
         GameLoopLight.SetActive (false);
         CrashCamTarget.transform.parent = CarController.transform;
         if (CarInitialPosition == Vector3.zero) {
@@ -69,15 +75,12 @@ public class StartScreenController : MonoBehaviour {
     void Update () {
         // Debug.Log (Input.GetMouseButtonDown (0));
         //enable the home screen UI
-        if (!HomeUIEnabled && Input.GetMouseButtonDown (0) || Input.touchCount > 0) {
-            EnableHomeUI ();
+        if (!homeUIOn && Input.GetMouseButtonDown (0) || Input.touchCount > 0) {
+            if (OnEndIntro != null) {
+                OnEndIntro ();
+
+            }
         }
-    }
-    //show the homescreen before the intro is done
-    bool HomeUIEnabled = false;
-    void EnableHomeUI () {
-        HomeScreenUI.SetActive (true);
-        HomeUIEnabled = true;
     }
 
     public float CarShotDuration;
@@ -162,13 +165,13 @@ public class StartScreenController : MonoBehaviour {
                 for (int i = 0; i < CowFeet.Count; i++) {
                     CowFeet[i].AddRelativeForce (0, 0, -10, ForceMode.Impulse);
                 }
+                //trigger end intro event
+                if (!homeUIOn && OnEndIntro != null) {
+                    OnEndIntro ();
+                }
 
                 //CowSpine[CowSpine.Count - 1].AddRelativeForce(0,0,10,ForceMode.Impulse);
                 CowSpine[CowSpine.Count - 1].AddRelativeTorque (new Vector3 (0, 5, 0), ForceMode.Impulse);
-
-                if (!HomeUIEnabled) {
-                    EnableHomeUI ();
-                }
 
                 Time.timeScale = 0.02f;
                 Time.fixedDeltaTime /= 50;
