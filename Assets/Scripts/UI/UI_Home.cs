@@ -5,21 +5,57 @@ using UnityEngine;
 public class UI_Home : MonoBehaviour {
 	[SerializeField]
 	GameObject HomeUI;
+
 	[SerializeField]
 	private StartScreenController IntroReel;
+
 	private bool IntroAnimPlayed = false;
 	private Animator Anim;
-	//events from elsewhere that concern this screen
 
+	//public home screen events
+	public delegate void ButtonClick ();
+	public event ButtonClick OnClickPlay;
+	public event ButtonClick OnClickSettings;
+	public event ButtonClick OnClickSocial;
+	public event ButtonClick OnClickOnline;
+	public event ButtonClick OnClickCarPicker;
+	public event ButtonClick OnClickFaceCam;
+	public event ButtonClick OnClickScreenRec;
+	public event ButtonClick OnShareBtnClick;
+
+	//these are triggered by buttons and any validation can be done here before emitting the event
+	public void PlayBtnClick () {
+		if (OnClickPlay != null) OnClickPlay ();
+	}
+	public void SettingsClick () {
+		if (OnClickSettings != null) OnClickSettings ();
+	}
+	public void SocialClick () {
+		if (OnClickSocial != null) OnClickSocial ();
+	}
+	public void OnlineBtnClick () {
+		if (OnClickOnline != null) OnClickOnline ();
+	}
+	public void CarPickerBtnClick () {
+		if (OnClickCarPicker != null) OnClickCarPicker ();
+	}
+	public void FaceCamBtnClick () {
+		if (OnClickFaceCam != null) OnClickFaceCam ();
+	}
+	public void ScreenRecBtnClick () {
+		if (OnClickScreenRec != null) OnClickScreenRec ();
+	}
+	public void ShareBtnClick () {
+		if (OnShareBtnClick != null) OnShareBtnClick ();
+	}
+	//Housekeeping
 	void OnEnable () {
 		Anim = gameObject.GetComponent<Animator> ();
 		IntroReel.OnEndIntro += SlideIn;
-
 	}
 
 	void OnDisable () {
 		IntroReel.OnEndIntro -= SlideIn;
-
 	}
 
 	//anim state names
@@ -53,24 +89,21 @@ public class UI_Home : MonoBehaviour {
 		PlayAnim (2, 0);
 	}
 
-	bool settingsOn = false;
+	bool settingsIn = false;
 	private void ToggleSettings () {
-		if (settingsOn) {
+		if (settingsIn) {
 
 		} else {
 
 		}
 	}
 
-	bool socialOn = false;
+	bool socialIn = false;
 	private void ToggleSocial () {
-		if (socialOn) {
+		if (socialIn) {
 
 		} else {
 
 		}
 	}
-
-	bool IntroPlayed;
-	void PlayIntroAnim () { }
 }

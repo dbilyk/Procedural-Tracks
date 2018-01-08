@@ -76,7 +76,7 @@ public class StartScreenController : MonoBehaviour {
         // Debug.Log (Input.GetMouseButtonDown (0));
         //enable the home screen UI
         if (!homeUIOn && Input.GetMouseButtonDown (0) || Input.touchCount > 0) {
-            if (OnEndIntro != null) {
+            if (this.OnEndIntro != null) {
                 OnEndIntro ();
 
             }
