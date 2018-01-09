@@ -82,7 +82,11 @@
      <Compile Include="Assets\Scripts\UI\RaceStatsUIUpdate.cs" />
      <Compile Include="Assets\Scripts\UI\StartingLight.cs" />
      <Compile Include="Assets\Scripts\UI\UIManager.cs" />
+     <Compile Include="Assets\Scripts\UI\UI_GameLoop.cs" />
+     <Compile Include="Assets\Scripts\UI\UI_Header.cs" />
      <Compile Include="Assets\Scripts\UI\UI_Home.cs" />
+     <Compile Include="Assets\Scripts\UI\UI_MapSelector.cs" />
+     <Compile Include="Assets\Scripts\UI\UI_Settings.cs" />
      <Compile Include="Assets\Scripts\UI\UI_Skins.cs" />
      <None Include="Assets\Fonts\OFL.txt" />
  <Reference Include="UnityEngine.UI">
