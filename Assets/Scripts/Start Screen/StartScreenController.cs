@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class StartScreenController : MonoBehaviour {
-    IScreen Screen;
     public float introFogDistance;
     public float GameloopFogDistance;
     public Color32 GameloopFogColor;
