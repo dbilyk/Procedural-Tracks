@@ -39,6 +39,7 @@ public class StartScreenController : MonoBehaviour {
     void OnEnable () {
         HomeScreenUI.SetActive (false);
         GameLoopLight.SetActive (false);
+        QualitySettings.shadowDistance = 150;
         CrashCamTarget.transform.parent = CarController.transform;
         if (CarInitialPosition == Vector3.zero) {
             CarInitialPosition = CarController.CarBody.gameObject.transform.localPosition;
@@ -199,6 +200,8 @@ public class StartScreenController : MonoBehaviour {
             GameLoopLight.SetActive (true);
 
         }
+
+        QualitySettings.shadowDistance = 40;
         MainCam.enabled = true;
         Time.timeScale = 1;
         Time.fixedDeltaTime = 0.02f;

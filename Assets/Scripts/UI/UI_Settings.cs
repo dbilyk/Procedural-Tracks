@@ -7,10 +7,10 @@ public class UI_Settings : MonoBehaviour {
 	Animator Anim;
 
 	[SerializeField]
-	Slider MusicVolSlider;
+	Button TutorialBtn, CreditsBtn;
 
 	[SerializeField]
-	Slider SFXSlider;
+	Slider MusicVolSlider, SFXSlider;
 
 	public delegate void ButtonClick ();
 	public event ButtonClick OnClickTutorial, OnClickCredits;
@@ -37,6 +37,10 @@ public class UI_Settings : MonoBehaviour {
 	//Housekeeping
 	void OnEnable () {
 		Anim = gameObject.GetComponent<Animator> ();
+
+		//settings button event callbacks
+		TutorialBtn.onClick.AddListener (delegate { ClickTutorial (); });
+		CreditsBtn.onClick.AddListener (delegate { ClickCredits (); });
 		MusicVolSlider.onValueChanged.AddListener (delegate { MusicVolChanged (); });
 		SFXSlider.onValueChanged.AddListener (delegate { SFXVolChanged (); });
 	}
@@ -47,19 +51,28 @@ public class UI_Settings : MonoBehaviour {
 
 	//UI events, check for gotchas here before sending
 	public void ClickTutorial () {
-		if (OnClickTutorial != null) OnClickTutorial ();
+		Debug.Log ("Tutorial");
+		if (OnClickTutorial != null) {
+			OnClickTutorial ();
+		}
 	}
 
 	public void ClickCredits () {
-		if (OnClickCredits != null) OnClickCredits ();
+		Debug.Log ("Credits");
+		if (OnClickCredits != null) {
+			OnClickCredits ();
+		}
 	}
+
 	public void MusicVolChanged () {
+		Debug.Log ("Music Slider");
 		if (OnMusicVolChanged != null) {
 
 			OnMusicVolChanged (MusicVolSlider.value);
 		}
 	}
 	public void SFXVolChanged () {
+		Debug.Log ("SFX Slider");
 		if (OnSFXVolChanged != null) {
 			OnSFXVolChanged (SFXSlider.value);
 		}
