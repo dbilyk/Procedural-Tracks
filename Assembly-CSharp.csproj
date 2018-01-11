@@ -77,7 +77,6 @@
      <Compile Include="Assets\Scripts\Start Screen\IntroCritterAnimDelay.cs" />
      <Compile Include="Assets\Scripts\Start Screen\StartScreenController.cs" />
      <Compile Include="Assets\Scripts\UI\MiniMap.cs" />
-     <Compile Include="Assets\Scripts\UI\NewLapAlert.cs" />
      <Compile Include="Assets\Scripts\UI\RaceStatsUIUpdate.cs" />
      <Compile Include="Assets\Scripts\UI\StartingLight.cs" />
      <Compile Include="Assets\Scripts\UI\UIManager.cs" />
@@ -85,8 +84,10 @@
      <Compile Include="Assets\Scripts\UI\UI_Header.cs" />
      <Compile Include="Assets\Scripts\UI\UI_Home.cs" />
      <Compile Include="Assets\Scripts\UI\UI_MapSelector.cs" />
+     <Compile Include="Assets\Scripts\UI\UI_PauseGame.cs" />
      <Compile Include="Assets\Scripts\UI\UI_Settings.cs" />
      <Compile Include="Assets\Scripts\UI\UI_Skins.cs" />
+     <Compile Include="Assets\Scripts\Utility\TurnSelfOff.cs" />
      <None Include="Assets\Fonts\OFL.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

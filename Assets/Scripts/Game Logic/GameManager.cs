@@ -13,176 +13,149 @@ public class GameManager : MonoBehaviour {
     public MapCreator MapCreator;
     public SmoothFollowCam FollowCam;
 
-    //game objects
-    public GameObject RaceStatsManager;
-    public GameObject MobManager;
-    public GameObject Player;
-    public GameObject newAI;
-    public GameObject ActiveGameTrack;
-    public GameObject BermDecals;
+    //game object
+    public GameObject RaceStatsManager,
+    MobManager,
+    Player,
+    newAI,
+    ActiveGameTrack,
+    BermDecals,
+    AIContainer,
+    StartingGridContainer,
+    FoliageContainer,
+    GameLoopUI,
+    MiniMapGroup,
+    StartingLights;
 
-    public GameObject AIContainer;
-    public GameObject StartingGridContainer;
-    public GameObject FoliageContainer;
+    public List<AIInputController> AIInputs = new List<AIInputController> ();
 
-    public GameObject GameLoopUI;
-    public GameObject MiniMapGroup;
-    public GameObject StartingLights;
-
-    public List<AIInputController> AIInputs = new List<AIInputController>();
-
-    
-    
-
-    void Awake()
-    {
+    void Awake () {
         Application.targetFrameRate = 60;
     }
 
     //small helper to toggle AI input
-    private void SetAIInput(bool isActive)
-    {
-        for (int i = 0; i < AIInputs.Count; i++)
-        {
+    private void SetAIInput (bool isActive) {
+        for (int i = 0; i < AIInputs.Count; i++) {
             AIInputs[i].enabled = isActive;
         }
     }
 
+    public void GenerateNewTrackData () {
+        Data.Curr_RawPoints = new List<Vector2> ();
 
-    public void GenerateNewTrackData()
-    {
-        Data.Curr_RawPoints = new List<Vector2>();
-
-        Data.Curr_RawPoints = MapCreator.CreateRawUnsortedPoints();
-        Data.Curr_RawPoints = MapCreator.SortPoints(Data.Curr_RawPoints);
+        Data.Curr_RawPoints = MapCreator.CreateRawUnsortedPoints ();
+        Data.Curr_RawPoints = MapCreator.SortPoints (Data.Curr_RawPoints);
         //have to run point thinning and angle adjustment several times because they recursively affect each other.
-        for (int i = 0; i < 50; i++)
-        {
-            Data.Curr_RawPoints = MapCreator.RemovePointsTooClose(Data.Curr_RawPoints, Data.PointSpacing);
-            Data.Curr_RawPoints = MapCreator.CheckControlPointAngles(Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
+        for (int i = 0; i < 50; i++) {
+            Data.Curr_RawPoints = MapCreator.RemovePointsTooClose (Data.Curr_RawPoints, Data.PointSpacing);
+            Data.Curr_RawPoints = MapCreator.CheckControlPointAngles (Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
         }
 
         //Data.Curr_RawPoints = MapCreator.ApplyRandomRotation(Data.Curr_RawPoints);
-        Data.Curr_ControlPoints = MapCreator.CreateControlPoints(Data.Curr_RawPoints);
-        Data.Curr_TrackPoints = MapCreator.CreateTrackPoints(Data.Curr_ControlPoints, Data.MeshTrackPointFreq);
+        Data.Curr_ControlPoints = MapCreator.CreateControlPoints (Data.Curr_RawPoints);
+        Data.Curr_TrackPoints = MapCreator.CreateTrackPoints (Data.Curr_ControlPoints, Data.MeshTrackPointFreq);
     }
 
-    public void GenerateLevel()
-    {
+    public void GenerateLevel () {
         //mesh creation
-        MapCreator.CreateOrSetMeshHelperObjects(Data.Curr_TrackPoints);
-        MapCreator.RotateTrackObjectsAlongCurves(Data.CurrentMeshHelperObjects);
-
-        MapCreator.CreateStartingGrid(Data.CurrentMeshHelperObjects, Data.StartingGridLength, Data.StartingGridWidth, Data.NumberOfGridPositions);
-
-        MapCreator.CreateTrackBerms(Data.CurrentMeshHelperObjects, Data.BermWidth, Data.BermOffset, Data.BermLength, BermDecals.GetComponent<MeshFilter>());
-
-        MapCreator.CreateTrackMesh(Data.CurrentMeshHelperObjects, Data.TrackMeshThickness, ActiveGameTrack.gameObject.GetComponent<MeshFilter>());
-
-        MapCreator.CreateColliderForTrack(Data.Curr_OuterTrackPoints, Data.Curr_InnerTrackPoints, Data.TrackColliderResolution, ActiveGameTrack.GetComponent<PolygonCollider2D>());
+        MapCreator.CreateOrSetMeshHelperObjects (Data.Curr_TrackPoints);
+        MapCreator.RotateTrackObjectsAlongCurves (Data.CurrentMeshHelperObjects);
+        MapCreator.CreateStartingGrid (Data.CurrentMeshHelperObjects, Data.StartingGridLength, Data.StartingGridWidth, Data.NumberOfGridPositions);
+        MapCreator.CreateTrackBerms (Data.CurrentMeshHelperObjects, Data.BermWidth, Data.BermOffset, Data.BermLength, BermDecals.GetComponent<MeshFilter> ());
+        MapCreator.CreateTrackMesh (Data.CurrentMeshHelperObjects, Data.TrackMeshThickness, ActiveGameTrack.gameObject.GetComponent<MeshFilter> ());
+        MapCreator.CreateColliderForTrack (Data.Curr_OuterTrackPoints, Data.Curr_InnerTrackPoints, Data.TrackColliderResolution, ActiveGameTrack.GetComponent<PolygonCollider2D> ());
 
         //populates current racing line with correct data
-        Data.Curr_RacingLinePoints = MapCreator.CreateRacingLinePoints(Data.Curr_RawPoints, Data.RacingLineWaypointFreq, Data.RacingLineTightness);
+        Data.Curr_RacingLinePoints = MapCreator.CreateRacingLinePoints (Data.Curr_RawPoints, Data.RacingLineWaypointFreq, Data.RacingLineTightness);
 
         //create barriers
-        Data.InnerBarrierPoints = InnerBarrier.CreateOutline(Data.Curr_RawPoints, Data.InnerBarrierOffset, "inner");
-        Data.OuterBarrierPoints = OuterBarrier.CreateOutline(Data.Curr_RawPoints, Data.OuterBarrierOffset, "outer");
-        InnerBarrier.CreateBarrier(Data.InnerBarrierPoints);
-        OuterBarrier.CreateBarrier(Data.OuterBarrierPoints);
-        
-        FoliageContainer.SetActive(true);
+        Data.InnerBarrierPoints = InnerBarrier.CreateOutline (Data.Curr_RawPoints, Data.InnerBarrierOffset, "inner");
+        Data.OuterBarrierPoints = OuterBarrier.CreateOutline (Data.Curr_RawPoints, Data.OuterBarrierOffset, "outer");
+        InnerBarrier.CreateBarrier (Data.InnerBarrierPoints);
+        OuterBarrier.CreateBarrier (Data.OuterBarrierPoints);
 
-        StaticBatchingUtility.Combine(FoliageContainer);
+        FoliageContainer.SetActive (true);
+        StaticBatchingUtility.Combine (FoliageContainer);
     }
 
-    public void GenerateAI()
-    {
+    public void GenerateAI () {
         //creates a new AI opponent
-        for (int i = 0; i < Data.CarStartingPositions.Count - 1; i++)
-        {
-            GameObject Ai = Instantiate(newAI, AIContainer.transform);
-
+        for (int i = 0; i < Data.CarStartingPositions.Count - 1; i++) {
+            GameObject Ai = Instantiate (newAI, AIContainer.transform);
             Ai.transform.position = Data.CarStartingPositions[i].transform.position;
             Ai.transform.rotation = Data.CarStartingPositions[i].transform.rotation;
-            AIInputController aiInput = Ai.GetComponent<AIInputController>();
+            AIInputController aiInput = Ai.GetComponent<AIInputController> ();
             aiInput.enabled = false;
-            AIInputs.Add(aiInput);
+            AIInputs.Add (aiInput);
         }
     }
 
-    public void StartingCountdown()
-    {
-
-
+    public void StartingCountdown () {
 
         //positions player/AIs
         Player.transform.position = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.position;
         Player.transform.rotation = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.rotation;
-        Player.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-        Player.GetComponent<CarMovement>().enabled = false;
+        Player.GetComponent<Rigidbody2D> ().velocity = Vector2.zero;
+        Player.GetComponent<CarMovement> ().enabled = false;
         //disable UI before start of race
-        GameLoopUI.SetActive(false);
+        GameLoopUI.SetActive (false);
 
-        StartCoroutine("StartRace");
-        Vector3 CamStartPosition = new Vector3(Player.transform.position.x -5, Player.transform.position.y,-3);
-        Quaternion CamStartRotation = Quaternion.Euler(0,100,0);
+        StartCoroutine ("StartRace");
+        Vector3 CamStartPosition = new Vector3 (Player.transform.position.x - 5, Player.transform.position.y, -3);
+        Quaternion CamStartRotation = Quaternion.Euler (0, 100, 0);
         FollowCam.gameObject.transform.position = CamStartPosition;
         FollowCam.gameObject.transform.rotation = CamStartRotation;
-        InvokeRepeating("StartingCam",0,0.02f);
+        InvokeRepeating ("StartingCam", 0, 0.02f);
     }
 
-    public void StartingCam()
-    {
+    public void StartingCam () {
         GameObject cam = FollowCam.gameObject;
-            cam.transform.position = Vector3.Lerp(cam.transform.position, new Vector3(Player.transform.position.x, Player.transform.position.y, -18), 0.05f);
-            cam.transform.rotation = Quaternion.Lerp(cam.transform.rotation, Quaternion.Euler(Player.transform.rotation.eulerAngles.x, Player.transform.rotation.eulerAngles.y, Player.transform.rotation.eulerAngles.z - 90), 0.05f);
+        cam.transform.position = Vector3.Lerp (cam.transform.position, new Vector3 (Player.transform.position.x, Player.transform.position.y, -18), 0.05f);
+        cam.transform.rotation = Quaternion.Lerp (cam.transform.rotation, Quaternion.Euler (Player.transform.rotation.eulerAngles.x, Player.transform.rotation.eulerAngles.y, Player.transform.rotation.eulerAngles.z - 90), 0.05f);
     }
 
-    IEnumerator StartRace()
-    {
-        StartingLights.SetActive(true);
-        yield return new WaitForSeconds(CountdownLength);
-        CancelInvoke("StartingCam");
+    IEnumerator StartRace () {
+        StartingLights.SetActive (true);
+        yield return new WaitForSeconds (CountdownLength);
+        CancelInvoke ("StartingCam");
         FollowCam.enabled = true;
 
         //must activate before GameloopUI
-        RaceStatsManager.SetActive(true);
-        
+        RaceStatsManager.SetActive (true);
+
         //Enable gameloop UI
-        GameLoopUI.SetActive(true);
-        MiniMapGroup.SetActive(true);
+        GameLoopUI.SetActive (true);
+        MiniMapGroup.SetActive (true);
 
         //enables AI input
-        SetAIInput(true);
+        SetAIInput (true);
         //enables player movement
-        Player.GetComponent<CarMovement>().enabled = true;
+        Player.GetComponent<CarMovement> ().enabled = true;
 
         //Start Spawning Critters
-        MobManager.SetActive(true);
+        MobManager.SetActive (true);
 
     }
 
     //destroys stuff that gets recreated in StartNewGame
-    public void ResetGame()
-    {
-        StopCoroutine("StartRace");
-        StartingLights.SetActive(false);
-        SetAIInput(false);
+    public void ResetGame () {
+        StopCoroutine ("StartRace");
+        StartingLights.SetActive (false);
+        SetAIInput (false);
         //setting these false will re-trigger Initialization in their respective OnEnable functions
-        GameLoopUI.SetActive(false);
-        RaceStatsManager.SetActive(false);
+        GameLoopUI.SetActive (false);
+        RaceStatsManager.SetActive (false);
 
         //places AI back on starting grid
-        for (int i =0; i < AIContainer.transform.childCount; i ++)
-        {
-            GameObject AI = AIContainer.transform.GetChild(i).gameObject;
+        for (int i = 0; i < AIContainer.transform.childCount; i++) {
+            GameObject AI = AIContainer.transform.GetChild (i).gameObject;
 
-            AI.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-            AI.transform.position = StartingGridContainer.transform.GetChild(i).transform.position;
-            AI.transform.rotation = StartingGridContainer.transform.GetChild(i).transform.rotation;
+            AI.GetComponent<Rigidbody2D> ().velocity = Vector2.zero;
+            AI.transform.position = StartingGridContainer.transform.GetChild (i).transform.position;
+            AI.transform.rotation = StartingGridContainer.transform.GetChild (i).transform.rotation;
         }
-        MobManager.SetActive(false);
+        MobManager.SetActive (false);
 
     }
-   
+
 }

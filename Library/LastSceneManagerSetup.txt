@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/Main 2018/Core Gameplay v1 UI MapSelector assembled.unity
+- path: Assets/Scenes/Main 2018/Core Gameplay v1 UI GameLoop UI Started.unity
   isLoaded: 1
   isActive: 1

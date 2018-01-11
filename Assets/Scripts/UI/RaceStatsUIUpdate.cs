@@ -4,23 +4,16 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class RaceStatsUIUpdate : MonoBehaviour {
-    public Text CurrentLapTimeBig;
-    public Text CurrentLapTimeSmall;
-
-    public Text LastLapTimeBig;
-    public Text LastLapTimeSmall;
-
-    public Text BestLapTimeBig;
-    public Text BestLapTimeSmall;
-
-    public Text CurrentPlace;
-    public Text TotalPlaces;
-
-    public Text CurrentLap;
-    public Text TotalLaps;
-
-    public float IndentCurrentTime;
-    public float IndentBestAndLastTime;
+    public Text CurrentLapTimeBig,
+    CurrentLapTimeSmall,
+    LastLapTimeBig,
+    LastLapTimeSmall,
+    BestLapTimeBig,
+    BestLapTimeSmall,
+    CurrentPlace,
+    TotalPlaces,
+    CurrentLap,
+    TotalLaps;
 
     public Text LapCompleteAlert;
     public RaceStatsManager raceStatsManager;
@@ -30,6 +23,7 @@ public class RaceStatsUIUpdate : MonoBehaviour {
     void OnEnable () {
         raceStatsManager.OnLapAlert += TriggerLapAlert;
         UpdateUI = false;
+        //pole data 0 is always the player
         PlayerRaceStats = Data.CarPoleData[0];
 
     }
