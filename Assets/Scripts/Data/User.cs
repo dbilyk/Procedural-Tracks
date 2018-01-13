@@ -10,9 +10,8 @@ public class User : MonoBehaviour {
         public float CornerLerpStep { get; } = 0.1f;
         public int PtsPerQuad { get; } = 500;
         public float PointSpacing { get; } = 3f;
-        public
 
-        public int CornerWidth { get; set; } = 1;
+        public int CornerWidth { get; set; } = 125;
 
     }
 
