@@ -61,6 +61,7 @@
      <Compile Include="Assets\Scripts\Critters\CritterMobManager.cs" />
      <Compile Include="Assets\Scripts\Critters\chickMove.cs" />
      <Compile Include="Assets\Scripts\Data\Data.cs" />
+     <Compile Include="Assets\Scripts\Data\Track.cs" />
      <Compile Include="Assets\Scripts\Data\User.cs" />
      <Compile Include="Assets\Scripts\Debug\ExtensionMethods.cs" />
      <Compile Include="Assets\Scripts\Game Logic\AIInputController.cs" />
@@ -87,7 +88,7 @@
      <Compile Include="Assets\Scripts\UI\UI_PauseGame.cs" />
      <Compile Include="Assets\Scripts\UI\UI_Settings.cs" />
      <Compile Include="Assets\Scripts\UI\UI_Skins.cs" />
-     <Compile Include="Assets\Scripts\Utility\TurnSelfOff.cs" />
+     <Compile Include="Assets\Scripts\Utility\ToggleSelf.cs" />
      <None Include="Assets\Fonts\OFL.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

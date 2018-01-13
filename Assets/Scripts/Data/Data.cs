@@ -86,17 +86,6 @@
      //currently selected track skin  FARM is TEMP
      public static int Curr_TrackSkin = (int) TrackSkins.Farm;
 
-     //saved track data
-     public static List<SavedTrack> Svd_Tracks;
-
  }
 
  public enum TrackSkins { Farm, Mountains, Desert, Snow }
-
- //data structure for saving a track
- public class SavedTrack {
-     public List<Vector2> RawPoints;
-     public string name;
-     public int id;
-
- }

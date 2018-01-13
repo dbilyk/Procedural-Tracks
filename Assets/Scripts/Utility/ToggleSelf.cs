@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class TurnSelfOff : MonoBehaviour {
+public class ToggleSelf : MonoBehaviour {
 	void Off (GameObject self) {
 		self.SetActive (false);
 	}
