@@ -40,44 +40,6 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    public void GenerateNewTrackData () {
-        Data.Curr_RawPoints = new List<Vector2> ();
-
-        Data.Curr_RawPoints = MapCreator.CreateRawUnsortedPoints ();
-        Data.Curr_RawPoints = MapCreator.SortPoints (Data.Curr_RawPoints);
-        //have to run point thinning and angle adjustment several times because they recursively affect each other.
-        for (int i = 0; i < 50; i++) {
-            Data.Curr_RawPoints = MapCreator.RemovePointsTooClose (Data.Curr_RawPoints, Data.PointSpacing);
-            Data.Curr_RawPoints = MapCreator.CheckControlPointAngles (Data.Curr_RawPoints, Data.CornerBroadeningLerpStep);
-        }
-
-        //Data.Curr_RawPoints = MapCreator.ApplyRandomRotation(Data.Curr_RawPoints);
-        Data.Curr_ControlPoints = MapCreator.CreateControlPoints (Data.Curr_RawPoints);
-        Data.Curr_TrackPoints = MapCreator.CreateTrackPoints (Data.Curr_ControlPoints, Data.MeshTrackPointFreq);
-    }
-
-    public void GenerateLevel () {
-        //mesh creation
-        MapCreator.CreateOrSetMeshHelperObjects (Data.Curr_TrackPoints);
-        MapCreator.RotateTrackObjectsAlongCurves (Data.CurrentMeshHelperObjects);
-        MapCreator.CreateStartingGrid (Data.CurrentMeshHelperObjects, Data.StartingGridLength, Data.StartingGridWidth, Data.NumberOfGridPositions);
-        MapCreator.CreateTrackBerms (Data.CurrentMeshHelperObjects, Data.BermWidth, Data.BermOffset, Data.BermLength, BermDecals.GetComponent<MeshFilter> ());
-        MapCreator.CreateTrackMesh (Data.CurrentMeshHelperObjects, Data.TrackMeshThickness, ActiveGameTrack.gameObject.GetComponent<MeshFilter> ());
-        MapCreator.CreateColliderForTrack (Data.Curr_OuterTrackPoints, Data.Curr_InnerTrackPoints, Data.TrackColliderResolution, ActiveGameTrack.GetComponent<PolygonCollider2D> ());
-
-        //populates current racing line with correct data
-        Data.Curr_RacingLinePoints = MapCreator.CreateRacingLinePoints (Data.Curr_RawPoints, Data.RacingLineWaypointFreq, Data.RacingLineTightness);
-
-        //create barriers
-        Data.InnerBarrierPoints = InnerBarrier.CreateOutline (Data.Curr_RawPoints, Data.InnerBarrierOffset, "inner");
-        Data.OuterBarrierPoints = OuterBarrier.CreateOutline (Data.Curr_RawPoints, Data.OuterBarrierOffset, "outer");
-        InnerBarrier.CreateBarrier (Data.InnerBarrierPoints);
-        OuterBarrier.CreateBarrier (Data.OuterBarrierPoints);
-
-        FoliageContainer.SetActive (true);
-        StaticBatchingUtility.Combine (FoliageContainer);
-    }
-
     public void GenerateAI () {
         //creates a new AI opponent
         for (int i = 0; i < Data.CarStartingPositions.Count - 1; i++) {

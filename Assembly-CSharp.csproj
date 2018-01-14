@@ -75,6 +75,7 @@
      <Compile Include="Assets\Scripts\Map Creation\FoliageCreator.cs" />
      <Compile Include="Assets\Scripts\Map Creation\MapCreator.cs" />
      <Compile Include="Assets\Scripts\Map Creation\MapGraphics.cs" />
+     <Compile Include="Assets\Scripts\Map Creation\MapRenderer.cs" />
      <Compile Include="Assets\Scripts\Start Screen\IntroCritterAnimDelay.cs" />
      <Compile Include="Assets\Scripts\Start Screen\StartScreenController.cs" />
      <Compile Include="Assets\Scripts\UI\MiniMap.cs" />

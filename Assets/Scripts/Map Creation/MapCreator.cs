@@ -4,16 +4,6 @@ using System.Linq;
 using UnityEngine;
 
 public class MapCreator : MonoBehaviour {
-    float MapWidth { get; set; } = 80;
-    float MapHeight { get; set; } = 80;
-    float CornerLerpStep { get; } = 0.1f;
-    int PtsPerQuad { get; } = 500;
-
-    float PointSpacing { get; set; } = 3f;
-    int CornerWidth { get; set; } = 125;
-
-    List<GameObject> MeshHelpers = new List<GameObject> ();
-
     //Mesh Helper objects 
     public GameObject MeshHelperContainer;
     public GameObject MeshHelperObject;
@@ -51,17 +41,17 @@ public class MapCreator : MonoBehaviour {
     //____________________________________________________________________________________________________________________________________________________
 
     //Sorts points into a circular sequence-----------------------------------------------------------------
-    public List<Vector2> CreateRawUnsortedPoints () {
+    public List<Vector2> CreateRawUnsortedPoints (float mapW, float mapH, int ptsPerQuad) {
         List<Vector2> Points = new List<Vector2> ();
         Vector2 UR = new Vector2 (1, 1);
         Vector2 LR = new Vector2 (1, -1);
         Vector2 LL = new Vector2 (-1, -1);
         Vector2 UL = new Vector2 (-1, 1);
 
-        List<Vector2> URL = CreateQuadrantPoints (Data.PtCtPerQuad, Data.MapWidth, Data.MapHeight, UR);
-        List<Vector2> LRL = CreateQuadrantPoints (Data.PtCtPerQuad, Data.MapWidth, Data.MapHeight, LR);
-        List<Vector2> LLL = CreateQuadrantPoints (Data.PtCtPerQuad, Data.MapWidth, Data.MapHeight, LL);
-        List<Vector2> ULL = CreateQuadrantPoints (Data.PtCtPerQuad, Data.MapWidth, Data.MapHeight, UL);
+        List<Vector2> URL = CreateQuadrantPoints (ptsPerQuad, mapW, mapH, UR);
+        List<Vector2> LRL = CreateQuadrantPoints (ptsPerQuad, mapW, mapH, LR);
+        List<Vector2> LLL = CreateQuadrantPoints (ptsPerQuad, mapW, mapH, LL);
+        List<Vector2> ULL = CreateQuadrantPoints (ptsPerQuad, mapW, mapH, UL);
 
         Points.AddRange (URL);
         Points.AddRange (LRL);
@@ -151,7 +141,7 @@ public class MapCreator : MonoBehaviour {
     //and if angle is greater than the minimum angle, 
     //move point B half way towards the midpoint between pt A and C, 
     //thereby increasing the angle.
-    public List<Vector2> CheckControlPointAngles (List<Vector2> currentCtrlPts, float lerpStep) {
+    public List<Vector2> CheckControlPointAngles (List<Vector2> currentCtrlPts, float lerpStep, float cornerW) {
         List<Vector2> newPoints = new List<Vector2> (currentCtrlPts);
 
         for (int i = 0; i < newPoints.Count; i++) {
@@ -170,7 +160,7 @@ public class MapCreator : MonoBehaviour {
 
             float Angle = AngleBetweenThreePoints (newPoints[indexA], newPoints[indexB], newPoints[indexC]);
 
-            while (Angle < Data.MinCornerWidth) {
+            while (Angle < cornerW) {
                 Vector2 MidpointAC = new Vector2 ((newPoints[indexA].x + newPoints[indexC].x) / 2, (newPoints[indexA].y + newPoints[indexC].y) / 2);
                 Vector2 MoveBTowardsAC = Vector2.Lerp (newPoints[indexB], MidpointAC, lerpStep);
                 Vector2 originalB = newPoints[indexB];
@@ -201,18 +191,15 @@ public class MapCreator : MonoBehaviour {
         }
         return TrackPts;
     }
+    //currently unused method
+    public List<Vector2> ShrinkData (List<Vector2> passedData, float XShrinkFactor, float YShrinkFactor) {
+        List<Vector2> shrunkData = new List<Vector2> (passedData);
 
-    //cant find a use for this method whatsoever...
-    //public List<Vector2> ShrinkData(List<Vector2> passedData, float XShrinkFactor, float YShrinkFactor)
-    //{
-    //    List<Vector2> shrunkData = new List<Vector2>(passedData);
-
-    //    for (int i = 0; i < shrunkData.Count; i++)
-    //    {
-    //        shrunkData[i] = new Vector2(shrunkData[i].x / XShrinkFactor, shrunkData[i].y / YShrinkFactor);
-    //    }
-    //    return shrunkData;
-    //}
+        for (int i = 0; i < shrunkData.Count; i++) {
+            shrunkData[i] = new Vector2 (shrunkData[i].x / XShrinkFactor, shrunkData[i].y / YShrinkFactor);
+        }
+        return shrunkData;
+    }
 
     //applies the same rotation (random) to each point in the list
     public List<Vector2> ApplyRandomRotation (List<Vector2> points) {
@@ -227,20 +214,20 @@ public class MapCreator : MonoBehaviour {
     }
 
     //creates mesh helpers if there aren't enough already instantiated, and positions them according to the data.
-    public void CreateOrSetMeshHelperObjects (List<Vector2> trackPoints) {
+    public void CreateOrSetMeshHelperObjects (List<Vector2> trackPoints, List<GameObject> currMeshHelpers) {
         //creates the object pool from which to creat mesh if no pool exists
-        if (Data.CurrentMeshHelperObjects == null) {
-            Data.CurrentMeshHelperObjects = new List<GameObject> ();
+        if (currMeshHelpers == null) {
+            currMeshHelpers = new List<GameObject> ();
             foreach (Vector2 pt in trackPoints) {
                 GameObject point = Instantiate (MeshHelperObject, MeshHelperContainer.transform);
                 point.transform.position = pt;
-                Data.CurrentMeshHelperObjects.Add (point);
+                currMeshHelpers.Add (point);
 
             }
         }
         //if pool exists...
         else {
-            int ObjectsCt = Data.CurrentMeshHelperObjects.Count;
+            int ObjectsCt = currMeshHelpers.Count;
             int DataCt = trackPoints.Count;
 
             //make sure there are enough existing helpers in the pool, and if not,
@@ -248,19 +235,19 @@ public class MapCreator : MonoBehaviour {
             if (ObjectsCt < DataCt) {
                 for (int i = 0; i < DataCt - ObjectsCt; i++) {
                     GameObject point = Instantiate (MeshHelperObject, MeshHelperContainer.transform);
-                    Data.CurrentMeshHelperObjects.Add (point);
+                    currMeshHelpers.Add (point);
                 }
             }
 
             if (ObjectsCt > DataCt) {
                 for (int i = 0; i < ObjectsCt - DataCt; i++) {
-                    Destroy (Data.CurrentMeshHelperObjects[Data.CurrentMeshHelperObjects.Count - 1]);
-                    Data.CurrentMeshHelperObjects.RemoveAt (Data.CurrentMeshHelperObjects.Count - 1);
+                    Destroy (currMeshHelpers[currMeshHelpers.Count - 1]);
+                    currMeshHelpers.RemoveAt (currMeshHelpers.Count - 1);
                 }
             }
 
             for (int i = 0; i < DataCt; i++) {
-                Data.CurrentMeshHelperObjects[i].transform.position = trackPoints[i];
+                currMeshHelpers[i].transform.position = trackPoints[i];
             }
         }
     }
@@ -281,7 +268,15 @@ public class MapCreator : MonoBehaviour {
     }
 
     //Creates Track mesh
-    public void CreateTrackMesh (List<GameObject> TPs, float Thickness, MeshFilter targetMeshFilter) {
+    public MeshData CreateTrackMesh (
+        List<GameObject> TPs,
+        float Thickness,
+        MeshFilter targetMeshFilter,
+        List<Vector2> innerMeshPoints,
+        List<Vector2> outerMeshPoints,
+        MeshData meshData
+    ) {
+
         Mesh mesh = new Mesh ();
         List<Vector3> vertices = new List<Vector3> ();
         List<Vector3> normals = new List<Vector3> ();
@@ -302,8 +297,8 @@ public class MapCreator : MonoBehaviour {
             normals.Add (Vector3.back);
 
             //adds vert data
-            Data.Curr_InnerTrackPoints.Add (TPs[i].transform.position + (TPs[i].transform.up * -Thickness));
-            Data.Curr_OuterTrackPoints.Add (TPs[i].transform.position + (TPs[i].transform.up * Thickness));
+            innerMeshPoints.Add (TPs[i].transform.position + (TPs[i].transform.up * -Thickness));
+            outerMeshPoints.Add (TPs[i].transform.position + (TPs[i].transform.up * Thickness));
 
         }
         //add starting point to the end in order to close the seal the loop!
@@ -330,12 +325,12 @@ public class MapCreator : MonoBehaviour {
         }
 
         //populate current data with all mesh info for saving option later.
-        Data.Curr_InnerTrackPoints.Add (vertices[0]);
-        Data.Curr_InnerTrackPoints.Add (vertices[1]);
-        Data.Curr_Verts = vertices;
-        Data.Curr_Normals = normals;
-        Data.Curr_UVs = UVs;
-        Data.Curr_Indicies = indicies;
+        innerMeshPoints.Add (vertices[0]);
+        outerMeshPoints.Add (vertices[1]);
+        meshData.Verts = vertices;
+        meshData.Normals = normals;
+        meshData.UVs = UVs;
+        meshData.Indicies = indicies;
 
         mesh.vertices = vertices.ToArray ();
         mesh.uv = UVs.ToArray ();
@@ -349,6 +344,7 @@ public class MapCreator : MonoBehaviour {
             filter.sharedMesh = mesh;
 
         }
+        return meshData;
     }
     //OVERLOAD for creating mesh with existing data
     public void CreateTrackMesh (List<Vector3> Vertices, List<Vector3> Normals, List<Vector2> UVs, List<int> Indicies, MeshFilter targetMeshFilter) {
@@ -369,8 +365,16 @@ public class MapCreator : MonoBehaviour {
 
     }
 
-    public void CreateTrackBerms (List<GameObject> TPs, float Thickness, float OffsetFromTrack, int LengthInPoints, MeshFilter targetMeshFilter) {
-        List<GameObject> passedData = new List<GameObject> (TPs);
+    public void CreateTrackBerms (
+        List<GameObject> meshHelpers,
+        float Thickness,
+        float OffsetFromTrack,
+        int LengthInPoints,
+        MeshFilter targetMeshFilter,
+        List<Vector2> rawPoints,
+        int trackPtFreq
+    ) {
+        List<GameObject> passedData = new List<GameObject> (meshHelpers);
         List<float[]> CornerAngles = new List<float[]> ();
         Mesh mesh = new Mesh ();
         List<Vector3> vertices = new List<Vector3> ();
@@ -379,125 +383,123 @@ public class MapCreator : MonoBehaviour {
         List<int> indicies = new List<int> ();
 
         //create corner angles list 
-        for (int i = 0; i < Data.Curr_RawPoints.Count - 1; i++) {
+        for (int i = 0; i < rawPoints.Count - 1; i++) {
             int ptA = i;
             int ptB = i + 1;
             int ptC = i + 2;
-            if (i == Data.Curr_RawPoints.Count - 2) {
+            if (i == rawPoints.Count - 2) {
                 ptC = 0;
             }
 
-            float ang = AngleBetweenThreePoints (Data.Curr_RawPoints[ptA], Data.Curr_RawPoints[ptB], Data.Curr_RawPoints[ptC]);
+            float ang = AngleBetweenThreePoints (rawPoints[ptA], rawPoints[ptB], rawPoints[ptC]);
 
-            float angDir = ExtensionMethods.AngularDirection (Data.Curr_RawPoints[ptC] - Data.Curr_RawPoints[ptA], Data.Curr_RawPoints[ptB] - Data.Curr_RawPoints[ptA]);
+            float angDir = ExtensionMethods.AngularDirection (rawPoints[ptC] - rawPoints[ptA], rawPoints[ptB] - rawPoints[ptA]);
             float[] val = new float[2] { ang, angDir };
             CornerAngles.Add (val);
         }
         //at this point, we have an array of corner data with corner width, and direction of each corner
 
         float prevCornerDirection = 0, currCornerDirection;
-        for (int i = 0; i < passedData.Count - Data.MeshTrackPointFreq; i += (int) Data.MeshTrackPointFreq) {
-            currCornerDirection = CornerAngles[i / (int) Data.MeshTrackPointFreq][1];
-            //check if corner is narrow enough for decal, currently not doing anything....
-            if (Mathf.Abs (CornerAngles[i / (int) Data.MeshTrackPointFreq][0]) < Data.MinCornerWidth + 100) {
-                float sign;
-                if (CornerAngles[i / (int) Data.MeshTrackPointFreq][1] < 0) {
-                    sign = -1;
-                } else {
-                    sign = 1;
-                }
-                if (LengthInPoints > Data.MeshTrackPointFreq) {
-                    LengthInPoints = (int) Data.MeshTrackPointFreq;
-                }
-                if (LengthInPoints % 2 != 0) {
-                    LengthInPoints -= 1;
-                }
-                for (int j = ((int) Data.MeshTrackPointFreq - LengthInPoints) / 2; j <= LengthInPoints + (((int) Data.MeshTrackPointFreq - LengthInPoints) / 2); j += 2) {
+        for (int i = 0; i < passedData.Count - trackPtFreq; i += (int) trackPtFreq) {
+            currCornerDirection = CornerAngles[i / (int) trackPtFreq][1];
 
-                    //POPULATE VERTS and OTHER STUFF
-                    if (j == ((int) Data.MeshTrackPointFreq - LengthInPoints) / 2) {
-                        //check if the current corner is on the same side of track as previous corner
-                        if (currCornerDirection > 0 && prevCornerDirection > 0 || currCornerDirection < 0 && prevCornerDirection < 0) {
-                            vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * OffsetFromTrack));
-                            vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * (OffsetFromTrack + Thickness)));
-                        } else {
-                            vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * OffsetFromTrack));
-                            vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * (OffsetFromTrack + 0.05f)));
-                        }
-                        UVs.Add (new Vector2 (0, 0));
-                        UVs.Add (new Vector2 (0, 1));
+            float sign;
+            if (CornerAngles[i / (int) trackPtFreq][1] < 0) {
+                sign = -1;
+            } else {
+                sign = 1;
+            }
+            if (LengthInPoints > trackPtFreq) {
+                LengthInPoints = (int) trackPtFreq;
+            }
+            if (LengthInPoints % 2 != 0) {
+                LengthInPoints -= 1;
+            }
+            for (int j = ((int) trackPtFreq - LengthInPoints) / 2; j <= LengthInPoints + (((int) trackPtFreq - LengthInPoints) / 2); j += 2) {
 
-                        normals.Add (Vector3.back);
-                        normals.Add (Vector3.back);
-                    }
-                    if (j != ((int) Data.MeshTrackPointFreq - LengthInPoints) / 2 && j != (LengthInPoints + ((int) Data.MeshTrackPointFreq - LengthInPoints) / 2)) {
+                //POPULATE VERTS and OTHER STUFF
+                if (j == ((int) trackPtFreq - LengthInPoints) / 2) {
+                    //check if the current corner is on the same side of track as previous corner
+                    if (currCornerDirection > 0 && prevCornerDirection > 0 || currCornerDirection < 0 && prevCornerDirection < 0) {
                         vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * OffsetFromTrack));
                         vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * (OffsetFromTrack + Thickness)));
-                        UVs.Add (new Vector2 (((float) j / (float) LengthInPoints), 0));
-                        UVs.Add (new Vector2 (((float) j / (float) LengthInPoints), 1));
-                        normals.Add (Vector3.back);
-                        normals.Add (Vector3.back);
-
-                        if (sign >= 0) {
-                            //triangle 1 vertex indicies
-                            indicies.Add (vertices.Count - 4);
-                            indicies.Add (vertices.Count - 3);
-                            indicies.Add (vertices.Count - 1);
-                            //triangle 2 vertex indicies
-                            indicies.Add (vertices.Count - 4);
-                            indicies.Add (vertices.Count - 1);
-                            indicies.Add (vertices.Count - 2);
-                        } else {
-                            //triangle 1 vertex indicies
-                            indicies.Add (vertices.Count - 4);
-                            indicies.Add (vertices.Count - 1);
-                            indicies.Add (vertices.Count - 3);
-                            //triangle 2 vertex indicies
-                            indicies.Add (vertices.Count - 4);
-                            indicies.Add (vertices.Count - 2);
-                            indicies.Add (vertices.Count - 1);
-                        }
-
+                    } else {
+                        vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * OffsetFromTrack));
+                        vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * (OffsetFromTrack + 0.05f)));
                     }
-                    if (j == (LengthInPoints + ((int) Data.MeshTrackPointFreq - LengthInPoints) / 2)) {
-                        //check if the current corner is on the same side of track as next corner, dont put an endcap on
-                        if (currCornerDirection > 0 && CornerAngles[(i / (int) Data.MeshTrackPointFreq) + 1][1] > 0 || currCornerDirection < 0 && CornerAngles[(i / (int) Data.MeshTrackPointFreq) + 1][1] < 0) {
-                            vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * OffsetFromTrack));
-                            vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * (OffsetFromTrack + Thickness)));
-                        } else {
-                            vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * OffsetFromTrack));
-                            vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * (OffsetFromTrack + 0.05f)));
-                        }
-                        UVs.Add (new Vector2 (1, 0));
-                        UVs.Add (new Vector2 (1, 1));
+                    UVs.Add (new Vector2 (0, 0));
+                    UVs.Add (new Vector2 (0, 1));
 
-                        normals.Add (Vector3.back);
-                        normals.Add (Vector3.back);
-
-                        if (sign >= 0) {
-                            //triangle 1 vertex indicies
-                            indicies.Add (vertices.Count - 4);
-                            indicies.Add (vertices.Count - 3);
-                            indicies.Add (vertices.Count - 1);
-                            //triangle 2 vertex indicies
-                            indicies.Add (vertices.Count - 4);
-                            indicies.Add (vertices.Count - 1);
-                            indicies.Add (vertices.Count - 2);
-                        } else {
-                            //triangle 1 vertex indicies
-                            indicies.Add (vertices.Count - 4);
-                            indicies.Add (vertices.Count - 1);
-                            indicies.Add (vertices.Count - 3);
-                            //triangle 2 vertex indicies
-                            indicies.Add (vertices.Count - 4);
-                            indicies.Add (vertices.Count - 2);
-                            indicies.Add (vertices.Count - 1);
-                        }
-
-                    }
+                    normals.Add (Vector3.back);
+                    normals.Add (Vector3.back);
                 }
-                prevCornerDirection = CornerAngles[i / (int) Data.MeshTrackPointFreq][1];
+                if (j != ((int) trackPtFreq - LengthInPoints) / 2 && j != (LengthInPoints + ((int) trackPtFreq - LengthInPoints) / 2)) {
+                    vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * OffsetFromTrack));
+                    vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * (OffsetFromTrack + Thickness)));
+                    UVs.Add (new Vector2 (((float) j / (float) LengthInPoints), 0));
+                    UVs.Add (new Vector2 (((float) j / (float) LengthInPoints), 1));
+                    normals.Add (Vector3.back);
+                    normals.Add (Vector3.back);
+
+                    if (sign >= 0) {
+                        //triangle 1 vertex indicies
+                        indicies.Add (vertices.Count - 4);
+                        indicies.Add (vertices.Count - 3);
+                        indicies.Add (vertices.Count - 1);
+                        //triangle 2 vertex indicies
+                        indicies.Add (vertices.Count - 4);
+                        indicies.Add (vertices.Count - 1);
+                        indicies.Add (vertices.Count - 2);
+                    } else {
+                        //triangle 1 vertex indicies
+                        indicies.Add (vertices.Count - 4);
+                        indicies.Add (vertices.Count - 1);
+                        indicies.Add (vertices.Count - 3);
+                        //triangle 2 vertex indicies
+                        indicies.Add (vertices.Count - 4);
+                        indicies.Add (vertices.Count - 2);
+                        indicies.Add (vertices.Count - 1);
+                    }
+
+                }
+                if (j == (LengthInPoints + ((int) trackPtFreq - LengthInPoints) / 2)) {
+                    //check if the current corner is on the same side of track as next corner, dont put an endcap on
+                    if (currCornerDirection > 0 && CornerAngles[(i / (int) trackPtFreq) + 1][1] > 0 || currCornerDirection < 0 && CornerAngles[(i / (int) trackPtFreq) + 1][1] < 0) {
+                        vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * OffsetFromTrack));
+                        vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * (OffsetFromTrack + Thickness)));
+                    } else {
+                        vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * OffsetFromTrack));
+                        vertices.Add (passedData[i + j].transform.position + (passedData[i + j].transform.up * sign * (OffsetFromTrack + 0.05f)));
+                    }
+                    UVs.Add (new Vector2 (1, 0));
+                    UVs.Add (new Vector2 (1, 1));
+
+                    normals.Add (Vector3.back);
+                    normals.Add (Vector3.back);
+
+                    if (sign >= 0) {
+                        //triangle 1 vertex indicies
+                        indicies.Add (vertices.Count - 4);
+                        indicies.Add (vertices.Count - 3);
+                        indicies.Add (vertices.Count - 1);
+                        //triangle 2 vertex indicies
+                        indicies.Add (vertices.Count - 4);
+                        indicies.Add (vertices.Count - 1);
+                        indicies.Add (vertices.Count - 2);
+                    } else {
+                        //triangle 1 vertex indicies
+                        indicies.Add (vertices.Count - 4);
+                        indicies.Add (vertices.Count - 1);
+                        indicies.Add (vertices.Count - 3);
+                        //triangle 2 vertex indicies
+                        indicies.Add (vertices.Count - 4);
+                        indicies.Add (vertices.Count - 2);
+                        indicies.Add (vertices.Count - 1);
+                    }
+
+                }
             }
+            prevCornerDirection = CornerAngles[i / (int) trackPtFreq][1];
 
         }
 
@@ -533,10 +535,10 @@ public class MapCreator : MonoBehaviour {
 
     }
 
-    public List<Vector2> CreateRacingLinePoints (List<Vector2> currentRawPts, float WaypointFreq, float LerpTightness) {
+    public List<Vector2> CreateRacingLinePoints (List<Vector2> rawPts, float WaypointFreq, float LerpTightness) {
 
         //plots control points with angles shrunk to try and create a racing line.
-        List<Vector2> RacingLine = new List<Vector2> (currentRawPts);
+        List<Vector2> RacingLine = new List<Vector2> (rawPts);
         //move starting corner towards apex
         Vector2 MpAC = new Vector2 ((RacingLine[RacingLine.Count - 2].x + RacingLine[1].x) / 2, (RacingLine[RacingLine.Count - 2].y + RacingLine[1].y) / 2);
         RacingLine[0] = Vector2.Lerp (RacingLine[0], MpAC, LerpTightness);
@@ -558,16 +560,15 @@ public class MapCreator : MonoBehaviour {
     /// <summary>
     /// Must happen before MeshHelpers are reset to something else...
     /// </summary>
-    public void CreateStartingGrid (List<GameObject> TrackMeshHelpers, float gridLength, float gridWidth, int numberOfPositions) {
-        List<GameObject> passedData = new List<GameObject> (TrackMeshHelpers);
-        Data.CarStartingPositions = new List<GameObject> ();
-        int randomStartingPointIndex = Random.Range ((int) Data.MeshTrackPointFreq * 2, (int) passedData.Count - (int) (Data.MeshTrackPointFreq * 2));
+    public void CreateStartingGrid (List<GameObject> trackMeshHelpers, float gridLength, float gridWidth, int numberOfPositions, List<GameObject> startingPos, int trackPtFreq) {
+        List<GameObject> passedData = new List<GameObject> (trackMeshHelpers);
+        int randomStartingPointIndex = Random.Range ((int) trackPtFreq * 2, (int) passedData.Count - (int) (trackPtFreq * 2));
         bool firstLoop = true;
 
-        Vector2 CurrentGridPairCenterpoint = passedData[randomStartingPointIndex - (int) Data.MeshTrackPointFreq / 6].transform.position;
+        Vector2 CurrentGridPairCenterpoint = passedData[randomStartingPointIndex - (int) trackPtFreq / 6].transform.position;
 
         bool reachedTargetPosQty = false;
-        for (int i = randomStartingPointIndex - (int) Data.MeshTrackPointFreq / 6; i > 0; i--) {
+        for (int i = randomStartingPointIndex - (int) trackPtFreq / 6; i > 0; i--) {
             GameObject innerGO;
             GameObject outerGO;
             if ((CurrentGridPairCenterpoint - (Vector2) passedData[i].transform.position).sqrMagnitude > gridLength || firstLoop) {
@@ -585,12 +586,12 @@ public class MapCreator : MonoBehaviour {
                         outerGO.transform.rotation = rotation;
 
                         innerGO.SetActive (true);
-                        Data.CarStartingPositions.Add (innerGO);
-                        if (Data.CarStartingPositions.Count == numberOfPositions) { reachedTargetPosQty = true; break; }
+                        startingPos.Add (innerGO);
+                        if (startingPos.Count == numberOfPositions) { reachedTargetPosQty = true; break; }
 
                         outerGO.SetActive (true);
-                        Data.CarStartingPositions.Add (outerGO);
-                        if (Data.CarStartingPositions.Count == numberOfPositions) { reachedTargetPosQty = true; break; }
+                        startingPos.Add (outerGO);
+                        if (startingPos.Count == numberOfPositions) { reachedTargetPosQty = true; break; }
 
                         CurrentGridPairCenterpoint = passedData[i].transform.position;
 

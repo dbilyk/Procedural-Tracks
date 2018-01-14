@@ -11,13 +11,13 @@
      public static Color32 orange = new Color32 (255, 100, 0, 255);
 
      //gerenal map settings
-     public static float MapWidth = 80; //done
-     public static float MapHeight = 80; //done
+     // public static float MapWidth = 80; //done
+     //public static float MapHeight = 80; //done
 
      //track creation settings
-     public static float MinCornerWidth = 125;
+     //public static float MinCornerWidth = 125;
      //lerp step that is applied while trying to reach the minimum corner angle
-     public static float CornerBroadeningLerpStep = 0.1f;
+     //public static float CornerBroadeningLerpStep = 0.1f;
      public static int PtCtPerQuad = 500;
      public static float PointSpacing = 3f;
 
