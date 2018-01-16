@@ -560,8 +560,9 @@ public class MapCreator : MonoBehaviour {
     /// <summary>
     /// Must happen before MeshHelpers are reset to something else...
     /// </summary>
-    public void CreateStartingGrid (List<GameObject> trackMeshHelpers, float gridLength, float gridWidth, int numberOfPositions, List<GameObject> startingPos, int trackPtFreq) {
+    public void CreateStartingGridData (List<GameObject> trackMeshHelpers, float gridLength, float gridWidth, int numberOfPositions, int trackPtFreq, Track track) {
         List<GameObject> passedData = new List<GameObject> (trackMeshHelpers);
+        List<Tform> startingPos = new List<Tform> ();
         int randomStartingPointIndex = Random.Range ((int) trackPtFreq * 2, (int) passedData.Count - (int) (trackPtFreq * 2));
         bool firstLoop = true;
 
@@ -569,49 +570,43 @@ public class MapCreator : MonoBehaviour {
 
         bool reachedTargetPosQty = false;
         for (int i = randomStartingPointIndex - (int) trackPtFreq / 6; i > 0; i--) {
-            GameObject innerGO;
-            GameObject outerGO;
+            Tform innerTform = new Tform ();
+            Tform outerTform = new Tform ();
             if ((CurrentGridPairCenterpoint - (Vector2) passedData[i].transform.position).sqrMagnitude > gridLength || firstLoop) {
                 for (int j = 0; j < numberOfPositions; j++) {
-                    if (StartingOutlines[j].gameObject.activeSelf == false && StartingOutlines[j + 1].gameObject.activeSelf == false) {
-                        innerGO = StartingOutlines[j].gameObject;
-                        outerGO = StartingOutlines[j + 1].gameObject;
-                        Vector2 innerPos = passedData[i].transform.position + (passedData[i].transform.up * -gridWidth);
-                        Vector2 outerPos = passedData[i].transform.position + (passedData[i].transform.up * gridWidth);
-                        Quaternion rotation = passedData[i].transform.rotation;
 
-                        innerGO.transform.position = (Vector3) innerPos + new Vector3 (0, 0, -0.001f);
-                        outerGO.transform.position = (Vector3) outerPos + new Vector3 (0, 0, -0.001f);
-                        innerGO.transform.rotation = rotation;
-                        outerGO.transform.rotation = rotation;
+                    Vector2 innerPos = passedData[i].transform.position + (passedData[i].transform.up * -gridWidth);
+                    Vector2 outerPos = passedData[i].transform.position + (passedData[i].transform.up * gridWidth);
+                    Quaternion rotation = passedData[i].transform.rotation;
 
-                        innerGO.SetActive (true);
-                        startingPos.Add (innerGO);
-                        if (startingPos.Count == numberOfPositions) { reachedTargetPosQty = true; break; }
+                    innerTform.position = (Vector3) innerPos + new Vector3 (0, 0, -0.001f);
+                    outerTform.position = (Vector3) outerPos + new Vector3 (0, 0, -0.001f);
+                    innerTform.rotation = rotation;
+                    outerTform.rotation = rotation;
 
-                        outerGO.SetActive (true);
-                        startingPos.Add (outerGO);
-                        if (startingPos.Count == numberOfPositions) { reachedTargetPosQty = true; break; }
+                    startingPos.Add (innerTform);
+                    if (startingPos.Count == numberOfPositions) { reachedTargetPosQty = true; break; }
 
-                        CurrentGridPairCenterpoint = passedData[i].transform.position;
+                    startingPos.Add (outerTform);
+                    if (startingPos.Count == numberOfPositions) { reachedTargetPosQty = true; break; }
 
-                        break;
-                    }
+                    CurrentGridPairCenterpoint = passedData[i].transform.position;
+
                 }
             }
 
             if (reachedTargetPosQty) {
                 break;
+
             }
             firstLoop = false;
         }
 
-        GameObject startingLine = StartingGridContainer.transform.Find ("StartingLine").gameObject;
-        startingLine.SetActive (true);
-        Data.StartingLine = startingLine;
-        Data.StartingLine.transform.position = passedData[randomStartingPointIndex].transform.position + new Vector3 (0, 0, -0.001f);
-        Data.StartingLine.transform.rotation = passedData[randomStartingPointIndex].transform.rotation;
-
+        //Data.StartingLine = startingLine;
+        //Data.StartingLine.transform.position = passedData[randomStartingPointIndex].transform.position + new Vector3 (0, 0, -0.001f);
+        //Data.StartingLine.transform.rotation = passedData[randomStartingPointIndex].transform.rotation;
+        track.StartingLineTform.position = passedData[randomStartingPointIndex].transform.position + new Vector3 (0, 0, -0.001f);
+        track.StartingLineTform.rotation = passedData[randomStartingPointIndex].transform.rotation;
     }
 
 }

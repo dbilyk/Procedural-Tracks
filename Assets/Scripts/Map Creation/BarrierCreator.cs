@@ -83,19 +83,4 @@ public class BarrierCreator : MonoBehaviour {
         //converts our newly adjusted raw points into mesh!
     }
 
-    public void CreateBarrier (List<Vector2> barrierRawPointData) {
-        List<Vector2> trackPoints = mapCreator.CreateControlPoints (barrierRawPointData);
-        trackPoints = mapCreator.CreateTrackPoints (trackPoints, Data.BarrierMeshPointFrequency);
-        mapCreator.CreateOrSetMeshHelperObjects (trackPoints);
-        mapCreator.RotateTrackObjectsAlongCurves (Data.CurrentMeshHelperObjects);
-
-        //this shouldnt be here, needs refactoring...
-        Data.Curr_InnerTrackPoints.Clear ();
-        Data.Curr_OuterTrackPoints.Clear ();
-        mapCreator.CreateTrackMesh (Data.CurrentMeshHelperObjects, Data.BarrierThickness, this.GetComponent<MeshFilter> ());
-
-        mapCreator.CreateColliderForTrack (Data.Curr_OuterTrackPoints, Data.Curr_InnerTrackPoints, Data.BarrierColliderResolution, this.GetComponent<PolygonCollider2D> ());
-
-    }
-
 }

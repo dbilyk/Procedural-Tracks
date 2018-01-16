@@ -9,19 +9,32 @@ public class MeshData {
   public List<int> Indicies = new List<int> ();
 }
 
+public class Tform {
+  public Vector2 position;
+  public Quaternion rotation;
+
+}
+
 public class Track {
+  //populated on GenerateLevel
   public MeshData trackMeshData = new MeshData ();
+  public List<Vector2> OuterTrackPoints;
+  public List<Vector2> InnerTrackPoints;
+
   public MeshData outerBarrierData = new MeshData ();
   public MeshData innerBarrierData = new MeshData ();
 
-  public Mesh TrackMesh;
-  public Mesh InnerBarrier;
-  public Mesh OuterBarrier;
-
+  //populated on track GenerateNewTrackData()
+  public List<Vector2> OuterBarrierRawPoints;
+  public List<Vector2> InnerBarrierRawPoints;
   public List<Vector2> RawPoints;
   public List<Vector2> ControlPoints;
   public List<Vector2> TrackPoints;
+
   public List<Vector2> RacingLinePoints;
-  public List<GameObject> CarStartingPositions;
+
+  public List<Tform> CarStartingPositions = new List<Tform> ();
+  public Tform StartingLineTform;
+
   public List<Vector2> FoliageLocations;
 }

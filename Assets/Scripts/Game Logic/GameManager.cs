@@ -8,9 +8,6 @@ public class GameManager : MonoBehaviour {
     public float CountdownLength = 2;
 
     //script objects
-    public BarrierCreator InnerBarrier;
-    public BarrierCreator OuterBarrier;
-    public MapCreator MapCreator;
     public SmoothFollowCam FollowCam;
 
     //game object

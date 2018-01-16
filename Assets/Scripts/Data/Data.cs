@@ -18,37 +18,37 @@
      //public static float MinCornerWidth = 125;
      //lerp step that is applied while trying to reach the minimum corner angle
      //public static float CornerBroadeningLerpStep = 0.1f;
-     public static int PtCtPerQuad = 500;
-     public static float PointSpacing = 3f;
+     //public static int PtCtPerQuad = 500;
+     //public static float PointSpacing = 3f;
 
      //track mesh and collider settings
-     public static List<GameObject> CurrentMeshHelperObjects;
-     public static List<Vector2> Curr_OuterTrackPoints = new List<Vector2> ();
-     public static List<Vector2> Curr_InnerTrackPoints = new List<Vector2> ();
-     public static float MeshTrackPointFreq = 30;
+     //  public static List<GameObject> CurrentMeshHelperObjects;
+     //  public static List<Vector2> Curr_OuterTrackPoints = new List<Vector2> ();
+     //  public static List<Vector2> Curr_InnerTrackPoints = new List<Vector2> ();
+     //  public static float MeshTrackPointFreq = 30;
 
-     //berm Decal creation settings
-     public static int BermLength = 30;
-     public static float BermWidth = 0.2f;
-     public static float BermOffset = 1.2f;
+     //  //berm Decal creation settings
+     //  public static int BermLength = 30;
+     //  public static float BermWidth = 0.2f;
+     //  public static float BermOffset = 1.2f;
 
-     public static float TrackMeshThickness = 1.2f;
-     public static int TrackColliderResolution = 13;
+     //  public static float TrackMeshThickness = 1.2f;
+     //  public static int TrackColliderResolution = 13;
 
      //to use for saved games
-     public static List<Vector3> Curr_Verts = new List<Vector3> ();
-     public static List<Vector3> Curr_Normals = new List<Vector3> ();
-     public static List<Vector2> Curr_UVs = new List<Vector2> ();
-     public static List<int> Curr_Indicies = new List<int> ();
+     //  public static List<Vector3> Curr_Verts = new List<Vector3> ();
+     //  public static List<Vector3> Curr_Normals = new List<Vector3> ();
+     //  public static List<Vector2> Curr_UVs = new List<Vector2> ();
+     //  public static List<int> Curr_Indicies = new List<int> ();
 
      //barrier data
-     public static List<Vector2> InnerBarrierPoints;
-     public static List<Vector2> OuterBarrierPoints;
-     public static float InnerBarrierOffset = 2f;
-     public static float OuterBarrierOffset = 2f;
-     public static float BarrierThickness = 0.05f;
-     public static int BarrierMeshPointFrequency = 9;
-     public static int BarrierColliderResolution = 2;
+     //  public static List<Vector2> InnerBarrierPoints;
+     //  public static List<Vector2> OuterBarrierPoints;
+     //  public static float InnerBarrierOffset = 2f;
+     //  public static float OuterBarrierOffset = 2f;
+     //  public static float BarrierThickness = 0.05f;
+     //  public static int BarrierMeshPointFrequency = 9;
+     //  public static int BarrierColliderResolution = 2;
 
      //CURRENT game state MAP data
      public static List<Vector2> Curr_RawPoints;
