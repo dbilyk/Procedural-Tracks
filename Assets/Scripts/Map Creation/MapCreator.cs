@@ -268,13 +268,13 @@ public class MapCreator : MonoBehaviour {
     }
 
     //Creates Track mesh
-    public MeshData CreateTrackMesh (
+    public void CreateTrackMesh (
         List<GameObject> TPs,
         float Thickness,
         MeshFilter targetMeshFilter,
         List<Vector2> innerMeshPoints,
-        List<Vector2> outerMeshPoints,
-        MeshData meshData
+        List<Vector2> outerMeshPoints
+        //MeshData meshData
     ) {
 
         Mesh mesh = new Mesh ();
@@ -327,10 +327,10 @@ public class MapCreator : MonoBehaviour {
         //populate current data with all mesh info for saving option later.
         innerMeshPoints.Add (vertices[0]);
         outerMeshPoints.Add (vertices[1]);
-        meshData.Verts = vertices;
-        meshData.Normals = normals;
-        meshData.UVs = UVs;
-        meshData.Indicies = indicies;
+        //meshData.Verts = vertices;
+        //meshData.Normals = normals;
+        //meshData.UVs = UVs;
+        //meshData.Indicies = indicies;
 
         mesh.vertices = vertices.ToArray ();
         mesh.uv = UVs.ToArray ();
@@ -344,7 +344,7 @@ public class MapCreator : MonoBehaviour {
             filter.sharedMesh = mesh;
 
         }
-        return meshData;
+        //return meshData;
     }
     //OVERLOAD for creating mesh with existing data
     public void CreateTrackMesh (List<Vector3> Vertices, List<Vector3> Normals, List<Vector2> UVs, List<int> Indicies, MeshFilter targetMeshFilter) {

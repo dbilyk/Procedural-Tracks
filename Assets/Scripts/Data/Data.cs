@@ -87,5 +87,3 @@
      public static int Curr_TrackSkin = (int) TrackSkins.Farm;
 
  }
-
- public enum TrackSkins { Farm, Mountains, Desert, Snow }

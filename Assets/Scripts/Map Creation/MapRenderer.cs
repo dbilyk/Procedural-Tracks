@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MapRenderer : MapCreator {
-  MapCreator mapCreator = new MapCreator ();
-  BarrierCreator barrierCreator = new BarrierCreator ();
-
-  public List<GameObject> MeshHelpers { get; set; } = new List<GameObject> ();
+  [SerializeField]
+  MapCreator mapCreator;
+  [SerializeField]
+  BarrierCreator barrierCreator;
+  [SerializeField]
+  FoliageCreator foliageCreator;
+  public List<GameObject> MeshHelpers = new List<GameObject> ();
 
   float MapWidth = 80;
   float MapHeight = 80;
@@ -16,7 +19,7 @@ public class MapRenderer : MapCreator {
   float PointSpacing = 3f;
   int CornerWidth = 125;
 
-  short MeshTrackPointFreq = 30;
+  public readonly short MeshTrackPointFreq = 30;
   float MeshThickness = 1.2f;
   int TrackColliderResolution = 13;
 
@@ -68,6 +71,7 @@ public class MapRenderer : MapCreator {
     track.TrackPoints = mapCreator.CreateTrackPoints (track.ControlPoints, MeshTrackPointFreq);
 
     track.RacingLinePoints = mapCreator.CreateRacingLinePoints (track.RawPoints, RacingLineWaypointFreq, RacingLineTightness);
+    mapCreator.CreateOrSetMeshHelperObjects (track.TrackPoints, MeshHelpers);
 
     //populates track object with Tforms of all 
     mapCreator.CreateStartingGridData (
@@ -85,7 +89,6 @@ public class MapRenderer : MapCreator {
 
   public void GenerateLevel (Track track) {
     //mesh creation
-    mapCreator.CreateOrSetMeshHelperObjects (track.TrackPoints, MeshHelpers);
     mapCreator.RotateTrackObjectsAlongCurves (MeshHelpers);
 
     mapCreator.CreateTrackBerms (
@@ -103,8 +106,8 @@ public class MapRenderer : MapCreator {
       MeshThickness,
       CurrentGameTrack.gameObject.GetComponent<MeshFilter> (),
       track.InnerTrackPoints,
-      track.OuterTrackPoints,
-      track.trackMeshData
+      track.OuterTrackPoints
+      //track.trackMeshData
     );
 
     mapCreator.CreateColliderForTrack (
@@ -118,8 +121,6 @@ public class MapRenderer : MapCreator {
     CreateBarriers (track.InnerBarrierRawPoints, track);
     CreateBarriers (track.OuterBarrierRawPoints, track);
 
-    FoliageContainer.SetActive (true);
-    StaticBatchingUtility.Combine (FoliageContainer);
   }
 
   void CreateBarriers (List<Vector2> barrierRawPointData, Track track) {
@@ -139,8 +140,8 @@ public class MapRenderer : MapCreator {
       BarrierThickness,
       OuterBarrier.GetComponent<MeshFilter> (),
       outerBarrierInnerPts,
-      outerBarrierOuterPts,
-      track.outerBarrierData
+      outerBarrierOuterPts
+      //track.outerBarrierData
     );
 
     mapCreator.CreateTrackMesh (
@@ -148,8 +149,8 @@ public class MapRenderer : MapCreator {
       BarrierThickness,
       InnerBarrier.GetComponent<MeshFilter> (),
       innerBarrierInnerPts,
-      innerBarrierOuterPts,
-      track.innerBarrierData
+      innerBarrierOuterPts
+      //track.innerBarrierData
     );
     mapCreator.CreateColliderForTrack (
       outerBarrierOuterPts,

@@ -3,59 +3,57 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class FoliageCreator : MonoBehaviour {
+    [SerializeField]
+    MapRenderer mapRenderer;
 
-    public List<GameObject> Foliage = new List<GameObject>();
+    [SerializeField]
+    User user;
 
-    public List<Vector2> InnerFoliagePath;
-    public List<Vector2> OuterFoliagePath;
+    [SerializeField]
+    List<GameObject> Foliage = new List<GameObject> ();
 
-    public List<GameObject> InstantiatedFoliage = new List<GameObject>();
-    public float FoliageDensity;
-    public BarrierCreator barrierCreator;
-    public MapCreator mapCreator;
-	// Use this for initialization
-	void OnEnable () {
-        InnerFoliagePath = barrierCreator.CreateOutline(Data.Curr_RawPoints,Data.InnerBarrierOffset +1f, "inner");
-        InnerFoliagePath = mapCreator.CreateTrackPoints(InnerFoliagePath,10);
-        OuterFoliagePath = barrierCreator.CreateOutline(Data.Curr_RawPoints,Data.InnerBarrierOffset +1f, "outer");
-        OuterFoliagePath = mapCreator.CreateTrackPoints(OuterFoliagePath, 10);
+    [SerializeField]
+    float FoliageDensity = 0.5f;
 
-        for (int i = 0; i < InnerFoliagePath.Count; i ++)
-        {
-            float rand = Random.value;
-
-            if (rand < FoliageDensity)
-            {
-                int randIndex = Random.Range(0, Foliage.Count);
-                GameObject newItem = GameObject.Instantiate(Foliage[randIndex],gameObject.transform);
-                newItem.transform.position = InnerFoliagePath[i] + Random.insideUnitCircle * 0.2f;
-                InstantiatedFoliage.Add(newItem);
-            }
-        }
-        for (int i = 0; i < OuterFoliagePath.Count; i++)
-        {
-            float rand = Random.value;
-
-            if (rand < FoliageDensity)
-            {
-                int randIndex = Random.Range(0, Foliage.Count);
-                GameObject newItem = Instantiate(Foliage[randIndex], gameObject.transform);
-                newItem.transform.position = OuterFoliagePath[i] + Random.insideUnitCircle * 0.2f;
-                InstantiatedFoliage.Add(newItem);
-
-            }
-        }
-        
-         
-    }
-    void OnDisable()
-    {
-        foreach (GameObject GO in InstantiatedFoliage)
-        {
-            GameObject.Destroy(GO);
-        }
+    [SerializeField]
+    BarrierCreator barrierCreator;
+    [SerializeField]
+    MapCreator mapCreator;
+    // Use this for initialization
+    public void GenerateFoliageData (Track track) {
+        List<Vector2> InnerFoliagePath = barrierCreator.CreateOutline (track.RawPoints, mapRenderer.InnerBarrierOffset + 1f, "inner");
+        InnerFoliagePath = mapCreator.CreateTrackPoints (InnerFoliagePath, 10);
+        track.InnerFoliageLocs = InnerFoliagePath;
+        List<Vector2> OuterFoliagePath = barrierCreator.CreateOutline (track.RawPoints, mapRenderer.OuterBarrierOffset + 1f, "outer");
+        OuterFoliagePath = mapCreator.CreateTrackPoints (OuterFoliagePath, 10);
+        track.OuterFoliageLocs = OuterFoliagePath;
 
     }
-	
-	
+
+    public void RenderFoliage (Track track) {
+
+        for (int i = 0; i < track.InnerFoliageLocs.Count; i++) {
+            float rand = Random.value;
+
+            if (rand < FoliageDensity) {
+                int randIndex = Random.Range (0, Foliage.Count);
+                GameObject newItem = GameObject.Instantiate (Foliage[randIndex], gameObject.transform);
+                newItem.transform.rotation = Random.rotation;
+                newItem.transform.position = track.InnerFoliageLocs[i] + Random.insideUnitCircle * 0.2f;
+            }
+        }
+        for (int i = 0; i < track.OuterFoliageLocs.Count; i++) {
+            float rand = Random.value;
+
+            if (rand < FoliageDensity) {
+                int randIndex = Random.Range (0, Foliage.Count);
+                GameObject newItem = Instantiate (Foliage[randIndex], gameObject.transform);
+                newItem.transform.position = track.OuterFoliageLocs[i] + Random.insideUnitCircle * 0.2f;
+                newItem.transform.rotation = Random.rotation;
+
+            }
+        }
+        StaticBatchingUtility.Combine (gameObject);
+    }
+
 }

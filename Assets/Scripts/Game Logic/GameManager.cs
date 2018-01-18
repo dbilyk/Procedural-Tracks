@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    public void GenerateAI () {
+    void GenerateAI () {
         //creates a new AI opponent
         for (int i = 0; i < Data.CarStartingPositions.Count - 1; i++) {
             GameObject Ai = Instantiate (newAI, AIContainer.transform);
@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    public void StartingCountdown () {
+    void StartingCountdown () {
 
         //positions player/AIs
         Player.transform.position = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.position;
@@ -114,6 +114,11 @@ public class GameManager : MonoBehaviour {
             AI.transform.rotation = StartingGridContainer.transform.GetChild (i).transform.rotation;
         }
         MobManager.SetActive (false);
+
+    }
+
+    void NewRace () {
+        ResetGame ();
 
     }
 

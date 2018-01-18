@@ -13,6 +13,11 @@ public class UI_MapSelector : MonoBehaviour {
 	Animator Anim;
 
 	[SerializeField]
+	UI_MapViewer mapViewer;
+
+	Track selectedTrack;
+
+	[SerializeField]
 	UI_Skins UI_SkinSelector;
 
 	[SerializeField]
@@ -32,7 +37,10 @@ public class UI_MapSelector : MonoBehaviour {
 	};
 	//buttons in the screen
 	public delegate void ButtonClick ();
-	public event ButtonClick OnClickNewTrackCoins, OnClickNewTrackVideo, OnClickStartRace;
+	public event ButtonClick OnClickNewTrackCoins, OnClickNewTrackVideo;
+
+	public delegate void startRace (Track t);
+	public event startRace OnClickStartRace;
 
 	//sliders in the screen
 	public delegate void SliderChanged (float newValue);
@@ -54,6 +62,7 @@ public class UI_MapSelector : MonoBehaviour {
 	//Housekeeping
 	void OnEnable () {
 		Anim = gameObject.GetComponent<Animator> ();
+
 		//trigger events when UI buttons change
 		EasyTgl.onValueChanged.AddListener (delegate { ToggleDiff (EasyTgl); });
 		MediumTgl.onValueChanged.AddListener (delegate { ToggleDiff (MediumTgl); });
@@ -75,6 +84,7 @@ public class UI_MapSelector : MonoBehaviour {
 
 	//listeners for newTrack btn
 	void NewTrackVideo () {
+		selectedTrack = mapViewer.SelectedTrack;
 		Debug.Log ("newTrackVideo");
 		if (OnClickNewTrackVideo != null) {
 			OnClickNewTrackVideo ();
@@ -83,7 +93,8 @@ public class UI_MapSelector : MonoBehaviour {
 
 	void NewTrackCoins () {
 		Debug.Log ("newTrackCoins");
-		if (OnClickNewTrackVideo != null) {
+		selectedTrack = mapViewer.SelectedTrack;
+		if (OnClickNewTrackCoins != null) {
 			OnClickNewTrackCoins ();
 		}
 	}
@@ -134,7 +145,7 @@ public class UI_MapSelector : MonoBehaviour {
 	void StartRace () {
 		Debug.Log ("StartRace");
 		if (OnClickStartRace != null) {
-			OnClickStartRace ();
+			OnClickStartRace (selectedTrack);
 		}
 	}
 

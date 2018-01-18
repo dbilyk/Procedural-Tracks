@@ -30,9 +30,9 @@ public class UI_Home : MonoBehaviour {
 		CarSelectBtn.onClick.AddListener (delegate { CarPickerBtnClick (); });
 
 		//------------------------------------UNIMPLEMENTED !!!!!!!!!!!!!!!---------------------------------------------------
-		//FaceCamBtn.onClick.AddListener (delegate { FaceCamBtnClick (); });
-		//ScreenRecBtn.onClick.AddListener (delegate { ScreenRecBtnClick (); });
-		//ShareBtn.onClick.AddListener (delegate { ShareBtnClick (); });
+		FaceCamBtn.onClick.AddListener (delegate { FaceCamBtnClick (); });
+		ScreenRecBtn.onClick.AddListener (delegate { ScreenRecBtnClick (); });
+		ShareBtn.onClick.AddListener (delegate { ShareBtnClick (); });
 
 	}
 

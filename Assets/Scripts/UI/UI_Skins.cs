@@ -15,8 +15,8 @@ public class UI_Skins : MonoBehaviour {
   [SerializeField]
   UI_MapSelector MapSelector;
 
-  public delegate void ButtonClick ();
-  public event ButtonClick OnClickFarm, OnClickMountains, OnClickDesert, OnClickSnow;
+  public delegate void ButtonClick (TrackSkins trackSkin);
+  public event ButtonClick OnClickSkin;
 
   //anim state names
   List<string> BaseStates = new List<string> () {
@@ -47,24 +47,24 @@ public class UI_Skins : MonoBehaviour {
 
   //UI event Handlers
   void ClickFarm () {
-    if (OnClickFarm != null) {
-      OnClickFarm ();
+    if (OnClickSkin != null) {
+      OnClickSkin (TrackSkins.Farm);
     }
   }
 
   void ClickMountains () {
-    if (OnClickMountains != null) {
-      OnClickMountains ();
+    if (OnClickSkin != null) {
+      OnClickSkin (TrackSkins.Mountains);
     }
   }
   void ClickDesert () {
-    if (OnClickDesert != null) {
-      OnClickDesert ();
+    if (OnClickSkin != null) {
+      OnClickSkin (TrackSkins.Desert);
     }
   }
   void ClickSnow () {
-    if (OnClickSnow != null) {
-      OnClickSnow ();
+    if (OnClickSkin != null) {
+      OnClickSkin (TrackSkins.Snow);
     }
   }
 
