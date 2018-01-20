@@ -91,6 +91,7 @@
      <Compile Include="Assets\Scripts\UI\UI_Settings.cs" />
      <Compile Include="Assets\Scripts\UI\UI_Skins.cs" />
      <Compile Include="Assets\Scripts\Utility\ToggleSelf.cs" />
+     <Compile Include="Assets\SnapScroller.cs" />
      <None Include="Assets\Fonts\OFL.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

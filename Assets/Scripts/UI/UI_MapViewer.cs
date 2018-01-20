@@ -6,10 +6,10 @@ using UnityEngine.UI;
 
 public class UI_MapViewer : MonoBehaviour {
 
-	Color32 bgCol1 = new Color32 (255, 142, 126, 255);
-	Color32 bgCol2 = new Color32 (109, 218, 123, 255);
-	Color32 bgCol3 = new Color32 (73, 210, 255, 255);
-	Color32 bgCol4 = new Color32 (162, 131, 176, 255);
+	Color32 bgCol1 = new Color32 (255, 142, 126, 205);
+	Color32 bgCol2 = new Color32 (109, 218, 123, 205);
+	Color32 bgCol3 = new Color32 (73, 210, 255, 205);
+	Color32 bgCol4 = new Color32 (162, 131, 176, 205);
 
 	[Tooltip ("Use this to control the size of the rendered line")]
 	[SerializeField]
@@ -47,14 +47,18 @@ public class UI_MapViewer : MonoBehaviour {
 
 	List<Track> userTracks;
 	LineRenderer newTrackLine;
+	GameObject NewTrackDisplay;
+	void Awake () {
+		NewTrackDisplay = GameObject.Instantiate (TrackDisplayPrefab, TrackDisplayContainer.transform);
+		userTracks = User.SavedTracks;
+		newTrackLine = NewTrackDisplay.GetComponentInChildren<LineRenderer> ();
+		RenderSavedTracks ();
+
+	}
 
 	void OnEnable () {
 		mapSelector.OnClickNewTrackCoins += RedrawTrack;
 		mapSelector.OnClickNewTrackVideo += RedrawTrack;
-		userTracks = User.SavedTracks;
-		GameObject NewTrackDisplay = GameObject.Instantiate (TrackDisplayPrefab, TrackDisplayContainer.transform);
-		newTrackLine = NewTrackDisplay.GetComponentInChildren<LineRenderer> ();
-		RenderSavedTracks ();
 	}
 
 	void OnDisable () {
@@ -84,9 +88,11 @@ public class UI_MapViewer : MonoBehaviour {
 		for (int i = 0; i < userTracks.Count; i++) {
 			GameObject savedTrack = Instantiate (TrackDisplayPrefab, TrackDisplayContainer.transform);
 			LineRenderer trackLine = savedTrack.GetComponentInChildren<LineRenderer> ();
-			List<Vector3> lowResTrackPts = thinData (convertVec2toVec3 (userTracks[i].TrackPoints), 4);
+			List<Vector2> lowResTrackPts = thinData (userTracks[i].TrackPoints, 4);
+			lowResTrackPts = mapCreator.ShrinkData (lowResTrackPts, trackScale, trackScale);
+			List<Vector3> lowResVec3 = convertVec2toVec3 (lowResTrackPts);
 			trackLine.positionCount = lowResTrackPts.Count;
-			trackLine.SetPositions (lowResTrackPts.ToArray ());
+			trackLine.SetPositions (lowResVec3.ToArray ());
 			savedTrack.GetComponent<Image> ().color = GetRandomColor ();
 
 		}
