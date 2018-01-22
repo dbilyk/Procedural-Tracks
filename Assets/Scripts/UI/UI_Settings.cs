@@ -30,10 +30,6 @@ public class UI_Settings : MonoBehaviour {
 	void PlayAnim (int baseStatesIndex, int layerIndex) {
 		Anim.Play (BaseStates[baseStatesIndex], layerIndex);
 	}
-
-	void ScreenOn (bool state) {
-		gameObject.transform.GetChild (0).gameObject.SetActive (state);
-	}
 	//Housekeeping
 	void OnEnable () {
 		Anim = gameObject.GetComponent<Animator> ();
@@ -76,22 +72,5 @@ public class UI_Settings : MonoBehaviour {
 		if (OnSFXVolChanged != null) {
 			OnSFXVolChanged (SFXSlider.value);
 		}
-	}
-
-	//animations
-	private void SlideIn_R () {
-
-	}
-
-	private void SlideOut_R () {
-
-	}
-
-	private void SlideIn_L () {
-
-	}
-
-	private void SlideOut_L () {
-
 	}
 }

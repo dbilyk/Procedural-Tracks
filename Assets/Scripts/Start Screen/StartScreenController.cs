@@ -22,6 +22,9 @@ public class StartScreenController : MonoBehaviour {
     public GameObject IntroRabbit;
     public GameObject HomeScreenUI;
 
+    [SerializeField]
+    User user;
+
     Vector3 CarInitialPosition;
     Quaternion CarInitialRotation;
     Vector3 RabbitInitialPosition;
@@ -36,6 +39,7 @@ public class StartScreenController : MonoBehaviour {
     private bool homeUIOn = false;
 
     void OnEnable () {
+        user.OnStartRace += StartRace;
         HomeScreenUI.SetActive (false);
         GameLoopLight.SetActive (false);
         QualitySettings.shadowDistance = 150;
@@ -73,11 +77,11 @@ public class StartScreenController : MonoBehaviour {
     }
 
     void Update () {
-        // Debug.Log (Input.GetMouseButtonDown (0));
-        //enable the home screen UI
+        //enable the home screen UI early when touched
         if (!homeUIOn && Input.GetMouseButtonDown (0) || Input.touchCount > 0) {
-            if (this.OnEndIntro != null) {
+            if (OnEndIntro != null) {
                 OnEndIntro ();
+                homeUIOn = true;
 
             }
         }
@@ -171,7 +175,7 @@ public class StartScreenController : MonoBehaviour {
                 }
 
                 //CowSpine[CowSpine.Count - 1].AddRelativeForce(0,0,10,ForceMode.Impulse);
-                CowSpine[CowSpine.Count - 1].AddRelativeTorque (new Vector3 (0, 5, 0), ForceMode.Impulse);
+                CowSpine[CowSpine.Count - 1].AddTorque (new Vector3 (0, 500, 500), ForceMode.Impulse);
 
                 Time.timeScale = 0.02f;
                 Time.fixedDeltaTime /= 50;
@@ -185,16 +189,21 @@ public class StartScreenController : MonoBehaviour {
                     CrashCamTarget.transform.parent = gameObject.transform;
                 }
             } else {
-                //CowSpine[1].AddRelativeTorque(new Vector3(0.2f, 0, 0), ForceMode.Impulse);
-                //CowSpine[5].AddRelativeTorque(new Vector3(3, 0.7f, 0), ForceMode.Acceleration);
-                //CowSpine[CowSpine.Count - 1].AddRelativeTorque(new Vector3(0.1f, 0f, 0), ForceMode.Impulse);
+                //CowSpine[1].AddRelativeTorque (new Vector3 (0.2f, 0, 0), ForceMode.Impulse);
+                //CowSpine[5].AddRelativeTorque (new Vector3 (3, 0.7f, 0), ForceMode.Acceleration);
+                CowSpine[CowSpine.Count - 2].AddRelativeTorque (new Vector3 (0f, -0.01f, 0), ForceMode.Impulse);
 
             }
 
         }
     }
 
+    void StartRace () {
+        gameObject.SetActive (false);
+    }
+
     void OnDisable () {
+        user.OnStartRace -= StartRace;
         if (GameLoopLight != null) {
             GameLoopLight.SetActive (true);
 

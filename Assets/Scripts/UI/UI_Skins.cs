@@ -3,36 +3,42 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum TrackSkins { Farm, Mountains, Desert, Snow }
+
 public class UI_Skins : MonoBehaviour {
   Animator Anim;
 
   [SerializeField]
-  Button FarmBtn, MtnBtn, DesertBtn, SnowBtn;
+  Button FarmBtn, MtnBtn, DesertBtn, SnowBtn, BackBtn;
 
   [SerializeField]
   UI_Home HomeScreen;
 
   [SerializeField]
+  UI_Header header;
+
+  [SerializeField]
   UI_MapSelector MapSelector;
 
-  public delegate void ButtonClick ();
-  public event ButtonClick OnClickFarm, OnClickMountains, OnClickDesert, OnClickSnow;
+  public delegate void ButtonClick (TrackSkins trackSkin);
+  public event ButtonClick OnClickSkin;
 
   //anim state names
   List<string> BaseStates = new List<string> () {
-    "",
-    "",
-    "",
-    ""
+    "Skins_SlideInL",
+    "Skins_SlideInR",
+    "Skins_SlideOutL",
+    "Skins_SlideOutR",
   };
-
-  void ScreenOn (bool state) {
-    gameObject.transform.GetChild (0).gameObject.SetActive (state);
-  }
 
   //Housekeeping
   void OnEnable () {
     Anim = gameObject.GetComponent<Animator> ();
+
+    //event listeners
+    HomeScreen.OnClickButton += SlideInR;
+    header.OnClickSkinsBack += SlideOutR;
+    header.OnClickTrackPickerBack += SlideInL;
 
     //private button events
     FarmBtn.onClick.AddListener (delegate { ClickFarm (); });
@@ -41,47 +47,61 @@ public class UI_Skins : MonoBehaviour {
     SnowBtn.onClick.AddListener (delegate { ClickSnow (); });
   }
 
+  void PlayAnim (int statesIndex, int layer) {
+    string anim = BaseStates[statesIndex];
+    Anim.Play (anim, layer);
+  }
+
   void OnDisable () {
 
   }
 
   //UI event Handlers
   void ClickFarm () {
-    if (OnClickFarm != null) {
-      OnClickFarm ();
+    PlayAnim (2, 0);
+    if (OnClickSkin != null) {
+      OnClickSkin (TrackSkins.Farm);
     }
   }
 
   void ClickMountains () {
-    if (OnClickMountains != null) {
-      OnClickMountains ();
+    PlayAnim (2, 0);
+    if (OnClickSkin != null) {
+      OnClickSkin (TrackSkins.Mountains);
     }
   }
   void ClickDesert () {
-    if (OnClickDesert != null) {
-      OnClickDesert ();
+    PlayAnim (2, 0);
+    if (OnClickSkin != null) {
+      OnClickSkin (TrackSkins.Desert);
     }
   }
   void ClickSnow () {
-    if (OnClickSnow != null) {
-      OnClickSnow ();
+    PlayAnim (2, 0);
+    if (OnClickSkin != null) {
+      OnClickSkin (TrackSkins.Snow);
     }
   }
 
-  //animations
-  void SlideIn_R () {
+  public void SlideInR (Home_Btns btns) {
 
+    if (btns == Home_Btns.PlayBtn) PlayAnim (1, 0);
   }
 
-  void SlideOut_R () {
-
+  public void SlideOutR () {
+    PlayAnim (3, 0);
   }
 
-  void SlideIn_L () {
-
+  public void SlideInL () {
+    PlayAnim (0, 0);
   }
 
-  void SlideOut_L () {
-
+  public void EnableScreen () {
+    gameObject.transform.GetChild (0).gameObject.SetActive (true);
   }
+
+  public void DisableScreen () {
+    gameObject.transform.GetChild (0).gameObject.SetActive (false);
+  }
+
 }

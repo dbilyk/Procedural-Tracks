@@ -20,12 +20,23 @@ public class UI_Header : MonoBehaviour {
 	[SerializeField]
 	UI_Skins SkinsUI;
 
+	[SerializeField]
+	StartScreenController startScreen;
+
 	public delegate void ButtonClick ();
 	public event ButtonClick OnClickHomeSettings, OnClickSkinsBack, OnClickTrackPickerBack;
 
 	//anim state names
 	List<string> BaseStates = new List<string> () {
-		"",
+		"HeaderIntro",
+		"SwapSettingsToSkinsBack",
+		"SwapSkinsToSettings"
+
+	};
+
+	//anim layer1 names
+	List<string> LayerOneStates = new List<string> () {
+		"CoinFlash",
 		"",
 		"",
 		""
@@ -33,14 +44,33 @@ public class UI_Header : MonoBehaviour {
 
 	//utility
 	void PlayAnim (int baseStatesIndex, int layerIndex) {
-		Anim.Play (BaseStates[baseStatesIndex], layerIndex);
+		List<string> target = new List<string> ();
+		switch (layerIndex) {
+			case 0:
+				target = BaseStates;
+				break;
+			case 1:
+				target = LayerOneStates;
+				break;
+		}
+
+		Anim.Play (target[baseStatesIndex], layerIndex);
 	}
 
-	void ScreenOn (bool state) {
-		gameObject.transform.GetChild (0).gameObject.SetActive (state);
+	public void EnableScreen () {
+		gameObject.transform.GetChild (0).gameObject.SetActive (true);
 	}
+
+	public void DisableScreen () {
+
+		gameObject.transform.GetChild (0).gameObject.SetActive (false);
+	}
+
 	//Housekeeping
 	void OnEnable () {
+		startScreen.OnEndIntro += introAnim;
+		HomeUI.OnClickButton += iconSwapHomeToSkins;
+		SkinsUI.OnClickSkin += iconSwapSkinsToMap;
 		Anim = gameObject.GetComponent<Animator> ();
 
 		//settings button event callbacks
@@ -62,6 +92,7 @@ public class UI_Header : MonoBehaviour {
 
 	void ClickSkinsBack () {
 		Debug.Log ("Skins Back Btn");
+		PlayAnim (2, 0);
 		if (OnClickSkinsBack != null) {
 			OnClickSkinsBack ();
 		}
@@ -73,7 +104,36 @@ public class UI_Header : MonoBehaviour {
 		if (OnClickTrackPickerBack != null) {
 			OnClickTrackPickerBack ();
 		}
+		TrackPickerBackBtn.gameObject.SetActive (false);
+		SkinsBackBtn.gameObject.SetActive (true);
+	}
+
+	//these handle the inital animation in
+	void introAnim () {
+		StartCoroutine ("delayAnim");
+		StartCoroutine ("delayCoinFlash");
+	}
+	IEnumerator delayAnim () {
+		yield return new WaitForSecondsRealtime (0.5f);
+		PlayAnim (0, 0);
 
 	}
 
+	IEnumerator delayCoinFlash () {
+		yield return new WaitForSecondsRealtime (1f);
+		PlayAnim (0, 1);
+
+	}
+
+	void iconSwapHomeToSkins (Home_Btns btn) {
+		if (btn == Home_Btns.PlayBtn) {
+			PlayAnim (1, 0);
+		}
+	}
+
+	void iconSwapSkinsToMap (TrackSkins skin) {
+		Debug.Log ("Here");
+		SkinsBackBtn.gameObject.SetActive (false);
+		TrackPickerBackBtn.gameObject.SetActive (true);
+	}
 }

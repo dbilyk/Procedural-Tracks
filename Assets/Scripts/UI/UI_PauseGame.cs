@@ -34,10 +34,6 @@ public class UI_PauseGame : MonoBehaviour {
 		Anim.Play (BaseStates[baseStatesIndex], layerIndex);
 	}
 
-	void ScreenOn (bool state) {
-		gameObject.transform.GetChild (0).gameObject.SetActive (state);
-	}
-
 	public void ClickRestart () {
 		Debug.Log ("Restart");
 		if (OnClickRestart != null) {

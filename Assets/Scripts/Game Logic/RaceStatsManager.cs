@@ -37,6 +37,8 @@ public class RaceStatsManager : MonoBehaviour {
     public int CheckpointFreq = 1;
     public CarPolePositionData PlayerPoleData = new CarPolePositionData ();
 
+    [SerializeField]
+    User user;
     private List<Vector2> Checkpoints = new List<Vector2> ();
     private List<CarPolePositionData> CarsOnTrack = new List<CarPolePositionData> ();
     private int TotalCheckpointsOnMap;
@@ -46,7 +48,7 @@ public class RaceStatsManager : MonoBehaviour {
     //call at the start of a race ot populate currentPoleData list
     void CurrentPoleDataInit () {
         if (!hasInitialized) {
-            Checkpoints = mapCreator.CreateTrackPoints (Data.Curr_ControlPoints, CheckpointFreq);
+            Checkpoints = mapCreator.CreateTrackPoints (user.ActiveTrack.ControlPoints, CheckpointFreq);
             int closestChkptToStartingLine = ExtensionMethods.GetNearestInList (GameObject.FindGameObjectWithTag ("StartingLine").transform.position, Checkpoints);
             if (closestChkptToStartingLine != Checkpoints.Count - 1) {
                 closestChkptToStartingLine += 1;
@@ -188,13 +190,14 @@ public class RaceStatsManager : MonoBehaviour {
         if (Vector2.Dot (playerVelocity, ChkPts[player.Curr_CheckpointIndex] - ChkPts[player.PrevCheckpointIndex]) > 0f) {
             //call delegate to turn off wrong way blinker the first time that this turns true
             if (!player.FacingForward) {
-                OnFacingForward ();
+                if (OnFacingForward != null) OnFacingForward ();
             }
             player.FacingForward = true;
         } else {
             //call delegate to turn on Wrong Way blinker in UI MANAGER the first time that this is false
             if (player.FacingForward && playerVelocity.sqrMagnitude > 0.01f) {
-                OnFacingWrongWay ();
+
+                if (OnFacingWrongWay != null) OnFacingWrongWay ();
             }
             player.FacingForward = false;
             player.AllowCheckpointUpdates = false;
@@ -288,7 +291,7 @@ public class RaceStatsManager : MonoBehaviour {
         CarPolePositionData thisCar = Data.CarPoleData[PoleDataIndex];
         //if the player completes lap, trigger UI event
         if (PoleDataIndex == 0) {
-            OnLapAlert (thisCar.Curr_LapNumber + 1);
+            if (OnLapAlert != null) OnLapAlert (thisCar.Curr_LapNumber + 1);
         }
 
         if (thisCar.Curr_LapNumber == 0) {
