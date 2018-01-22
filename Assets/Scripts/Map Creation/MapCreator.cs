@@ -214,7 +214,7 @@ public class MapCreator : MonoBehaviour {
     }
 
     //creates mesh helpers if there aren't enough already instantiated, and positions them according to the data.
-    public void CreateOrSetMeshHelperObjects (List<Vector2> trackPoints, List<GameObject> currMeshHelpers) {
+    public List<GameObject> CreateOrSetMeshHelperObjects (List<Vector2> trackPoints, List<GameObject> currMeshHelpers) {
         //creates the object pool from which to creat mesh if no pool exists
         if (currMeshHelpers == null) {
             currMeshHelpers = new List<GameObject> ();
@@ -250,6 +250,7 @@ public class MapCreator : MonoBehaviour {
                 currMeshHelpers[i].transform.position = trackPoints[i];
             }
         }
+        return currMeshHelpers;
     }
 
     //Track Mesh Helper: rotates all track objects to face towards the next point, thereby following the curvature of the bezier curves.
@@ -565,37 +566,34 @@ public class MapCreator : MonoBehaviour {
         List<Tform> startingPos = new List<Tform> ();
         int randomStartingPointIndex = Random.Range ((int) trackPtFreq * 2, (int) passedData.Count - (int) (trackPtFreq * 2));
         bool firstLoop = true;
-
         Vector2 CurrentGridPairCenterpoint = passedData[randomStartingPointIndex - (int) trackPtFreq / 6].transform.position;
 
         bool reachedTargetPosQty = false;
         for (int i = randomStartingPointIndex - (int) trackPtFreq / 6; i > 0; i--) {
-            Tform innerTform = new Tform ();
-            Tform outerTform = new Tform ();
             if ((CurrentGridPairCenterpoint - (Vector2) passedData[i].transform.position).sqrMagnitude > gridLength || firstLoop) {
-                for (int j = 0; j < numberOfPositions; j++) {
+                Tform innerTform = new Tform ();
+                Tform outerTform = new Tform ();
 
-                    Vector2 innerPos = passedData[i].transform.position + (passedData[i].transform.up * -gridWidth);
-                    Vector2 outerPos = passedData[i].transform.position + (passedData[i].transform.up * gridWidth);
-                    Quaternion rotation = passedData[i].transform.rotation;
+                Vector2 innerPos = passedData[i].transform.position + (passedData[i].transform.up * -gridWidth);
+                Vector2 outerPos = passedData[i].transform.position + (passedData[i].transform.up * gridWidth);
+                Quaternion rotation = passedData[i].transform.rotation;
 
-                    innerTform.position = (Vector3) innerPos + new Vector3 (0, 0, -0.001f);
-                    outerTform.position = (Vector3) outerPos + new Vector3 (0, 0, -0.001f);
-                    innerTform.rotation = rotation;
-                    outerTform.rotation = rotation;
+                innerTform.position = (Vector3) innerPos + new Vector3 (0, 0, -0.001f);
+                outerTform.position = (Vector3) outerPos + new Vector3 (0, 0, -0.001f);
 
-                    startingPos.Add (innerTform);
-                    if (startingPos.Count == numberOfPositions) { reachedTargetPosQty = true; break; }
+                innerTform.rotation = rotation;
+                outerTform.rotation = rotation;
+                startingPos.Add (innerTform);
+                if (startingPos.Count == numberOfPositions) { reachedTargetPosQty = true; }
 
-                    startingPos.Add (outerTform);
-                    if (startingPos.Count == numberOfPositions) { reachedTargetPosQty = true; break; }
+                startingPos.Add (outerTform);
+                if (startingPos.Count == numberOfPositions) { reachedTargetPosQty = true; }
 
-                    CurrentGridPairCenterpoint = passedData[i].transform.position;
-
-                }
+                CurrentGridPairCenterpoint = passedData[i].transform.position;
             }
 
             if (reachedTargetPosQty) {
+                track.CarStartingPositions = startingPos;
                 break;
 
             }

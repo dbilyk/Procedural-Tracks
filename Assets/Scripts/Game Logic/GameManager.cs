@@ -9,6 +9,16 @@ public class GameManager : MonoBehaviour {
 
     //script objects
     public SmoothFollowCam FollowCam;
+    [SerializeField]
+    MapRenderer mapRenderer;
+    [SerializeField]
+    User user;
+
+    Track activeTrack {
+        get {
+            return user.ActiveTrack;
+        }
+    }
 
     //game object
     public GameObject RaceStatsManager,
@@ -30,6 +40,14 @@ public class GameManager : MonoBehaviour {
         Application.targetFrameRate = 60;
     }
 
+    void OnEnable () {
+        user.OnStartRace += NewRace;
+
+    }
+    void OnDisable () {
+        user.OnStartRace -= NewRace;
+    }
+
     //small helper to toggle AI input
     private void SetAIInput (bool isActive) {
         for (int i = 0; i < AIInputs.Count; i++) {
@@ -39,10 +57,10 @@ public class GameManager : MonoBehaviour {
 
     void GenerateAI () {
         //creates a new AI opponent
-        for (int i = 0; i < Data.CarStartingPositions.Count - 1; i++) {
+        for (int i = 0; i < user.OpponentQty - 1; i++) {
             GameObject Ai = Instantiate (newAI, AIContainer.transform);
-            Ai.transform.position = Data.CarStartingPositions[i].transform.position;
-            Ai.transform.rotation = Data.CarStartingPositions[i].transform.rotation;
+            Ai.transform.position = activeTrack.CarStartingPositions[i].position;
+            Ai.transform.rotation = activeTrack.CarStartingPositions[i].rotation;
             AIInputController aiInput = Ai.GetComponent<AIInputController> ();
             aiInput.enabled = false;
             AIInputs.Add (aiInput);
@@ -50,10 +68,9 @@ public class GameManager : MonoBehaviour {
     }
 
     void StartingCountdown () {
-
         //positions player/AIs
-        Player.transform.position = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.position;
-        Player.transform.rotation = Data.CarStartingPositions[Data.CarStartingPositions.Count - 1].transform.rotation;
+        Player.transform.position = activeTrack.CarStartingPositions[user.OpponentQty - 1].position;
+        Player.transform.rotation = activeTrack.CarStartingPositions[user.OpponentQty - 1].rotation;
         Player.GetComponent<Rigidbody2D> ().velocity = Vector2.zero;
         Player.GetComponent<CarMovement> ().enabled = false;
         //disable UI before start of race
@@ -119,7 +136,9 @@ public class GameManager : MonoBehaviour {
 
     void NewRace () {
         ResetGame ();
-
+        mapRenderer.GenerateLevel (user.ActiveTrack);
+        GenerateAI ();
+        StartingCountdown ();
     }
 
 }

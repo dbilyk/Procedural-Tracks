@@ -50,12 +50,6 @@
      //  public static int BarrierMeshPointFrequency = 9;
      //  public static int BarrierColliderResolution = 2;
 
-     //CURRENT game state MAP data
-     public static List<Vector2> Curr_RawPoints;
-     public static List<Vector2> Curr_ControlPoints;
-     public static List<Vector2> Curr_TrackPoints;
-     public static int Curr_TrackRotation;
-
      //starting grid
      public static GameObject StartingLine;
      public static List<GameObject> CarStartingPositions;

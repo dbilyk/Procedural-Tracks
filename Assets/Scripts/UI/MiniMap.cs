@@ -6,9 +6,11 @@ public class MiniMap : MonoBehaviour {
     public MapCreator MapCreator;
     public int minimapResolution;
     public LineRenderer minimapLine;
+    [SerializeField]
+    User user;
 
     void OnEnable () {
-        CreateMinimap (Data.Curr_ControlPoints);
+        CreateMinimap (user.ActiveTrack.ControlPoints);
     }
 
     public void CreateMinimap (List<Vector2> passedControlPoints) {

@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class AnimalController : MonoBehaviour {
-    [SerializeField]
-    CritterMobManager critterMobManager;
+    public CritterMobManager critterMobManager;
     public User user;
     public Rigidbody2D Player;
     public Camera cam;
@@ -72,7 +71,6 @@ public class AnimalController : MonoBehaviour {
         }
         if (col.tag == "Player") {
             critterMobManager.CritterHit (MyType);
-            OnAnimalHit (MyType);
             gameObject.GetComponent<CircleCollider2D> ().enabled = false;
         }
     }

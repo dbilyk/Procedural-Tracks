@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public enum TrackSkins { Farm, Mountains, Desert, Snow }
-
 public class MeshData {
   public List<Vector3> Verts = new List<Vector3> ();
   public List<Vector2> UVs = new List<Vector2> ();
@@ -72,7 +70,7 @@ public class Track {
   public List<Vector2> InnerFoliageLocs = new List<Vector2> ();
   public List<Vector2> OuterFoliageLocs = new List<Vector2> ();
 
-  //cloning constructor, yes this is BAD because now i have to update it when hew fields added...
+  //cloning constructor, yes this is BAD because now i have to update it when new fields added...
   public Track (Track t) {
     this.OuterTrackPoints = t.OuterTrackPoints;
     this.InnerTrackPoints = t.InnerTrackPoints;

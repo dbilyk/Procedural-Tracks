@@ -3,6 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum Home_Btns {
+	PlayBtn,
+	SocialBtn,
+	CarSelectBtn,
+	OnlineBtn,
+	FaceCamBtn,
+	ScreenRecBtn,
+	ShareBtn
+}
+
 public class UI_Home : MonoBehaviour {
 	[SerializeField]
 	StartScreenController IntroReel;
@@ -13,16 +23,18 @@ public class UI_Home : MonoBehaviour {
 	Animator Anim;
 	bool IntroAnimPlayed = false;
 
+	[SerializeField]
+	UI_Header header;
+
 	//public home screen events
-	public delegate void ButtonClick ();
-	public event ButtonClick OnClickPlay, OnClickSettings, OnClickSocial, OnClickOnline,
-	OnClickCarPicker, OnClickFaceCam, OnClickScreenRec, OnShareBtnClick;
+	public delegate void ButtonClick (Home_Btns btn);
+	public event ButtonClick OnClickButton;
 
 	//Housekeeping
 	void OnEnable () {
 		Anim = gameObject.GetComponent<Animator> ();
 		IntroReel.OnEndIntro += SlideIn;
-
+		header.OnClickSkinsBack += SlideIn;
 		//Home UI button click event handler callbacks
 		PlayBtn.onClick.AddListener (delegate { PlayBtnClick (); });
 		SocialBtn.onClick.AddListener (delegate { SocialClick (); });
@@ -42,77 +54,81 @@ public class UI_Home : MonoBehaviour {
 
 	//these are triggered by buttons and any validation can be done here before emitting the event
 	void PlayBtnClick () {
-		Debug.Log ("No Play");
-		if (OnClickPlay != null) OnClickPlay ();
+		PlayAnim (2, 0);
+		if (OnClickButton != null) OnClickButton (Home_Btns.PlayBtn);
 	}
 
 	//callback functions from buttons
 	void SocialClick () {
 		Debug.Log ("No Social");
-		if (OnClickSocial != null) {
-			OnClickSocial ();
+		if (OnClickButton != null) {
+			OnClickButton (Home_Btns.SocialBtn);
 		}
 	}
 	void OnlineBtnClick () {
 		Debug.Log ("No Online");
-		if (OnClickOnline != null) {
-			OnClickOnline ();
+		if (OnClickButton != null) {
+			OnClickButton (Home_Btns.OnlineBtn);
 		}
 	}
 	void CarPickerBtnClick () {
 		Debug.Log ("No CarPicker");
-		if (OnClickCarPicker != null) {
-			OnClickCarPicker ();
+		if (OnClickButton != null) {
+			OnClickButton (Home_Btns.CarSelectBtn);
 		}
 	}
 	void FaceCamBtnClick () {
 		Debug.Log ("No FaceCam");
-		if (OnClickFaceCam != null) {
-			OnClickFaceCam ();
+		if (OnClickButton != null) {
+			OnClickButton (Home_Btns.FaceCamBtn);
 		}
 	}
 	void ScreenRecBtnClick () {
 		Debug.Log ("No scrnRec");
-		if (OnClickScreenRec != null) {
-			OnClickScreenRec ();
+		if (OnClickButton != null) {
+			OnClickButton (Home_Btns.ScreenRecBtn);
 		}
 	}
 	void ShareBtnClick () {
 		Debug.Log ("No share");
-		if (OnShareBtnClick != null) {
-			OnShareBtnClick ();
+		if (OnClickButton != null) {
+			OnClickButton (Home_Btns.ShareBtn);
 		}
 	}
 	//anim state names
 	List<string> BaseStates = new List<string> () {
 		"HomeScreenEnable",
-		"SettingsClick",
-		"SlideScreenOutL",
-		"SlideScreenInL"
+		"Home_SlideInL",
+		"Home_SlideOutL"
 	};
 
 	void PlayAnim (int baseStatesIndex, int layerIndex) {
 		Anim.Play (BaseStates[baseStatesIndex], layerIndex);
 	}
-
-	void ScreenOn (bool state) {
-		gameObject.transform.GetChild (0).gameObject.SetActive (state);
-	}
-
 	//logic
 	public void SlideIn () {
-		ScreenOn (true);
 		if (!IntroAnimPlayed) {
+			EnableScreen ();
 			PlayAnim (0, 0);
+			IntroAnimPlayed = true;
 		} else {
-			PlayAnim (3, 0);
+			PlayAnim (1, 0);
 
 		}
 	}
 
 	public void SlideOut () {
-		ScreenOn (false);
 		PlayAnim (2, 0);
+
+	}
+
+	public void EnableScreen () {
+		gameObject.transform.GetChild (0).gameObject.SetActive (true);
+	}
+
+	public void DisableScreen () {
+
+		gameObject.transform.GetChild (0).gameObject.SetActive (false);
 	}
 
 	bool settingsIn = false;

@@ -9,7 +9,18 @@ public class MapRenderer : MapCreator {
   BarrierCreator barrierCreator;
   [SerializeField]
   FoliageCreator foliageCreator;
-  public List<GameObject> MeshHelpers = new List<GameObject> ();
+  [SerializeField]
+  User user;
+
+  List<GameObject> _meshHelpers = new List<GameObject> ();
+  public List<GameObject> MeshHelpers {
+    get {
+      return _meshHelpers;
+    }
+    private set {
+      _meshHelpers = value;
+    }
+  }
 
   float MapWidth = 80;
   float MapHeight = 80;
@@ -48,7 +59,7 @@ public class MapRenderer : MapCreator {
   float StartingGridLength = 3;
   float StartingGridWidth = 0.5f;
   //also controls how many AI are on the track
-  int NumberOfGridPositions = 3;
+  int NumberOfGridPositions = 8;
 
   //racing line settings + data
   float RacingLineTightness = 0.3f;
@@ -71,8 +82,8 @@ public class MapRenderer : MapCreator {
     track.TrackPoints = mapCreator.CreateTrackPoints (track.ControlPoints, MeshTrackPointFreq);
 
     track.RacingLinePoints = mapCreator.CreateRacingLinePoints (track.RawPoints, RacingLineWaypointFreq, RacingLineTightness);
-    mapCreator.CreateOrSetMeshHelperObjects (track.TrackPoints, MeshHelpers);
-
+    MeshHelpers = mapCreator.CreateOrSetMeshHelperObjects (track.TrackPoints, MeshHelpers);
+    mapCreator.RotateTrackObjectsAlongCurves (MeshHelpers);
     //populates track object with Tforms of all 
     mapCreator.CreateStartingGridData (
       MeshHelpers,
@@ -85,12 +96,17 @@ public class MapRenderer : MapCreator {
     //create barrier data
     track.InnerBarrierRawPoints = barrierCreator.CreateOutline (track.RawPoints, InnerBarrierOffset, "inner");
     track.OuterBarrierRawPoints = barrierCreator.CreateOutline (track.RawPoints, OuterBarrierOffset, "outer");
+    foliageCreator.GenerateFoliageData (track);
   }
 
   public void GenerateLevel (Track track) {
-    //mesh creation
+    mapCreator.CreateOrSetMeshHelperObjects (track.TrackPoints, MeshHelpers);
+
     mapCreator.RotateTrackObjectsAlongCurves (MeshHelpers);
 
+    RenderStartingGrid (track, user.OpponentQty);
+
+    //mesh creation
     mapCreator.CreateTrackBerms (
       MeshHelpers,
       BermWidth,
@@ -118,52 +134,56 @@ public class MapRenderer : MapCreator {
 
     //populates current racing line with correct data
 
-    CreateBarriers (track.InnerBarrierRawPoints, track);
-    CreateBarriers (track.OuterBarrierRawPoints, track);
+    CreateBarriers (track.InnerBarrierRawPoints, track, InnerBarrier);
+    CreateBarriers (track.OuterBarrierRawPoints, track, OuterBarrier);
+
+    foliageCreator.RenderFoliage (track);
 
   }
 
-  void CreateBarriers (List<Vector2> barrierRawPointData, Track track) {
+  void CreateBarriers (List<Vector2> barrierRawPointData, Track track, GameObject barrierObj) {
     List<Vector2> trackPoints = mapCreator.CreateControlPoints (barrierRawPointData);
     trackPoints = mapCreator.CreateTrackPoints (trackPoints, BarrierMeshPointFrequency);
     mapCreator.CreateOrSetMeshHelperObjects (trackPoints, MeshHelpers);
     mapCreator.RotateTrackObjectsAlongCurves (MeshHelpers);
 
     //lists to create colliders for barriers.
-    List<Vector2> outerBarrierOuterPts = new List<Vector2> ();
-    List<Vector2> outerBarrierInnerPts = new List<Vector2> ();
-    List<Vector2> innerBarrierOuterPts = new List<Vector2> ();
-    List<Vector2> innerBarrierInnerPts = new List<Vector2> ();
+    List<Vector2> outerBarrierPts = new List<Vector2> ();
+    List<Vector2> innerBarrierPts = new List<Vector2> ();
 
     mapCreator.CreateTrackMesh (
       MeshHelpers,
       BarrierThickness,
-      OuterBarrier.GetComponent<MeshFilter> (),
-      outerBarrierInnerPts,
-      outerBarrierOuterPts
+      barrierObj.GetComponent<MeshFilter> (),
+      outerBarrierPts,
+      innerBarrierPts
       //track.outerBarrierData
     );
 
-    mapCreator.CreateTrackMesh (
-      MeshHelpers,
-      BarrierThickness,
-      InnerBarrier.GetComponent<MeshFilter> (),
-      innerBarrierInnerPts,
-      innerBarrierOuterPts
-      //track.innerBarrierData
-    );
     mapCreator.CreateColliderForTrack (
-      outerBarrierOuterPts,
-      outerBarrierInnerPts,
+      outerBarrierPts,
+      innerBarrierPts,
       BarrierColliderResolution,
-      OuterBarrier.GetComponent<PolygonCollider2D> ());
-
-    mapCreator.CreateColliderForTrack (
-      innerBarrierOuterPts,
-      innerBarrierInnerPts,
-      BarrierColliderResolution,
-      InnerBarrier.GetComponent<PolygonCollider2D> ());
+      barrierObj.GetComponent<PolygonCollider2D> ());
 
   }
 
+  void RenderStartingGrid (Track track, int posQty) {
+    //position the starting line
+    StartingLine.transform.position = track.StartingLineTform.position;
+    StartingLine.transform.rotation = track.StartingLineTform.rotation;
+
+    //disable all outlines first
+    for (int i = 0; i < StartingOutlines.Count; i++) {
+      StartingOutlines[i].SetActive (false);
+    }
+
+    //then enable and set tForm for the desired Qty of positions.
+    for (int i = 0; i < posQty; i++) {
+      GameObject targetOutline = StartingOutlines[i];
+      targetOutline.SetActive (true);
+      targetOutline.transform.position = track.CarStartingPositions[i].position;
+      targetOutline.transform.rotation = track.CarStartingPositions[i].rotation;
+    }
+  }
 }

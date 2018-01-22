@@ -12,22 +12,6 @@ public class UIManager : MonoBehaviour {
     //use this to pause game
     private float targetTimescale = 1f;
 
-    public void StartRace () {
-        StartScreen.SetActive (false);
-
-        //gameManager.ResetGame ();
-        // gameManager.GenerateNewTrackData ();
-        //gameManager.GenerateLevel ();
-        //gameManager.GenerateAI ();
-        //gameManager.StartingCountdown ();
-    }
-
-    public void RestartLevel () {
-        Time.timeScale = 1;
-        //gameManager.ResetGame ();
-        //gameManager.StartingCountdown ();
-    }
-
     public void QuitRace () {
         Debug.Log ("Just called Quit race on UIManager, take me back to start screen?");
 

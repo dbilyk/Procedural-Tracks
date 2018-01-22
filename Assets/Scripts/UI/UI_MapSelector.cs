@@ -13,9 +13,15 @@ public class UI_MapSelector : MonoBehaviour {
 	Animator Anim;
 
 	[SerializeField]
-	UI_MapViewer mapViewer;
+	UI_Skins skinsScreen;
 
-	Track selectedTrack;
+	[SerializeField]
+	UI_Header header;
+
+	[SerializeField]
+	UI_MapViewer mapViewer;
+	[SerializeField]
+	SnapScroller snapScroller;
 
 	[SerializeField]
 	UI_Skins UI_SkinSelector;
@@ -30,8 +36,8 @@ public class UI_MapSelector : MonoBehaviour {
 	Toggle EasyTgl, MediumTgl, HardTgl;
 
 	private List<string> BaseStates = new List<string> () {
-		"",
-		"",
+		"MapSelector_SlideInR",
+		"MapSelector_SlideOutR",
 		"",
 		""
 	};
@@ -39,11 +45,11 @@ public class UI_MapSelector : MonoBehaviour {
 	public delegate void ButtonClick ();
 	public event ButtonClick OnClickNewTrackCoins, OnClickNewTrackVideo;
 
-	public delegate void startRace (Track t);
+	public delegate void startRace (Track t, bool isNew);
 	public event startRace OnClickStartRace;
 
 	//sliders in the screen
-	public delegate void SliderChanged (float newValue);
+	public delegate void SliderChanged (float newValue, int totalPositions);
 	public event SliderChanged OnWidthValueChanged, OnCornerCtChanged, OnOpponentCtChanged;
 
 	//difficulty toggle event sends an enum
@@ -61,8 +67,10 @@ public class UI_MapSelector : MonoBehaviour {
 
 	//Housekeeping
 	void OnEnable () {
+		skinsScreen.OnClickSkin += SlideInR;
+		header.OnClickTrackPickerBack += SlideOutR;
 		Anim = gameObject.GetComponent<Animator> ();
-
+		_newTrackCreated = false;
 		//trigger events when UI buttons change
 		EasyTgl.onValueChanged.AddListener (delegate { ToggleDiff (EasyTgl); });
 		MediumTgl.onValueChanged.AddListener (delegate { ToggleDiff (MediumTgl); });
@@ -76,16 +84,21 @@ public class UI_MapSelector : MonoBehaviour {
 		CornerCount.onValueChanged.AddListener (delegate { CornerCtChanged (); });
 		OpponentCount.onValueChanged.AddListener (delegate { OpponentCtChanged (); });
 
+		snapScroller.OnNewTargetTrack += TargetTrackChanged;
+
 	}
 
 	void OnDisable () {
 
 	}
 
+	bool _newTrackCreated;
+
 	//listeners for newTrack btn
 	void NewTrackVideo () {
-		selectedTrack = mapViewer.SelectedTrack;
 		Debug.Log ("newTrackVideo");
+		_newTrackCreated = true;
+		StartRaceBtn.interactable = true;
 		if (OnClickNewTrackVideo != null) {
 			OnClickNewTrackVideo ();
 		}
@@ -93,7 +106,8 @@ public class UI_MapSelector : MonoBehaviour {
 
 	void NewTrackCoins () {
 		Debug.Log ("newTrackCoins");
-		selectedTrack = mapViewer.SelectedTrack;
+		_newTrackCreated = true;
+		StartRaceBtn.interactable = true;
 		if (OnClickNewTrackCoins != null) {
 			OnClickNewTrackCoins ();
 		}
@@ -104,21 +118,21 @@ public class UI_MapSelector : MonoBehaviour {
 	void WidthValueChanged () {
 		Debug.Log ("Width Val");
 		if (OnWidthValueChanged != null) {
-			OnWidthValueChanged (CornerWidth.value);
+			OnWidthValueChanged (CornerWidth.value, CornerWidth.numberOfSteps);
 
 		}
 	}
 	void CornerCtChanged () {
 		Debug.Log ("cornerCt");
 		if (OnCornerCtChanged != null) {
-			OnCornerCtChanged (CornerCount.value);
+			OnCornerCtChanged (CornerCount.value, CornerCount.numberOfSteps);
 
 		}
 	}
 	void OpponentCtChanged () {
 		Debug.Log ("OppCt");
 		if (OnOpponentCtChanged != null) {
-			OnOpponentCtChanged (OpponentCount.value);
+			OnOpponentCtChanged (OpponentCount.value, OpponentCount.numberOfSteps);
 
 		}
 	}
@@ -145,24 +159,32 @@ public class UI_MapSelector : MonoBehaviour {
 	void StartRace () {
 		Debug.Log ("StartRace");
 		if (OnClickStartRace != null) {
-			OnClickStartRace (selectedTrack);
+			if (snapScroller.targetTrackIndex == 0) {
+				//send the newly rendered track that the mapViewer created
+				OnClickStartRace (mapViewer.SelectedTrack, true);
+			} else {
+				OnClickStartRace (User.SavedTracks[snapScroller.targetTrackIndex - 1], false);
+			}
 		}
 	}
 
-	//animations
-	private void SlideIn_R () {
+	//---------EVENT LISTENERS FROM OTHER CLASSES---------------
 
+	void TargetTrackChanged (int index) {
+		//checks to make sure you cant start a race if you are targeting a NEW track, but havent paid for it yet
+		if (index == 0 && !_newTrackCreated) {
+			StartRaceBtn.interactable = false;
+		} else {
+			StartRaceBtn.interactable = true;
+		}
 	}
 
-	private void SlideOut_R () {
-
+	void SlideInR (TrackSkins skins) {
+		PlayAnim (0, 0);
 	}
 
-	private void SlideIn_L () {
-
+	void SlideOutR () {
+		PlayAnim (1, 0);
 	}
 
-	private void SlideOut_L () {
-
-	}
 }

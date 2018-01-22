@@ -30,33 +30,18 @@ public class User : MonoBehaviour {
     public delegate void CurrencyAdded (int newValue);
     public event CurrencyAdded OnCurrencyAdded;
 
+    public delegate void StartRace ();
+    public event StartRace OnStartRace;
+
     //player currency
     private int _userCurrency = 10000;
     private TrackSkins _currentSkin = TrackSkins.Farm;
-    private Track _currentTrack;
+    private Track _activeTrack;
+    private int _activeGameCurrency = 0;
+    private int _opponentQty;
 
     private static List<Track> _savedTracks = new List<Track> ();
     private static List<sTrack> _serializedTracks = new List<sTrack> ();
-
-    void OnEnable () {
-
-        ui_skins.OnClickSkin += setSkin;
-        critterMobManager.OnCritterHit += userHitCritter;
-        mapSelector.OnClickStartRace += addSavedTrack;
-        mapSelector.OnClickNewTrackCoins += NewTrackPurchase;
-
-        //if we have some persistent saved tracks, Open them and assign to savedTracks
-        if (Open<savedTracks> (savedTracksPath) != null) {
-            //populates SavedTracks with the serialized tracks retrieved by the Open() method
-            SavedTracks = populateSavedTracks (Open<savedTracks> (savedTracksPath).svdTracks);
-            Debug.Log ("Saved tracks populated with persistent data, count is now: " + SavedTracks.Count);
-        }
-
-    }
-
-    void OnDisable () {
-        ui_skins.OnClickSkin -= setSkin;
-    }
 
     public int UserCurrency {
         get {
@@ -79,12 +64,12 @@ public class User : MonoBehaviour {
         }
     }
 
-    public Track CurrentTrack {
+    public Track ActiveTrack {
         get {
-            return _currentTrack;
+            return _activeTrack;
         }
         private set {
-            _currentTrack = value;
+            _activeTrack = value;
         }
     }
 
@@ -97,29 +82,85 @@ public class User : MonoBehaviour {
         }
     }
 
+    public int OpponentQty { get; private set; }
+
+    public int ActiveGameCoins {
+        get {
+            return _activeGameCurrency;
+        }
+        private set {
+            _activeGameCurrency = value;
+        }
+    }
+
     //private skin setter based on UI input;
     void setSkin (TrackSkins skin) {
         CurrentSkin = skin;
     }
-    void setCurrentTrack (Track track) {
-        CurrentTrack = track;
-    }
-    void addSavedTrack (Track track) {
-        Track newTrack = new Track (track);
-        if (SavedTracks.Count == 0 || SavedTracks[0].ControlPoints != track.ControlPoints) {
-            User.SavedTracks.Insert (0, newTrack);
+    void setOppQty (float desiredQty, int totalOptionsCt) {
+        if (desiredQty != 1) {
+            OpponentQty = 2 + Mathf.FloorToInt (desiredQty * (float) totalOptionsCt);
 
-            //could be slow depending on the number of tracks that are being serialized
-            savedTracks serialClass = new savedTracks ();
-            for (int i = 0; i < SavedTracks.Count; i++) {
-                serialClass.svdTracks.Add (SavedTracks[i].toSerializedTrack ());
-            }
-            Save<savedTracks> (serialClass, savedTracksPath);
+        } else {
+            OpponentQty = totalOptionsCt + 1;
+        }
+        Debug.Log (OpponentQty);
+    }
+
+    void OnEnable () {
+
+        //----------------------------------------------------REMOVE, this is just for testing
+        OpponentQty = 2;
+
+        ui_skins.OnClickSkin += setSkin;
+        mapSelector.OnOpponentCtChanged += setOppQty;
+        critterMobManager.OnCritterHit += userHitCritter;
+        mapSelector.OnClickStartRace += targetTrack;
+        mapSelector.OnClickNewTrackCoins += NewTrackPurchase;
+
+        //if we have some persistent saved tracks, Open them and assign to savedTracks
+        if (Open<savedTracks> (savedTracksPath) != null) {
+            //populates SavedTracks with the serialized tracks retrieved by the Open() method
+            SavedTracks = populateSavedTracks (Open<savedTracks> (savedTracksPath).svdTracks);
+            Debug.Log ("Saved tracks populated with persistent data, count is now: " + SavedTracks.Count);
         }
 
     }
 
-    public void Save<T> (T obj, string path) {
+    void OnDisable () {
+        ui_skins.OnClickSkin -= setSkin;
+    }
+
+    //listens for StartRace btn, and if the requested track is new, it adds it to SavedTracks and saves the new set.
+    //if the requested track is a previously saved one, it simply assigns it to this object's CurrentTrack property.
+    void targetTrack (Track track, bool isNew) {
+        //if the track is not an existing saved track, but a newly rendered one...
+        if (isNew) {
+            ActiveTrack = track;
+            //create a new track instance, add it to
+            Track newTrack = new Track (track);
+            User.SavedTracks.Insert (0, newTrack);
+            savedTracks serialTracks = CreateSerialTracks (SavedTracks);
+            //could be slow depending on the number of tracks that are being serialized
+            Save<savedTracks> (serialTracks, savedTracksPath);
+
+        } else {
+            ActiveTrack = track;
+        }
+        if (OnStartRace != null) OnStartRace ();
+
+    }
+    //creates a serial class out of the passed in tracks list and returns it
+    savedTracks CreateSerialTracks (List<Track> tracks) {
+        savedTracks serialClass = new savedTracks ();
+        for (int i = 0; i < SavedTracks.Count; i++) {
+            serialClass.svdTracks.Add (SavedTracks[i].toSerializedTrack ());
+        }
+        return serialClass;
+    }
+
+    //general save method for any object to any path
+    public static void Save<T> (T obj, string path) {
         BinaryFormatter bf = new BinaryFormatter ();
         FileStream file;
         if (!File.Exists (Application.persistentDataPath + path)) {
@@ -132,7 +173,8 @@ public class User : MonoBehaviour {
         file.Close ();
     }
 
-    public T Open<T> (string path) {
+    //general open method 
+    public static T Open<T> (string path) {
         BinaryFormatter bf = new BinaryFormatter ();
         //check if file exists, if not, return default T
         if (File.Exists (Application.persistentDataPath + path)) {

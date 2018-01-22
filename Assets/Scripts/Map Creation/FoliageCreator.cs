@@ -27,7 +27,7 @@ public class FoliageCreator : MonoBehaviour {
         List<Vector2> OuterFoliagePath = barrierCreator.CreateOutline (track.RawPoints, mapRenderer.OuterBarrierOffset + 1f, "outer");
         OuterFoliagePath = mapCreator.CreateTrackPoints (OuterFoliagePath, 10);
         track.OuterFoliageLocs = OuterFoliagePath;
-
+        Debug.Log ("fol" + InnerFoliagePath.Count);
     }
 
     public void RenderFoliage (Track track) {

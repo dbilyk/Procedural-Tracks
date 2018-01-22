@@ -52,11 +52,11 @@ public class SnapScroller : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 				result = rawIndex;
 			}
 			//call our event if the target track changed;
-			// if (_lastTargetTrack != rawIndex) {
-			// 	if (OnNewTargetTrack != null) OnNewTargetTrack (result);
-			// 	_lastTargetTrack = result;
+			if (_lastTargetTrack != rawIndex) {
+				if (OnNewTargetTrack != null) OnNewTargetTrack (result);
+				_lastTargetTrack = result;
 
-			// }
+			}
 			return result;
 		}
 	}
@@ -74,22 +74,16 @@ public class SnapScroller : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 		}
 	}
 
-	bool hitRight {
-		get {
-			if (targetTrackIndex == trackCount) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}
-
 	float velocity;
 
 	void Start () {
+
 		ScrollContainerTform = gameObject.GetComponent<RectTransform> ();
 		ScrollPrefabTform = ScrollItemPfab.GetComponent<RectTransform> ();
 		mapWidth = ScrollPrefabTform.rect.width;
+
+		//initial signal of starting position, mostly to make sure the play btn is disabled.
+		if (OnNewTargetTrack != null) OnNewTargetTrack (targetTrackIndex);
 	}
 
 	public void OnBeginDrag (PointerEventData e) {
@@ -108,6 +102,7 @@ public class SnapScroller : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 	List<float> velocitiesThisDrag = new List<float> ();
 	IEnumerator drag (PointerEventData e) {
 		while (true) {
+			Debug.Log (centerOffset);
 			yield return new WaitForEndOfFrame ();
 			velocity = -e.delta.x;
 			velocitiesThisDrag.Add (velocity);
@@ -123,7 +118,6 @@ public class SnapScroller : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 		dragStopT = Time.unscaledTime;
 		bool momentum = (dragStopT - dragStartT < timeMomentumThresh) ? true : false;
 		moving = (velocity <= 0) ? motion.left : motion.right;
-		Debug.Log (velocity);
 		if (momentum) {
 			StartCoroutine ("Momentum");
 		} else {
@@ -151,6 +145,7 @@ public class SnapScroller : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 		lerpEnd = false;
 		startingTargetIndex = targetTrackIndex;
 		while (true) {
+			//handle what happens when you hit the end of the list after a fast swipe or if you just swipe fast
 			if (Mathf.Abs (velocity) > startLerpVelocity) {
 				if ((targetTrackIndex == 0 && centerOffset < 0) || (targetTrackIndex == trackCount && centerOffset > 0)) {
 					velocity /= 1.5f;
@@ -171,9 +166,9 @@ public class SnapScroller : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 					}
 
 				} else {
-					if (startingTargetIndex == 0 && centerOffset >= 0) {
+					if (startingTargetIndex == 0 && centerOffset > 0 && trackCount != 0) {
 						lerpToSelectedIndex (targetTrackIndex + 1);
-					} else if (startingTargetIndex == trackCount && centerOffset <= 0) {
+					} else if (startingTargetIndex == trackCount && centerOffset < 0 && trackCount != 0) {
 						lerpToSelectedIndex (targetTrackIndex - 1);
 					} else {
 

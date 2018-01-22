@@ -22,6 +22,9 @@ public class StartScreenController : MonoBehaviour {
     public GameObject IntroRabbit;
     public GameObject HomeScreenUI;
 
+    [SerializeField]
+    User user;
+
     Vector3 CarInitialPosition;
     Quaternion CarInitialRotation;
     Vector3 RabbitInitialPosition;
@@ -36,6 +39,7 @@ public class StartScreenController : MonoBehaviour {
     private bool homeUIOn = false;
 
     void OnEnable () {
+        user.OnStartRace += StartRace;
         HomeScreenUI.SetActive (false);
         GameLoopLight.SetActive (false);
         QualitySettings.shadowDistance = 150;
@@ -73,11 +77,11 @@ public class StartScreenController : MonoBehaviour {
     }
 
     void Update () {
-        // Debug.Log (Input.GetMouseButtonDown (0));
-        //enable the home screen UI
+        //enable the home screen UI early when touched
         if (!homeUIOn && Input.GetMouseButtonDown (0) || Input.touchCount > 0) {
-            if (this.OnEndIntro != null) {
+            if (OnEndIntro != null) {
                 OnEndIntro ();
+                homeUIOn = true;
 
             }
         }
@@ -194,7 +198,12 @@ public class StartScreenController : MonoBehaviour {
         }
     }
 
+    void StartRace () {
+        gameObject.SetActive (false);
+    }
+
     void OnDisable () {
+        user.OnStartRace -= StartRace;
         if (GameLoopLight != null) {
             GameLoopLight.SetActive (true);
 

@@ -72,11 +72,11 @@ public class CritterMobManager : MonoBehaviour {
     public event critterHit OnCritterHit;
 
     void OnEnable () {
-        critterHit CritterHit = new critterHit (_critterHit);
+        CritterHit = new critterHit (_critterHit);
         cam = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
         Spawned = false;
-        for (int i = 0; i < user.CurrentTrack.TrackPoints.Count; i += Mathf.RoundToInt ((int) mapRenderer.MeshTrackPointFreq / 4)) {
-            thinnedTrackPoints.Add (user.CurrentTrack.TrackPoints[i]);
+        for (int i = 0; i < user.ActiveTrack.TrackPoints.Count; i += Mathf.RoundToInt ((int) mapRenderer.MeshTrackPointFreq / 4)) {
+            thinnedTrackPoints.Add (user.ActiveTrack.TrackPoints[i]);
         }
     }
 
@@ -93,7 +93,7 @@ public class CritterMobManager : MonoBehaviour {
         yield return new WaitForSeconds (Random.Range (SecsBetweenSpawns - 1f, SecsBetweenSpawns + 1f));
         //grab nearest track point to player
         int nearestTrackIndex = ExtensionMethods.GetNearestInList ((Vector2) Player.transform.position, thinnedTrackPoints);
-        Vector2 NearestPointToPlayer = user.CurrentTrack.TrackPoints[nearestTrackIndex];
+        Vector2 NearestPointToPlayer = user.ActiveTrack.TrackPoints[nearestTrackIndex];
         if (nearestTrackIndex == LastNearestPointToPlayer) {
             Spawned = false;
             yield break;
@@ -182,13 +182,18 @@ public class CritterMobManager : MonoBehaviour {
 
             if (TargetCritterPool.Count < TargetCritterDensity) {
                 newCritter = Instantiate (TargetCritterType[(int) user.CurrentSkin], CritterContainer.transform);
-                newCritter.GetComponent<AnimalController> ().MyType = critterType;
+                AnimalController critterCtrl = newCritter.GetComponentInChildren<AnimalController> ();
+                critterCtrl.MyType = critterType;
+                critterCtrl.critterMobManager = gameObject.GetComponent<CritterMobManager> ();
                 TargetCritterPool.Add (newCritter);
             } else {
                 newCritter = TargetCritterPool.Find (x => x.transform.GetChild (0).gameObject.activeInHierarchy == false);
                 //if there's not enough disabled critters after the check, add some more to the pool
                 if (newCritter == null) {
                     newCritter = Instantiate (TargetCritterType[(int) user.CurrentSkin], CritterContainer.transform);
+                    AnimalController critterCtrl = newCritter.GetComponentInChildren<AnimalController> ();
+                    critterCtrl.MyType = critterType;
+                    critterCtrl.critterMobManager = gameObject.GetComponent<CritterMobManager> ();
                     TargetCritterPool.Add (newCritter);
                 }
             }

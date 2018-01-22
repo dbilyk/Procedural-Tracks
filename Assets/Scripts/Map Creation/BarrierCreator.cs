@@ -80,7 +80,6 @@ public class BarrierCreator : MonoBehaviour {
             newData.Add (newData[0]);
         }
         return newData;
-        //converts our newly adjusted raw points into mesh!
     }
 
 }
