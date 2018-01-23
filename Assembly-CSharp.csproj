@@ -78,10 +78,10 @@
      <Compile Include="Assets\Scripts\Start Screen\IntroCritterAnimDelay.cs" />
      <Compile Include="Assets\Scripts\Start Screen\StartScreenController.cs" />
      <Compile Include="Assets\Scripts\UI\MiniMap.cs" />
+     <Compile Include="Assets\Scripts\UI\RaceStartedEvent.cs" />
      <Compile Include="Assets\Scripts\UI\RaceStatsUIUpdate.cs" />
      <Compile Include="Assets\Scripts\UI\SnapScroller.cs" />
      <Compile Include="Assets\Scripts\UI\StartingLight.cs" />
-     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
      <Compile Include="Assets\Scripts\UI\UI_GameLoop.cs" />
      <Compile Include="Assets\Scripts\UI\UI_Header.cs" />
      <Compile Include="Assets\Scripts\UI\UI_Home.cs" />

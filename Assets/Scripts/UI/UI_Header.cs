@@ -30,8 +30,10 @@ public class UI_Header : MonoBehaviour {
 	List<string> BaseStates = new List<string> () {
 		"HeaderIntro",
 		"SwapSettingsToSkinsBack",
-		"SwapSkinsToSettings"
-
+		"SwapSkinsToSettings",
+		"SwapSkinsToMaps",
+		"SwapMapsToSkins",
+		"HeaderOutro"
 	};
 
 	//anim layer1 names
@@ -71,6 +73,7 @@ public class UI_Header : MonoBehaviour {
 		startScreen.OnEndIntro += introAnim;
 		HomeUI.OnClickButton += iconSwapHomeToSkins;
 		SkinsUI.OnClickSkin += iconSwapSkinsToMap;
+		MapSelectorUI.OnClickStartRace += outroAnim;
 		Anim = gameObject.GetComponent<Animator> ();
 
 		//settings button event callbacks
@@ -104,8 +107,8 @@ public class UI_Header : MonoBehaviour {
 		if (OnClickTrackPickerBack != null) {
 			OnClickTrackPickerBack ();
 		}
-		TrackPickerBackBtn.gameObject.SetActive (false);
-		SkinsBackBtn.gameObject.SetActive (true);
+		PlayAnim (4, 0);
+
 	}
 
 	//these handle the inital animation in
@@ -132,8 +135,10 @@ public class UI_Header : MonoBehaviour {
 	}
 
 	void iconSwapSkinsToMap (TrackSkins skin) {
-		Debug.Log ("Here");
-		SkinsBackBtn.gameObject.SetActive (false);
-		TrackPickerBackBtn.gameObject.SetActive (true);
+		PlayAnim (3, 0);
+	}
+
+	void outroAnim (Track t, bool b) {
+		PlayAnim (5, 0);
 	}
 }

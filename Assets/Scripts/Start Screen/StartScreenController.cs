@@ -172,6 +172,7 @@ public class StartScreenController : MonoBehaviour {
                 //trigger end intro event
                 if (!homeUIOn && OnEndIntro != null) {
                     OnEndIntro ();
+                    homeUIOn = true;
                 }
 
                 //CowSpine[CowSpine.Count - 1].AddRelativeForce(0,0,10,ForceMode.Impulse);

@@ -3,23 +3,33 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LapTrigger : MonoBehaviour {
-    public delegate void LapCompleteDel(int CarIndex);
+    public delegate void LapCompleteDel (int CarIndex);
     public static event LapCompleteDel OnLapComplete;
 
-    
+    [SerializeField]
+    RaceStatsManager statsManager;
 
-    void OnTriggerEnter2D(Collider2D col)
-    {
-        for (int i = 0; i < Data.CarPoleData.Count; i++)
-        {
-            if (col.gameObject == Data.CarPoleData[i].CarObject) {
-                OnLapComplete(i);
-                break;
-            }
-           
-        }
-        
-        
+    [SerializeField]
+    StartingLight startingLight;
+
+    bool raceStarted = false;
+
+    void Start () {
+        startingLight.OnStartingLightsComplete += setRaceStarted;
     }
-	
+
+    void setRaceStarted () {
+        raceStarted = true;
+    }
+
+    void OnTriggerEnter2D (Collider2D col) {
+        if (raceStarted) {
+            for (int i = 0; i < statsManager.CarPoleData.Count; i++) {
+                if (col.gameObject == statsManager.CarPoleData[i].CarObject) {
+                    OnLapComplete (i);
+                    break;
+                }
+            }
+        }
+    }
 }

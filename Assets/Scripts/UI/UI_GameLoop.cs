@@ -5,6 +5,13 @@ using UnityEngine.UI;
 public class UI_GameLoop : MonoBehaviour {
 	Animator Anim;
 
+	[SerializeField]
+	User user;
+
+	[SerializeField]
+	RaceStatsManager statsManager;
+	CritterMobManager critterManager;
+
 	//these should all be updated through events 
 	//BUT MUST BE UNSUBBED AFTER ANY EXIT CONDITION.!
 	[SerializeField]
@@ -21,6 +28,9 @@ public class UI_GameLoop : MonoBehaviour {
 	Button PauseBtn;
 
 	[SerializeField]
+	StartingLight startingLight;
+
+	[SerializeField]
 	GameObject WrongWayIndicator;
 
 	[SerializeField]
@@ -32,15 +42,44 @@ public class UI_GameLoop : MonoBehaviour {
 	public delegate void ButtonClick ();
 	public event ButtonClick OnClickPause;
 
+	bool RaceStarted;
+
 	void OnEnable () {
 		UpdateUI = false;
+		Anim = gameObject.GetComponent<Animator> ();
+		startingLight.OnStartingLightsComplete += BeginRace;
+		user.OnGameLoopCoinsAdded += updateCoinScore;
 
-		LapsInRaceAlert.text = Data.Curr_NumberOfLapsInRace.ToString ();
+		//wrong way blinker
+		raceStatsManager.OnFacingWrongWay += FacingWrongWay;
+		raceStatsManager.OnFacingForward += FacingForward;
 
 		PauseBtn.onClick.AddListener (delegate { ClickPause (); });
 		raceStatsManager.OnLapAlert += TriggerLapAlert;
-		//pole data 0 is always the player
-		playerRaceData = Data.CarPoleData[0];
+	}
+
+	List<string> BaseStates = new List<string> () {
+		"GameloopScreenIn"
+
+	};
+
+	List<string> Layer1 = new List<string> () {
+		"NewLapAlert"
+
+	};
+
+	void PlayAnim (int statesIndex, int layer) {
+		List<string> animLayer = new List<string> ();
+		switch (layer) {
+			case 0:
+				animLayer = BaseStates;
+				break;
+			case 1:
+				animLayer = Layer1;
+				break;
+		}
+		string anim = animLayer[statesIndex];
+		Anim.Play (anim, layer);
 	}
 
 	void OnDisable () {
@@ -49,7 +88,7 @@ public class UI_GameLoop : MonoBehaviour {
 
 	bool UpdateUI;
 	void Update () {
-		if (!UpdateUI) {
+		if (!UpdateUI && RaceStarted) {
 			StartCoroutine ("UpdateUIStats");
 			UpdateUI = true;
 		}
@@ -57,7 +96,7 @@ public class UI_GameLoop : MonoBehaviour {
 
 	//pause event sender
 	void ClickPause () {
-		Debug.Log ("pauseBTn");
+		Debug.Log ("pauseBtn");
 		if (OnClickPause != null) {
 			OnClickPause ();
 		}
@@ -65,8 +104,12 @@ public class UI_GameLoop : MonoBehaviour {
 
 	//listener for new lap event
 	void TriggerLapAlert (int newLapNumber) {
-		CurrLapTxt.text = newLapNumber.ToString ();
 		NewCurrLapAlert.text = newLapNumber.ToString ();
+		PlayAnim (0, 1);
+	}
+
+	void updateCoinScore (int val) {
+		CoinScoreTxt.text = val.ToString ();
 	}
 
 	IEnumerator UpdateUIStats () {
@@ -94,7 +137,7 @@ public class UI_GameLoop : MonoBehaviour {
 		//populate Pole position
 		CurrPlaceTxt.text = playerRaceData.Curr_PolePosition.ToString ();
 		//FIX ME
-		PlacesInRaceTxt.text = Data.CarPoleData.Count.ToString ();
+		PlacesInRaceTxt.text = statsManager.CarPoleData.Count.ToString ();
 
 		//populate current lap
 		if (playerRaceData.Curr_LapNumber < 1) {
@@ -102,9 +145,39 @@ public class UI_GameLoop : MonoBehaviour {
 		} else {
 			CurrLapTxt.text = playerRaceData.Curr_LapNumber.ToString ();
 		}
-		LapsInRaceTxt.text = Data.Curr_NumberOfLapsInRace.ToString ();
 
 		yield return new WaitForSeconds (0.05f);
 		UpdateUI = false;
 	}
+
+	void BeginRace () {
+		LapsInRaceTxt.text = user.lapsInRace.ToString ();
+		LapsInRaceAlert.text = user.lapsInRace.ToString ();
+		//pole data 0 is always the player
+		playerRaceData = statsManager.CarPoleData[0];
+		RaceStarted = true;
+		PlayAnim (0, 0);
+	}
+
+	void FacingWrongWay () {
+
+		StartCoroutine ("blinkWrongWay");
+	}
+
+	IEnumerator blinkWrongWay () {
+		while (true) {
+			yield return new WaitForSecondsRealtime (1f);
+			if (WrongWayIndicator.activeSelf) {
+				WrongWayIndicator.SetActive (false);
+			} else {
+				WrongWayIndicator.SetActive (true);
+			}
+		}
+	}
+
+	void FacingForward () {
+		StopCoroutine ("blinkWrongWay");
+		WrongWayIndicator.SetActive (false);
+	}
+	//--------------------------------------------------
 }

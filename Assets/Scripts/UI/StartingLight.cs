@@ -7,22 +7,33 @@ public class StartingLight : MonoBehaviour {
     public Animation StartingLightsAnim;
     public GameManager gameManager;
     private bool animstarted;
+    public AnimComplete animComplete;
 
-	// Use this for initialization
-	void OnEnable()
-    {
-        StartingLightsAnim.Play();
+    // Use this for initialization
+    void OnEnable () {
+        //gets called by the starting linght animation EVENT
+        animComplete = new AnimComplete (AnimationCompleted);
+        StartingLightsAnim.Play ();
         animstarted = true;
     }
-    void Update()
-    {
-        gameObject.transform.position = new Vector3(MainCam.transform.position.x, MainCam.transform.position.y, -1) + MainCam.transform.up;
+
+    void Update () {
+        gameObject.transform.position = new Vector3 (MainCam.transform.position.x, MainCam.transform.position.y, -1) + MainCam.transform.up;
         gameObject.transform.rotation = MainCam.transform.localRotation;
 
-        if(animstarted && !StartingLightsAnim.isPlaying){
-            gameObject.SetActive(false);
-            animstarted = false;
-        }
     }
-	
+
+    void AnimationCompleted () {
+
+        gameObject.SetActive (false);
+        animstarted = false;
+        if (OnStartingLightsComplete != null) {
+            OnStartingLightsComplete ();
+        }
+
+    }
+    public delegate void AnimComplete ();
+
+    public delegate void StartingLightsComplete ();
+    public event StartingLightsComplete OnStartingLightsComplete;
 }

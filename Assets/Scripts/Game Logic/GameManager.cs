@@ -30,8 +30,6 @@ public class GameManager : MonoBehaviour {
     AIContainer,
     StartingGridContainer,
     FoliageContainer,
-    GameLoopUI,
-    MiniMapGroup,
     StartingLights;
 
     public List<AIInputController> AIInputs = new List<AIInputController> ();
@@ -73,8 +71,6 @@ public class GameManager : MonoBehaviour {
         Player.transform.rotation = activeTrack.CarStartingPositions[user.OpponentQty - 1].rotation;
         Player.GetComponent<Rigidbody2D> ().velocity = Vector2.zero;
         Player.GetComponent<CarMovement> ().enabled = false;
-        //disable UI before start of race
-        GameLoopUI.SetActive (false);
 
         StartCoroutine ("StartRace");
         Vector3 CamStartPosition = new Vector3 (Player.transform.position.x - 5, Player.transform.position.y, -3);
@@ -99,10 +95,6 @@ public class GameManager : MonoBehaviour {
         //must activate before GameloopUI
         RaceStatsManager.SetActive (true);
 
-        //Enable gameloop UI
-        GameLoopUI.SetActive (true);
-        MiniMapGroup.SetActive (true);
-
         //enables AI input
         SetAIInput (true);
         //enables player movement
@@ -118,8 +110,6 @@ public class GameManager : MonoBehaviour {
         StopCoroutine ("StartRace");
         StartingLights.SetActive (false);
         SetAIInput (false);
-        //setting these false will re-trigger Initialization in their respective OnEnable functions
-        GameLoopUI.SetActive (false);
         RaceStatsManager.SetActive (false);
 
         //places AI back on starting grid

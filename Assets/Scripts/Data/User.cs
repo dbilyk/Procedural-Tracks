@@ -28,7 +28,7 @@ public class User : MonoBehaviour {
 
     //currency update delegate
     public delegate void CurrencyAdded (int newValue);
-    public event CurrencyAdded OnCurrencyAdded;
+    public event CurrencyAdded OnTotalCoinsAdded, OnGameLoopCoinsAdded;
 
     public delegate void StartRace ();
     public event StartRace OnStartRace;
@@ -37,8 +37,16 @@ public class User : MonoBehaviour {
     private int _userCurrency = 10000;
     private TrackSkins _currentSkin = TrackSkins.Farm;
     private Track _activeTrack;
-    private int _activeGameCurrency = 0;
+    private int _gameLoopCurrency = 0;
     private int _opponentQty;
+
+    public float AccelerationDivisor { get; private set; }
+    public float MaxBrakeDivisor { get; private set; }
+    public float MaxTractionDivisor { get; private set; }
+    public float SteeringResponseDivisor { get; private set; }
+
+    public int lapsInRace { get; private set; }
+    public List<CarPolePositionData> CarPoleData = new List<CarPolePositionData> ();
 
     private static List<Track> _savedTracks = new List<Track> ();
     private static List<sTrack> _serializedTracks = new List<sTrack> ();
@@ -49,9 +57,18 @@ public class User : MonoBehaviour {
         }
         private set {
             _userCurrency = value;
-            if (OnCurrencyAdded != null) {
-                OnCurrencyAdded (value);
+            if (OnTotalCoinsAdded != null) {
+                OnTotalCoinsAdded (value);
             }
+        }
+    }
+
+    public int GameLoopCurrency {
+        get { return _gameLoopCurrency; }
+        private set {
+            _gameLoopCurrency = value;
+            if (OnGameLoopCoinsAdded != null) OnGameLoopCoinsAdded (value);
+
         }
     }
 
@@ -84,15 +101,6 @@ public class User : MonoBehaviour {
 
     public int OpponentQty { get; private set; }
 
-    public int ActiveGameCoins {
-        get {
-            return _activeGameCurrency;
-        }
-        private set {
-            _activeGameCurrency = value;
-        }
-    }
-
     //private skin setter based on UI input;
     void setSkin (TrackSkins skin) {
         CurrentSkin = skin;
@@ -107,10 +115,20 @@ public class User : MonoBehaviour {
         Debug.Log (OpponentQty);
     }
 
+    void setEasySettings () {
+        lapsInRace = 2;
+        AccelerationDivisor = 2f;
+        MaxBrakeDivisor = 2f;
+        MaxTractionDivisor = 2f;
+        SteeringResponseDivisor = 1.4f;
+    }
+
     void OnEnable () {
 
-        //----------------------------------------------------REMOVE, this is just for testing
+        //default values
         OpponentQty = 2;
+        //default to easy settings
+        setEasySettings ();
 
         ui_skins.OnClickSkin += setSkin;
         mapSelector.OnOpponentCtChanged += setOppQty;
@@ -208,16 +226,16 @@ public class User : MonoBehaviour {
     void userHitCritter (CritterType type) {
         switch (type) {
             case CritterType.sml:
-                UserCurrency += 1;
+                GameLoopCurrency += 1;
                 break;
             case CritterType.med:
-                UserCurrency += 2;
+                GameLoopCurrency += 2;
                 break;
             case CritterType.lrg:
-                UserCurrency += 3;
+                GameLoopCurrency += 3;
                 break;
             case CritterType.leg:
-                UserCurrency += 10;
+                GameLoopCurrency += 10;
                 break;
         }
     }
