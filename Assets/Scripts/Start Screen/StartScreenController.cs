@@ -78,7 +78,7 @@ public class StartScreenController : MonoBehaviour {
 
     void Update () {
         //enable the home screen UI early when touched
-        if (!homeUIOn && Input.GetMouseButtonDown (0) || Input.touchCount > 0) {
+        if (!homeUIOn && (Input.GetMouseButtonDown (0) || Input.touchCount > 0)) {
             if (OnEndIntro != null) {
                 OnEndIntro ();
                 homeUIOn = true;

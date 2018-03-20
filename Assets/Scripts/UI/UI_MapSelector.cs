@@ -166,6 +166,7 @@ public class UI_MapSelector : MonoBehaviour {
 				OnClickStartRace (User.SavedTracks[snapScroller.targetTrackIndex - 1], false);
 			}
 		}
+		PlayAnim (1, 0);
 	}
 
 	//---------EVENT LISTENERS FROM OTHER CLASSES---------------

@@ -280,6 +280,7 @@ public class RaceStatsManager : MonoBehaviour {
                 }
             }
         }
+
         PlayerData.Curr_PolePosition = CarsAheadOfPlayer + 1;
 
         yield return new WaitForSeconds (0.1f);
@@ -295,17 +296,18 @@ public class RaceStatsManager : MonoBehaviour {
     //this delegate subscriber is called each time a car passes the lap line.
     void LapComplete (int PoleDataIndex) {
         CarPolePositionData thisCar = CarPoleData[PoleDataIndex];
-        //if the player completes lap, trigger UI event
-        if (PoleDataIndex == 0) {
-            if (OnLapAlert != null) OnLapAlert (thisCar.Curr_LapNumber + 1);
-        }
 
         if (thisCar.Curr_LapNumber == 0) {
             thisCar.Curr_LapNumber += 1;
             thisCar.Curr_LapStartTime = Time.time;
+            if (OnLapAlert != null) OnLapAlert (thisCar.Curr_LapNumber);
         }
 
         if (thisCar.TotalCheckpointsPassedThisLap >= Curr_PoleCheckpoints.Count * (PctOfCheckpointsThatConstitutesALap / 100)) {
+            //if the player completes lap, trigger UI event
+            if (PoleDataIndex == 0) {
+                if (OnLapAlert != null) OnLapAlert (thisCar.Curr_LapNumber + 1);
+            }
             if (thisCar.FastestLapTime == -1) {
                 thisCar.FastestLapTime = thisCar.Curr_LapTime;
             }
