@@ -39,7 +39,7 @@ public class FoliageCreator : MonoBehaviour {
       if (rand < FoliageDensity) {
         int        randIndex                  = Random.Range (0, Foliage.Count);
         GameObject newItem                    = GameObject.Instantiate (Foliage[randIndex], gameObject.transform);
-                   newItem.transform.rotation = Quaternion.Euler(90,90,Random.value * 360);
+                   newItem.transform.rotation = Quaternion.Euler(0,0,Random.value * 360);
                    newItem.transform.position = track.InnerFoliageLocs[i] + Random.insideUnitCircle * 0.2f;
       }
     }

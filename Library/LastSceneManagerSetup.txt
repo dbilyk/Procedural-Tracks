@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/March 2018/v3.01 saved on mac.unity
+- path: Assets/Scenes/March 2018/v3.02 fixing tree rotations.unity
   isLoaded: 1
   isActive: 1
