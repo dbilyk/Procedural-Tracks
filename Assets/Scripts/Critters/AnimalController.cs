@@ -64,7 +64,7 @@ public class AnimalController : MonoBehaviour {
             foreach (Rigidbody RB in Bones) {
                 GameObject player = col.gameObject;
                 RB.isKinematic = false;
-                RB.AddForce (((gameObject.transform.position - (player.transform.position - player.transform.right)).normalized + new Vector3 (0, 0, 0.5f)) * player.GetComponent<Rigidbody2D> ().velocity.magnitude * 2, ForceMode.Impulse);
+                RB.AddForce (((gameObject.transform.position - (player.transform.position - player.transform.right)).normalized + new Vector3 (0, 0, 1.5f)) * player.GetComponent<Rigidbody2D>().velocity.magnitude * 2, ForceMode.Impulse);
             }
             gameObject.GetComponent<CircleCollider2D> ().enabled = false;
 
