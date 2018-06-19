@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class MapRenderer : MapCreator {
   [SerializeField]
-  MapCreator mapCreator;
-  [SerializeField]
   BarrierCreator barrierCreator;
   [SerializeField]
   FoliageCreator foliageCreator;
   [SerializeField]
   User user;
+
+  RacingLineCreator racingLineCreator = new RacingLineCreator();
 
   List<GameObject> _meshHelpers = new List<GameObject> ();
   public List<GameObject> MeshHelpers {
@@ -22,26 +22,24 @@ public class MapRenderer : MapCreator {
     }
   }
 
-  float MapWidth = 80;
-  float MapHeight = 80;
+  float MapWidth = 100;
+  float MapHeight = 100;
   float CornerLerpStep = 0.1f;
   int PtsPerQuad = 500;
 
-  float PointSpacing = 3f;
-  int CornerWidth = 125;
+  float PointSpacing = 8f;
+  int CornerWidth = 100;
 
   public readonly short MeshTrackPointFreq = 30;
-  float MeshThickness = 1.2f;
+  public readonly float MeshThickness = 1.2f;
   int TrackColliderResolution = 13;
 
   //berm Decal creation settings
   int BermLength = 30;
-  float BermWidth = 0.2f;
-  float BermOffset = 1.2f;
+  float BermWidth = 0.2f, BermOffset = 1.2f;
 
   //barrier creation settings
-  public readonly float InnerBarrierOffset = 2f;
-  public readonly float OuterBarrierOffset = 2f;
+  public readonly float InnerBarrierOffset = 2f, OuterBarrierOffset = 2f;
   float BarrierThickness = 0.05f;
   int BarrierMeshPointFrequency = 9;
   int BarrierColliderResolution = 2;
@@ -66,26 +64,28 @@ public class MapRenderer : MapCreator {
   float RacingLineWaypointFreq = 10;
 
   public void GenerateNewTrackData (Track track) {
-
+    track.TrackPtFrequency = this.MeshTrackPointFreq;
+    track.TrackWidth = this.MeshThickness;
     track.RawPoints = new List<Vector2> ();
 
-    track.RawPoints = mapCreator.CreateRawUnsortedPoints (MapWidth, MapHeight, PtsPerQuad);
-    track.RawPoints = mapCreator.SortPoints (track.RawPoints);
+    track.RawPoints = CreateRawUnsortedPoints (MapWidth, MapHeight, PtsPerQuad);
+    track.RawPoints = SortPoints (track.RawPoints);
     //have to run point thinning and angle adjustment several times because they recursively affect each other.
     for (int i = 0; i < 50; i++) {
-      track.RawPoints = mapCreator.RemovePointsTooClose (track.RawPoints, PointSpacing);
-      track.RawPoints = mapCreator.CheckControlPointAngles (track.RawPoints, CornerLerpStep, CornerWidth);
+      track.RawPoints = RemovePointsTooClose (track.RawPoints, PointSpacing);
+      track.RawPoints = CheckControlPointAngles (track.RawPoints, CornerLerpStep, CornerWidth);
     }
 
     //track.RawPoints = MapCreator.ApplyRandomRotation(track.RawPoints);
-    track.ControlPoints = mapCreator.CreateControlPoints (track.RawPoints);
-    track.TrackPoints = mapCreator.CreateTrackPoints (track.ControlPoints, MeshTrackPointFreq);
+    track.ControlPoints = CreateControlPoints (track.RawPoints);
+    track.TrackPoints = CreateTrackPoints (track.ControlPoints, MeshTrackPointFreq);
 
-    track.RacingLinePoints = mapCreator.CreateRacingLinePoints (track.RawPoints, RacingLineWaypointFreq, RacingLineTightness);
-    MeshHelpers = mapCreator.CreateOrSetMeshHelperObjects (track.TrackPoints, MeshHelpers);
-    mapCreator.RotateTrackObjectsAlongCurves (MeshHelpers);
+    //track.RacingLinePoints = CreateRacingLinePoints (track.RawPoints, RacingLineWaypointFreq, RacingLineTightness);
+    track.RacingLinePoints = racingLineCreator.createRacingLine(track);
+    MeshHelpers = CreateOrSetMeshHelperObjects (track.TrackPoints, MeshHelpers);
+    RotateTrackObjectsAlongCurves (MeshHelpers);
     //populates track object with Tforms of all 
-    mapCreator.CreateStartingGridData (
+    CreateStartingGridData (
       MeshHelpers,
       StartingGridLength,
       StartingGridWidth,
@@ -100,14 +100,14 @@ public class MapRenderer : MapCreator {
   }
 
   public void GenerateLevel (Track track) {
-    mapCreator.CreateOrSetMeshHelperObjects (track.TrackPoints, MeshHelpers);
+    CreateOrSetMeshHelperObjects (track.TrackPoints, MeshHelpers);
 
-    mapCreator.RotateTrackObjectsAlongCurves (MeshHelpers);
+    RotateTrackObjectsAlongCurves (MeshHelpers);
 
     RenderStartingGrid (track, user.OpponentQty);
 
     //mesh creation
-    mapCreator.CreateTrackBerms (
+    CreateTrackBerms (
       MeshHelpers,
       BermWidth,
       BermOffset,
@@ -117,7 +117,7 @@ public class MapRenderer : MapCreator {
       MeshTrackPointFreq);
 
     //populates this track's 
-    mapCreator.CreateTrackMesh (
+    CreateTrackMesh (
       MeshHelpers,
       MeshThickness,
       CurrentGameTrack.gameObject.GetComponent<MeshFilter> (),
@@ -126,7 +126,7 @@ public class MapRenderer : MapCreator {
       //track.trackMeshData
     );
 
-    mapCreator.CreateColliderForTrack (
+    CreateColliderForTrack (
       track.OuterTrackPoints,
       track.InnerTrackPoints,
       TrackColliderResolution,
@@ -142,16 +142,16 @@ public class MapRenderer : MapCreator {
   }
 
   void CreateBarriers (List<Vector2> barrierRawPointData, Track track, GameObject barrierObj) {
-    List<Vector2> trackPoints = mapCreator.CreateControlPoints (barrierRawPointData);
-    trackPoints = mapCreator.CreateTrackPoints (trackPoints, BarrierMeshPointFrequency);
-    mapCreator.CreateOrSetMeshHelperObjects (trackPoints, MeshHelpers);
-    mapCreator.RotateTrackObjectsAlongCurves (MeshHelpers);
+    List<Vector2> trackPoints = CreateControlPoints (barrierRawPointData);
+    trackPoints = CreateTrackPoints (trackPoints, BarrierMeshPointFrequency);
+    CreateOrSetMeshHelperObjects (trackPoints, MeshHelpers);
+    RotateTrackObjectsAlongCurves (MeshHelpers);
 
     //lists to create colliders for barriers.
     List<Vector2> outerBarrierPts = new List<Vector2> ();
     List<Vector2> innerBarrierPts = new List<Vector2> ();
 
-    mapCreator.CreateTrackMesh (
+    CreateTrackMesh (
       MeshHelpers,
       BarrierThickness,
       barrierObj.GetComponent<MeshFilter> (),
@@ -160,7 +160,7 @@ public class MapRenderer : MapCreator {
       //track.outerBarrierData
     );
 
-    mapCreator.CreateColliderForTrack (
+    CreateColliderForTrack (
       outerBarrierPts,
       innerBarrierPts,
       BarrierColliderResolution,

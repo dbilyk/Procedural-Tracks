@@ -25,7 +25,6 @@ public class StartingLight : MonoBehaviour {
 
     void AnimationCompleted () {
 
-        gameObject.SetActive (false);
         animstarted = false;
         if (OnStartingLightsComplete != null) {
             OnStartingLightsComplete ();

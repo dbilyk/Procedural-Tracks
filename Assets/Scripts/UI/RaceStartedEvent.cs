@@ -10,4 +10,9 @@ public class RaceStartedEvent : MonoBehaviour {
 	public void RaceStarted () {
 		startingLight.animComplete ();
 	}
+
+//called from animation to disable the lights when done
+	public void Disable (){
+		gameObject.transform.parent.gameObject.SetActive (false);
+	}
 }

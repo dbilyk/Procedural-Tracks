@@ -135,7 +135,7 @@ public class User : MonoBehaviour {
         critterMobManager.OnCritterHit += userHitCritter;
         mapSelector.OnClickStartRace += targetTrack;
         mapSelector.OnClickNewTrackCoins += NewTrackPurchase;
-
+        
         //if we have some persistent saved tracks, Open them and assign to savedTracks
         if (Open<savedTracks> (savedTracksPath) != null) {
             //populates SavedTracks with the serialized tracks retrieved by the Open() method

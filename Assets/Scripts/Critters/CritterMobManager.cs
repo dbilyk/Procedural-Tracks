@@ -5,6 +5,7 @@ using UnityEngine;
 public enum CritterType { sml, med, lrg, leg }
 
 public class CritterMobManager : MonoBehaviour {
+    public GameObject CritterContainer;
     [Tooltip ("How many points ahead of players current closest point on track does the mob spawn")]
     public int SpawnPointsLookahead = 2;
     public float SmlCritterSpawnAreaWidth = 0.5f;
@@ -46,12 +47,6 @@ public class CritterMobManager : MonoBehaviour {
 
     public GameObject Player;
     Camera cam;
-
-    public GameObject CritterContainer;
-    //for baked meshes
-    public GameObject BakedCritters;
-    public GameObject BakedCritterInstance;
-
     private List<GameObject> SmlCritterPool = new List<GameObject> ();
     private List<GameObject> MedCritterPool = new List<GameObject> ();
     private List<GameObject> LgCritterPool = new List<GameObject> ();
@@ -101,13 +96,10 @@ public class CritterMobManager : MonoBehaviour {
         LastNearestPointToPlayer = nearestTrackIndex;
         int mobSpawnIndex;
         //makes sure mob spawn points loop across zero index
-        if (nearestTrackIndex + SpawnPointsLookahead > thinnedTrackPoints.Count - 1) {
-            mobSpawnIndex = (nearestTrackIndex + SpawnPointsLookahead) - thinnedTrackPoints.Count;
-        } else {
-            mobSpawnIndex = nearestTrackIndex + SpawnPointsLookahead;
-        }
+        mobSpawnIndex = (nearestTrackIndex + SpawnPointsLookahead) % thinnedTrackPoints.Count;
+        
         Vector2 SpawnCenterPoint = thinnedTrackPoints[mobSpawnIndex];
-        SpawnCenterPoint = new Vector2 (SpawnCenterPoint.x + Random.Range (-1, 1), SpawnCenterPoint.y + Random.Range (-1, 1));
+        SpawnCenterPoint = SpawnCenterPoint + Random.insideUnitCircle;
 
         List<GameObject> TargetCritterType = new List<GameObject> ();
         List<GameObject> TargetCritterPool = new List<GameObject> ();
@@ -146,34 +138,10 @@ public class CritterMobManager : MonoBehaviour {
             Vector2 AnimalInScreenCoords = cam.WorldToScreenPoint (TargetCritterPool[i].transform.position);
             if ((AnimalInScreenCoords.x > Screen.width + 50 || AnimalInScreenCoords.y > Screen.height + 50) && (AnimalInScreenCoords.x < -50 || AnimalInScreenCoords.y < -50)) {
                 GameObject CritterChild = TargetCritterPool[i].transform.GetChild (0).gameObject;
-                //NEED TO FIX THIS CHECK TO DEFINITIVELY DETERMIN THAT THE ANIMAL WAS HIT< AND NOT JUST OUT OF VIEW
-                if (!CritterChild.GetComponent<AnimalController> ().Bones[0].isKinematic) {
-                    Mesh bakedCarcass = new Mesh ();
-                    try {
-                        SkinnedMeshRenderer skin = CritterChild.GetComponent<SkinnedMeshRenderer> ();
-                        CritterChild.transform.localPosition = Vector3.zero;
-                        CritterChild.transform.rotation = TargetCritterPool[i].transform.rotation;
-                        CritterChild.GetComponent<SkinnedMeshRenderer> ().BakeMesh (bakedCarcass);
-
-                    } catch {
-                        CritterChild.transform.localPosition = Vector3.zero;
-                        CritterChild.transform.rotation = Quaternion.Euler (0, 0, 0);
-                        CritterChild.gameObject.GetComponentInChildren<SkinnedMeshRenderer> ().BakeMesh (bakedCarcass);
-                    }
-                    GameObject newBakedCritter = Instantiate (BakedCritterInstance, BakedCritters.transform);
-                    newBakedCritter.transform.position = TargetCritterPool[i].transform.position;
-                    newBakedCritter.transform.rotation = TargetCritterPool[i].transform.rotation;
-                    newBakedCritter.GetComponent<MeshFilter> ().mesh = bakedCarcass;
-
-                    GameObject[] preptoBake = new GameObject[1];
-                    preptoBake[0] = newBakedCritter;
-                    StaticBatchingUtility.Combine (preptoBake, BakedCritters);
-
-                }
-
                 CritterChild.SetActive (false);
             }
         }
+        
 
         //trigger
         for (int i = 0; i < TargetCritterDensity; i++) {
@@ -204,6 +172,7 @@ public class CritterMobManager : MonoBehaviour {
             yield return new WaitForSeconds (0.1f);
         }
         Spawned = false;
+
     }
 
 }

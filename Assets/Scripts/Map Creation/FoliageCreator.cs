@@ -37,6 +37,7 @@ public class FoliageCreator : MonoBehaviour {
 
   private void MakeEquidistantData(Track track,float barrierOffset, bool isInner, short frequency){
     List<Vector2> FoliagePath       = barrierCreator.CreateOutline (track.RawPoints, barrierOffset + FoliageOffset, (isInner)?"inner":"outer");
+                  FoliagePath       = mapRenderer.CreateControlPoints(FoliagePath);
                   FoliagePath       = mapCreator.CreateTrackPoints (FoliagePath, frequency);
     List<Vector2> Result            = new List<Vector2>(); 
                   
@@ -73,7 +74,7 @@ public class FoliageCreator : MonoBehaviour {
       if (rand < FoliageDensity) {
         int        randIndex                  = Random.Range (0, Foliage.Count);
         GameObject newItem                    = GameObject.Instantiate (Foliage[randIndex], gameObject.transform);
-                   newItem.transform.position = SceneryLocs[i];
+                   newItem.transform.position = new Vector2(Random.insideUnitCircle.x + SceneryLocs[i].x,Random.insideUnitCircle.y + SceneryLocs[i].y);
                    newItem.transform.rotation = Quaternion.Euler(0,0,Random.value * 360);
        //if there are too many children under parent, create a new parent before adding to last parent 
         if(TreeBatches[TreeBatches.Count - 1].transform.childCount > RenderBatchSize){

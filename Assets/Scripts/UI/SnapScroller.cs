@@ -102,7 +102,6 @@ public class SnapScroller : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 	List<float> velocitiesThisDrag = new List<float> ();
 	IEnumerator drag (PointerEventData e) {
 		while (true) {
-			Debug.Log (centerOffset);
 			yield return new WaitForEndOfFrame ();
 			velocity = -e.delta.x;
 			velocitiesThisDrag.Add (velocity);

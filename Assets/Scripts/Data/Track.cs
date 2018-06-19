@@ -47,6 +47,8 @@ public class Quat {
 
 [Serializable]
 public class Track {
+  public int TrackPtFrequency;
+  public float TrackWidth;
   //populated on GenerateLevel
   public List<Vector2> OuterTrackPoints = new List<Vector2> ();
   public List<Vector2> InnerTrackPoints = new List<Vector2> ();
@@ -72,6 +74,9 @@ public class Track {
 
   //cloning constructor, yes this is BAD because now i have to update it when new fields added...
   public Track (Track t) {
+
+    this.TrackPtFrequency = t.TrackPtFrequency;
+    this.TrackWidth = t.TrackWidth;
     this.OuterTrackPoints = t.OuterTrackPoints;
     this.InnerTrackPoints = t.InnerTrackPoints;
     this.OuterBarrierRawPoints = t.OuterBarrierRawPoints;
@@ -89,6 +94,8 @@ public class Track {
   public Track () { }
   //populates this track object with equivalent sTrack data
   public void DeserializeTrack (sTrack serializedVersion) {
+    this.TrackPtFrequency = serializedVersion.TrackPtFrequency;
+    this.TrackWidth = serializedVersion.TrackWidth;
     this.OuterTrackPoints = serializedVersion.OuterTrackPoints.DeserializeListV2 ();
     this.InnerTrackPoints = serializedVersion.InnerTrackPoints.DeserializeListV2 ();
     this.OuterBarrierRawPoints = serializedVersion.OuterBarrierRawPoints.DeserializeListV2 ();
@@ -111,6 +118,8 @@ public class Track {
 
   public sTrack toSerializedTrack () {
     sTrack result = new sTrack ();
+    result.TrackPtFrequency = this.TrackPtFrequency;
+    result.TrackWidth = this.TrackWidth;
     result.OuterTrackPoints = this.OuterTrackPoints.SerializeListV2 ();
     result.InnerTrackPoints = this.InnerTrackPoints.SerializeListV2 ();
     result.OuterBarrierRawPoints = this.OuterBarrierRawPoints.SerializeListV2 ();
@@ -139,6 +148,8 @@ public class Track {
 //this is the serializable version of my track data
 [Serializable]
 public class sTrack {
+  public int TrackPtFrequency;
+  public float TrackWidth;
   //populated on GenerateLevel
   public List<V2> OuterTrackPoints = new List<V2> ();
   public List<V2> InnerTrackPoints = new List<V2> ();

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class AnimalController : MonoBehaviour {
     public CritterMobManager critterMobManager;
+
     public User user;
     public Rigidbody2D Player;
     public Camera cam;
@@ -11,6 +12,9 @@ public class AnimalController : MonoBehaviour {
     public Animator AnimControl;
     public ParticleSystem BloodSplatter;
     bool animalHit = false;
+
+    [SerializeField]
+    VoxelBloodController bloodController;
 
     private CritterType _myType;
     public CritterType MyType {
@@ -22,11 +26,12 @@ public class AnimalController : MonoBehaviour {
         }
     }
 
-    public delegate void AnimalHit (CritterType type);
-    public event AnimalHit OnAnimalHit;
+    void Awake(){
+        bloodController = GameObject.FindGameObjectWithTag("BloodController").GetComponent<VoxelBloodController>();
+    }
+
 
     void OnEnable () {
-
         //reoptimizes hierarchy for animation playback when the object is reinstantiated from the pool
         Rigidbody[] ExposedBones = AnimControl.gameObject.transform.GetComponentsInChildren<Rigidbody> ();
         if (animalHit == true) {
@@ -58,11 +63,14 @@ public class AnimalController : MonoBehaviour {
         if (col.tag == "Player" || col.tag == "AI")
 
         {
+            animalHit = true;
+            GameObject player = col.gameObject;
+            Rigidbody2D playerRB = player.GetComponent<Rigidbody2D>();
+            bloodController.SpawnBlood(playerRB.velocity, playerRB.velocity.magnitude,player.transform.position, gameObject.transform.position);
             AnimatorUtility.DeoptimizeTransformHierarchy (AnimControl.gameObject);
             AnimControl.enabled = false;
-            StartCoroutine ("DelayedBlood");
+            //StartCoroutine ("DelayedBlood");
             foreach (Rigidbody RB in Bones) {
-                GameObject player = col.gameObject;
                 RB.isKinematic = false;
                 RB.AddForce (((gameObject.transform.position - (player.transform.position - player.transform.right)).normalized + new Vector3 (0, 0, 1.5f)) * player.GetComponent<Rigidbody2D>().velocity.magnitude * 2, ForceMode.Impulse);
             }
@@ -75,37 +83,37 @@ public class AnimalController : MonoBehaviour {
         }
     }
 
-    IEnumerator DelayedBlood () {
-        yield return new WaitForSeconds (0.02f);
-        animalHit = true;
-        ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
-        emmiter.enabled = true;
-        BloodSplatter.Play ();
-        StartCoroutine (SetObjectState ());
+    // IEnumerator DelayedBlood () {
+    //     yield return new WaitForSeconds (0.02f);
+    //     animalHit = true;
+    //     ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
+    //     emmiter.enabled = true;
+    //     BloodSplatter.Play ();
+    //     StartCoroutine (SetObjectState ());
 
-    }
+    // }
 
-    IEnumerator SetObjectState () {
-        if (BloodSplatter.isPlaying) {
-            ParticleSystem.Particle[] BloodParticles = new ParticleSystem.Particle[BloodSplatter.particleCount];
-            BloodSplatter.GetParticles (BloodParticles);
-            for (int i = 0; i < BloodParticles.Length; i++) {
-                if (BloodParticles[i].startLifetime - BloodParticles[i].remainingLifetime < 0.05f) {
-                    BloodParticles[i].velocity = Quaternion.Euler (0, 0, Random.Range (10, -10)) * Bones[0].GetComponent<Rigidbody> ().velocity * Random.Range (5, 20);
+    // IEnumerator SetObjectState () {
+    //     if (BloodSplatter.isPlaying) {
+    //         ParticleSystem.Particle[] BloodParticles = new ParticleSystem.Particle[BloodSplatter.particleCount];
+    //         BloodSplatter.GetParticles (BloodParticles);
+    //         for (int i = 0; i < BloodParticles.Length; i++) {
+    //             if (BloodParticles[i].startLifetime - BloodParticles[i].remainingLifetime < 0.05f) {
+    //                 BloodParticles[i].velocity = Quaternion.Euler (0, 0, Random.Range (10, -10)) * Bones[0].GetComponent<Rigidbody> ().velocity * Random.Range (5, 20);
 
-                }
+    //             }
 
-                BloodParticles[i].position = new Vector3 (BloodParticles[i].position.x, BloodParticles[i].position.y, 0f);
+    //             BloodParticles[i].position = new Vector3 (BloodParticles[i].position.x, BloodParticles[i].position.y, 0f);
 
-            }
-            BloodSplatter.SetParticles (BloodParticles, BloodParticles.Length);
-            //setParticleVelocity = true;
+    //         }
+    //         BloodSplatter.SetParticles (BloodParticles, BloodParticles.Length);
+    //         //setParticleVelocity = true;
 
-        }
+    //     }
 
-        yield return null;
-        StartCoroutine (BakeDeadCritter ());
-    }
+    //     yield return null;
+    //     StartCoroutine (BakeDeadCritter ());
+    // //}
 
     IEnumerator BakeDeadCritter () {
         while (true) {
