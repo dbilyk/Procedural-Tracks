@@ -53,7 +53,8 @@ public class VoxelBloodController : MonoBehaviour {
 			voxel.SetActive(true);
 			Rigidbody rb = voxel.GetComponent<Rigidbody>();
 			rb.AddExplosionForce(velMag*10*(Random.value*3),carPos+Random.insideUnitCircle*0.2f,100f,0f);
-			rb.AddForce(new Vector3(0,0,-2f+(Random.value*2)) + (Vector3)(velocity.normalized)*(5+(Random.value*3)),ForceMode.Impulse);
+			Vector3 forceVector = new Vector3(0,0,Random.Range(-4f,-2f)) + (Vector3)(velocity.normalized*(Random.Range(0,3f))*velocity.sqrMagnitude/20); 
+			rb.AddForce(forceVector,ForceMode.Impulse);
 		}
 	}
 }

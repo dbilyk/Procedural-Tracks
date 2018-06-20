@@ -69,9 +69,13 @@ public class Track {
   public List<Tform> CarStartingPositions = new List<Tform> ();
   public Tform StartingLineTform = new Tform ();
 
-  public List<Vector2> InnerFoliageLocs = new List<Vector2> ();
-  public List<Vector2> OuterFoliageLocs = new List<Vector2> ();
+  public List<Vector2> SmallEnvModelLocsInner = new List<Vector2> ();
+  public List<Vector2> LrgEnvModelLocsInner = new List<Vector2>();
+   
+  public List<Vector2> SmallEnvModelLocsOuter = new List<Vector2> ();
+  public List<Vector2> LrgEnvModelLocsOuter = new List<Vector2>();
 
+  public List<Tform> LandmarkLocs = new List<Tform>();
   //cloning constructor, yes this is BAD because now i have to update it when new fields added...
   public Track (Track t) {
 
@@ -87,8 +91,16 @@ public class Track {
     this.RacingLinePoints = t.RacingLinePoints;
     this.CarStartingPositions = t.CarStartingPositions;
     this.StartingLineTform = t.StartingLineTform;
-    this.InnerFoliageLocs = t.InnerFoliageLocs;
-    this.OuterFoliageLocs = t.OuterFoliageLocs;
+    
+    this.SmallEnvModelLocsInner = t.SmallEnvModelLocsInner;
+    this.SmallEnvModelLocsOuter = t.SmallEnvModelLocsOuter;
+    
+    this.LrgEnvModelLocsInner = t.LrgEnvModelLocsInner;
+    this.LrgEnvModelLocsOuter = t.LrgEnvModelLocsOuter;
+    
+    this.LandmarkLocs = t.LandmarkLocs;
+
+    
 
   }
   public Track () { }
@@ -104,8 +116,20 @@ public class Track {
     this.ControlPoints = serializedVersion.ControlPoints.DeserializeListV2 ();
     this.TrackPoints = serializedVersion.TrackPoints.DeserializeListV2 ();
     this.RacingLinePoints = serializedVersion.RacingLinePoints.DeserializeListV2 ();
-    this.InnerFoliageLocs = serializedVersion.InnerFoliageLocs.DeserializeListV2 ();
-    this.OuterFoliageLocs = serializedVersion.OuterFoliageLocs.DeserializeListV2 ();
+
+    this.SmallEnvModelLocsInner = serializedVersion.SmallEnvModelLocsInner.DeserializeListV2 ();
+    this.SmallEnvModelLocsOuter = serializedVersion.SmallEnvModelLocsOuter.DeserializeListV2 ();
+
+    this.LrgEnvModelLocsInner = serializedVersion.LrgEnvModelLocsInner.DeserializeListV2 ();
+    this.LrgEnvModelLocsOuter = serializedVersion.LrgEnvModelLocsOuter.DeserializeListV2 ();
+
+    for (int i = 0; i < serializedVersion.LandmarkLocs.Count; i++) {
+      Tform serialCopy = new Tform ();
+      serialCopy.position = serializedVersion.LandmarkLocs[i].position.DeserializeV3 ();
+      serialCopy.rotation = serializedVersion.LandmarkLocs[i].rotation.DeserializeQuat ();
+      this.LandmarkLocs.Add (serialCopy);
+    }
+
     for (int i = 0; i < serializedVersion.CarStartingPositions.Count; i++) {
       Tform serialCopy = new Tform ();
       serialCopy.position = serializedVersion.CarStartingPositions[i].position.DeserializeV3 ();
@@ -120,6 +144,7 @@ public class Track {
     sTrack result = new sTrack ();
     result.TrackPtFrequency = this.TrackPtFrequency;
     result.TrackWidth = this.TrackWidth;
+
     result.OuterTrackPoints = this.OuterTrackPoints.SerializeListV2 ();
     result.InnerTrackPoints = this.InnerTrackPoints.SerializeListV2 ();
     result.OuterBarrierRawPoints = this.OuterBarrierRawPoints.SerializeListV2 ();
@@ -127,9 +152,22 @@ public class Track {
     result.RawPoints = this.RawPoints.SerializeListV2 ();
     result.ControlPoints = this.ControlPoints.SerializeListV2 ();
     result.TrackPoints = this.TrackPoints.SerializeListV2 ();
+
     result.RacingLinePoints = this.RacingLinePoints.SerializeListV2 ();
-    result.InnerFoliageLocs = this.InnerFoliageLocs.SerializeListV2 ();
-    result.OuterFoliageLocs = this.OuterFoliageLocs.SerializeListV2 ();
+    result.SmallEnvModelLocsInner = this.SmallEnvModelLocsInner.SerializeListV2 ();
+    result.SmallEnvModelLocsOuter = this.SmallEnvModelLocsOuter.SerializeListV2 ();
+    
+
+    result.LrgEnvModelLocsInner = this.LrgEnvModelLocsInner.SerializeListV2 ();
+    result.LrgEnvModelLocsOuter = this.LrgEnvModelLocsOuter.SerializeListV2 ();
+    
+   for (int i = 0; i < this.LandmarkLocs.Count; i++) {
+      sTform serialCopy = new sTform ();
+      serialCopy.position = this.LandmarkLocs[i].position.SerializeV3 ();
+      serialCopy.rotation = this.LandmarkLocs[i].rotation.SerializeQuat ();
+      result.LandmarkLocs.Add (serialCopy);
+    } 
+    
     for (int i = 0; i < this.CarStartingPositions.Count; i++) {
       sTform serialCopy = new sTform ();
       serialCopy.position = this.CarStartingPositions[i].position.SerializeV3 ();
@@ -166,7 +204,11 @@ public class sTrack {
   public List<sTform> CarStartingPositions = new List<sTform> ();
   public sTform StartingLineTform = new sTform ();
 
-  public List<V2> InnerFoliageLocs = new List<V2> ();
-  public List<V2> OuterFoliageLocs = new List<V2> ();
+  public List<V2> SmallEnvModelLocsInner = new List<V2> ();
+  public List<V2> SmallEnvModelLocsOuter = new List<V2> ();
+  public List<V2> LrgEnvModelLocsInner = new List<V2> ();
+  public List<V2> LrgEnvModelLocsOuter = new List<V2> ();
+
+  public List<sTform> LandmarkLocs = new List<sTform>();
 
 }

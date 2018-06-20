@@ -94,6 +94,7 @@
      <Compile Include="Assets\Scripts\UI\UI_Skins.cs" />
      <Compile Include="Assets\Scripts\Utility\OnOff.cs" />
      <None Include="Assets\Fonts\OFL.txt" />
+     <None Include="Assets\Scripts\TODO.txt" />
  <Reference Include="UnityEngine.Analytics">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>

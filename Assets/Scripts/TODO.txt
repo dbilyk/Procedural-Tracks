@@ -1,0 +1,40 @@
+ENVIRONMENT
+Add two tracks of foliage data, plus building locations to Track object.
+  Make inner foliage loops smaller elements
+  Make outer foliage loops consist of trees, hay and bushes
+  find where to place barns
+  try striped BGmesh texture
+
+CRITTERS
+  finish all critters texture mapping
+  Finish all critter rigging
+  Finish all critter animations
+  Re-rig all critters with char joints
+
+UI
+  Game Over Screen
+    
+
+  Map Picker
+    Wireframe Map Selector Screen again.
+    Hook up corner-Count sliders
+    Create enticing mystery animation for new map gen.
+    Add track name input to slides
+    Add fastest lap time to sliders
+
+  Pause Menu
+    Revise/Review Design (Bottom Sheet approach?)
+  
+  Car Picker
+    Adapt map picker functionality to car picker.
+    Create pedestal car display 
+    Create car spin machine model/animation
+    Create car WIN animation
+      Race this car
+    Create car Try Again animation
+    price display for each car
+    performance metrics for each car (acceleration, top speed, grip, steering sensitivity)
+
+
+  Online Betting Functionality
+

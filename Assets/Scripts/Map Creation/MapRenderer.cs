@@ -96,7 +96,7 @@ public class MapRenderer : MapCreator {
     //create barrier data
     track.InnerBarrierRawPoints = barrierCreator.CreateOutline (track.RawPoints, InnerBarrierOffset, "inner");
     track.OuterBarrierRawPoints = barrierCreator.CreateOutline (track.RawPoints, OuterBarrierOffset, "outer");
-    foliageCreator.GenerateFoliageData (track);
+    foliageCreator.GenerateEnvironmentData (track);
   }
 
   public void GenerateLevel (Track track) {
@@ -137,7 +137,7 @@ public class MapRenderer : MapCreator {
     CreateBarriers (track.InnerBarrierRawPoints, track, InnerBarrier);
     CreateBarriers (track.OuterBarrierRawPoints, track, OuterBarrier);
 
-    foliageCreator.RenderFoliage (track);
+    foliageCreator.RenderEnvironment (track);
 
   }
 
