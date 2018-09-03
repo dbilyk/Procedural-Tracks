@@ -47,9 +47,10 @@ public class Quat {
 
 [Serializable]
 public class Track {
-  public int TrackPtFrequency;
-  public float TrackWidth;
-  //populated on GenerateLevel
+  public int CornerCount, TrackPtFrequency;
+  public float GoldMultiplier,SilverMultiplier, BronzeMultiplier, Length, FastestLap, TrackWidth;
+  public string Name;
+
   public List<Vector2> OuterTrackPoints = new List<Vector2> ();
   public List<Vector2> InnerTrackPoints = new List<Vector2> ();
 
@@ -58,6 +59,7 @@ public class Track {
   //public MeshData innerBarrierData = new MeshData ();
 
   //populated on track GenerateNewTrackData()
+
   public List<Vector2> OuterBarrierRawPoints = new List<Vector2> ();
   public List<Vector2> InnerBarrierRawPoints = new List<Vector2> ();
   public List<Vector2> RawPoints = new List<Vector2> ();
@@ -78,9 +80,17 @@ public class Track {
   public List<Tform> LandmarkLocs = new List<Tform>();
   //cloning constructor, yes this is BAD because now i have to update it when new fields added...
   public Track (Track t) {
-
     this.TrackPtFrequency = t.TrackPtFrequency;
     this.TrackWidth = t.TrackWidth;
+
+    this.CornerCount = t.CornerCount;
+    this.Length = t.Length;
+    this.FastestLap = t.FastestLap;
+    this.GoldMultiplier = t.GoldMultiplier;
+    this.SilverMultiplier = t.SilverMultiplier;
+    this.BronzeMultiplier = t.BronzeMultiplier;
+    this.Name = t.Name;
+
     this.OuterTrackPoints = t.OuterTrackPoints;
     this.InnerTrackPoints = t.InnerTrackPoints;
     this.OuterBarrierRawPoints = t.OuterBarrierRawPoints;
@@ -105,43 +115,62 @@ public class Track {
   }
   public Track () { }
   //populates this track object with equivalent sTrack data
-  public void DeserializeTrack (sTrack serializedVersion) {
-    this.TrackPtFrequency = serializedVersion.TrackPtFrequency;
-    this.TrackWidth = serializedVersion.TrackWidth;
-    this.OuterTrackPoints = serializedVersion.OuterTrackPoints.DeserializeListV2 ();
-    this.InnerTrackPoints = serializedVersion.InnerTrackPoints.DeserializeListV2 ();
-    this.OuterBarrierRawPoints = serializedVersion.OuterBarrierRawPoints.DeserializeListV2 ();
-    this.InnerBarrierRawPoints = serializedVersion.InnerBarrierRawPoints.DeserializeListV2 ();
-    this.RawPoints = serializedVersion.RawPoints.DeserializeListV2 ();
-    this.ControlPoints = serializedVersion.ControlPoints.DeserializeListV2 ();
-    this.TrackPoints = serializedVersion.TrackPoints.DeserializeListV2 ();
-    this.RacingLinePoints = serializedVersion.RacingLinePoints.DeserializeListV2 ();
+  public void DeserializeTrack (sTrack serialTrack) {
+    this.CornerCount = serialTrack.CornerCount;
+    this.Length = serialTrack.Length;
+    this.FastestLap = serialTrack.FastestLap;
+    this.GoldMultiplier = serialTrack.GoldMultiplier;
+    this.SilverMultiplier = serialTrack.SilverMultiplier;
+    this.BronzeMultiplier = serialTrack.BronzeMultiplier;
+    this.Name = serialTrack.Name;
 
-    this.SmallEnvModelLocsInner = serializedVersion.SmallEnvModelLocsInner.DeserializeListV2 ();
-    this.SmallEnvModelLocsOuter = serializedVersion.SmallEnvModelLocsOuter.DeserializeListV2 ();
 
-    this.LrgEnvModelLocsInner = serializedVersion.LrgEnvModelLocsInner.DeserializeListV2 ();
-    this.LrgEnvModelLocsOuter = serializedVersion.LrgEnvModelLocsOuter.DeserializeListV2 ();
+    this.TrackPtFrequency = serialTrack.TrackPtFrequency;
+    this.TrackWidth = serialTrack.TrackWidth;
+    this.OuterTrackPoints = serialTrack.OuterTrackPoints.DeserializeListV2 ();
+    this.InnerTrackPoints = serialTrack.InnerTrackPoints.DeserializeListV2 ();
+    this.OuterBarrierRawPoints = serialTrack.OuterBarrierRawPoints.DeserializeListV2 ();
+    this.InnerBarrierRawPoints = serialTrack.InnerBarrierRawPoints.DeserializeListV2 ();
+    this.RawPoints = serialTrack.RawPoints.DeserializeListV2 ();
+    this.ControlPoints = serialTrack.ControlPoints.DeserializeListV2 ();
+    this.TrackPoints = serialTrack.TrackPoints.DeserializeListV2 ();
+    this.RacingLinePoints = serialTrack.RacingLinePoints.DeserializeListV2 ();
 
-    for (int i = 0; i < serializedVersion.LandmarkLocs.Count; i++) {
+    this.SmallEnvModelLocsInner = serialTrack.SmallEnvModelLocsInner.DeserializeListV2 ();
+    this.SmallEnvModelLocsOuter = serialTrack.SmallEnvModelLocsOuter.DeserializeListV2 ();
+
+    this.LrgEnvModelLocsInner = serialTrack.LrgEnvModelLocsInner.DeserializeListV2 ();
+    this.LrgEnvModelLocsOuter = serialTrack.LrgEnvModelLocsOuter.DeserializeListV2 ();
+
+    for (int i = 0; i < serialTrack.LandmarkLocs.Count; i++) {
       Tform serialCopy = new Tform ();
-      serialCopy.position = serializedVersion.LandmarkLocs[i].position.DeserializeV3 ();
-      serialCopy.rotation = serializedVersion.LandmarkLocs[i].rotation.DeserializeQuat ();
+      serialCopy.position = serialTrack.LandmarkLocs[i].position.DeserializeV3 ();
+      serialCopy.rotation = serialTrack.LandmarkLocs[i].rotation.DeserializeQuat ();
       this.LandmarkLocs.Add (serialCopy);
     }
 
-    for (int i = 0; i < serializedVersion.CarStartingPositions.Count; i++) {
+    for (int i = 0; i < serialTrack.CarStartingPositions.Count; i++) {
       Tform serialCopy = new Tform ();
-      serialCopy.position = serializedVersion.CarStartingPositions[i].position.DeserializeV3 ();
-      serialCopy.rotation = serializedVersion.CarStartingPositions[i].rotation.DeserializeQuat ();
+      serialCopy.position = serialTrack.CarStartingPositions[i].position.DeserializeV3 ();
+      serialCopy.rotation = serialTrack.CarStartingPositions[i].rotation.DeserializeQuat ();
       this.CarStartingPositions.Add (serialCopy);
     }
-    this.StartingLineTform.position = serializedVersion.StartingLineTform.position.DeserializeV3 ();
-    this.StartingLineTform.rotation = serializedVersion.StartingLineTform.rotation.DeserializeQuat ();
+    this.StartingLineTform.position = serialTrack.StartingLineTform.position.DeserializeV3 ();
+    this.StartingLineTform.rotation = serialTrack.StartingLineTform.rotation.DeserializeQuat ();
   }
 
   public sTrack toSerializedTrack () {
     sTrack result = new sTrack ();
+
+    result.CornerCount = this.CornerCount;
+    result.Length = this.Length;
+    result.FastestLap = this.FastestLap;
+    result.GoldMultiplier = this.GoldMultiplier;
+    result.SilverMultiplier = this.SilverMultiplier;
+    result.BronzeMultiplier = this.BronzeMultiplier;
+    result.Name = this.Name;
+    
+
     result.TrackPtFrequency = this.TrackPtFrequency;
     result.TrackWidth = this.TrackWidth;
 
@@ -186,8 +215,10 @@ public class Track {
 //this is the serializable version of my track data
 [Serializable]
 public class sTrack {
-  public int TrackPtFrequency;
-  public float TrackWidth;
+  public int CornerCount, TrackPtFrequency;
+  public float GoldMultiplier,SilverMultiplier, BronzeMultiplier, Length, FastestLap, TrackWidth;
+  public string Name; 
+
   //populated on GenerateLevel
   public List<V2> OuterTrackPoints = new List<V2> ();
   public List<V2> InnerTrackPoints = new List<V2> ();

@@ -4,10 +4,33 @@ using UnityEngine;
 
 public enum CritterType { sml, med, lrg, leg }
 
+
+class CritterParams{
+    public TrackSkins Skin;
+    public float SpawnWidth {get;set;}
+    public float Odds {get;set;}
+    public int Density {get;set;}
+    public List<GameObject> Selection{get; set;}
+    public List<GameObject> Pool {get;set;}
+
+    CritterParams(TrackSkins skin,List<GameObject> selection, float odds, int density, float spawnWidth){
+        this.Skin = skin;
+        this.Selection = new List<GameObject> (selection);
+        this.Pool = new List<GameObject>();
+        this.Odds = odds;
+        this.Density = density;
+        this.SpawnWidth = spawnWidth;
+    }
+
+}
+
 public class CritterMobManager : MonoBehaviour {
     public GameObject CritterContainer;
     [Tooltip ("How many points ahead of players current closest point on track does the mob spawn")]
     public int SpawnPointsLookahead = 2;
+
+    private CritterParams FarmCrits, MtnCrits, DesertCrits, SnowCrits; 
+
     public float SmlCritterSpawnAreaWidth = 0.5f;
     public float MedCritterSpawnAreaWidth = 0.7f;
     public float LgCritterSpawnAreaWidth = 1f;
@@ -35,11 +58,11 @@ public class CritterMobManager : MonoBehaviour {
     public int LegendaryCritterDensity = 3;
 
     [Tooltip ("List index must correspond with TrackSkin Enum in Data class")]
-    public List<GameObject> SmlCritters = new List<GameObject> ();
+    public List<GameObject> smlCritterSelection = new List<GameObject> ();
     [Tooltip ("List index must correspond with TrackSkin Enum in Data class")]
-    public List<GameObject> MedCritters = new List<GameObject> ();
+    public List<GameObject> medCritters = new List<GameObject> ();
     [Tooltip ("List index must correspond with TrackSkin Enum in Data class")]
-    public List<GameObject> LgCritters = new List<GameObject> ();
+    public List<GameObject> lgCritters = new List<GameObject> ();
 
     public List<GameObject> LegendaryCritters = new List<GameObject> ();
 
@@ -67,6 +90,8 @@ public class CritterMobManager : MonoBehaviour {
     public event critterHit OnCritterHit;
 
     void OnEnable () {
+        
+
         CritterHit = new critterHit (_critterHit);
         cam = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
         Spawned = false;
@@ -83,6 +108,9 @@ public class CritterMobManager : MonoBehaviour {
         }
 
     }
+    
+    
+
 
     IEnumerator SpawnMob () {
         yield return new WaitForSeconds (Random.Range (SecsBetweenSpawns - 1f, SecsBetweenSpawns + 1f));
@@ -106,6 +134,11 @@ public class CritterMobManager : MonoBehaviour {
         int TargetCritterDensity;
         float targetSpawnAreaWidth;
         CritterType critterType;
+
+        // void setTargetParams(){
+        //     Debug.Log("hi");
+        // }
+
         //picks the type of critter and density for the current Mob.
         float RandomCritterSelector = Random.value;
         if (RandomCritterSelector < SmlCritterOdds) {

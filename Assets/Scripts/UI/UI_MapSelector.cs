@@ -10,6 +10,8 @@ public enum AIDifficulty {
 }
 
 public class UI_MapSelector : MonoBehaviour {
+	[SerializeField]
+	MapRenderer mapRenderer;
 	Animator Anim;
 
 	[SerializeField]
@@ -112,6 +114,8 @@ public class UI_MapSelector : MonoBehaviour {
 			OnClickNewTrackCoins ();
 		}
 	}
+
+	
 
 	//listeners for the slider callbacks pass the new value on to the events.
 	float prevWidth = 0;

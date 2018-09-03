@@ -37,8 +37,8 @@ public class AnimalController : MonoBehaviour {
         if (animalHit == true) {
             AnimControl.enabled = true;
             gameObject.GetComponent<CircleCollider2D> ().enabled = true;
-            ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
-            emmiter.enabled = false;
+            //ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
+            //emmiter.enabled = false;
             for (int i = 0; i < ExposedBones.Length; i++) {
                 ExposedBones[i].isKinematic = true;
 
@@ -115,21 +115,21 @@ public class AnimalController : MonoBehaviour {
     //     StartCoroutine (BakeDeadCritter ());
     // //}
 
-    IEnumerator BakeDeadCritter () {
-        while (true) {
-            //turn off emission when critter slows down
-            if (animalHit && Bones[0].velocity.sqrMagnitude < 0.01f) {
-                ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
-                emmiter.enabled = false;
+    // IEnumerator BakeDeadCritter () {
+    //     while (true) {
+    //         //turn off emission when critter slows down
+    //         if (animalHit && Bones[0].velocity.sqrMagnitude < 0.01f) {
+    //             ParticleSystem.EmissionModule emmiter = BloodSplatter.emission;
+    //             emmiter.enabled = false;
 
-            }
-            Vector3 AnimalPixelLoc = cam.WorldToScreenPoint (Bones[0].transform.position);
-            if (animalHit && Bones[0].velocity.sqrMagnitude < 0.001f && AnimalPixelLoc.x > Screen.width + 20 || AnimalPixelLoc.x < -20 || AnimalPixelLoc.y > Screen.height + 20 || AnimalPixelLoc.y < -20) {
-                gameObject.SetActive (false);
-                break;
-            }
-            yield return new WaitForSeconds (1f);
-        }
-    }
+    //         }
+    //         Vector3 AnimalPixelLoc = cam.WorldToScreenPoint (Bones[0].transform.position);
+    //         if (animalHit && Bones[0].velocity.sqrMagnitude < 0.001f && AnimalPixelLoc.x > Screen.width + 20 || AnimalPixelLoc.x < -20 || AnimalPixelLoc.y > Screen.height + 20 || AnimalPixelLoc.y < -20) {
+    //             gameObject.SetActive (false);
+    //             break;
+    //         }
+    //         yield return new WaitForSeconds (1f);
+    //     }
+    // }
 
 }

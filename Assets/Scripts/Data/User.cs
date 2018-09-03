@@ -188,7 +188,7 @@ public class User : MonoBehaviour {
         file = File.Open (Application.persistentDataPath + path, FileMode.Open);
         bf.Serialize (file, obj);
         file.Position = 0;
-        file.Close ();
+        file.Dispose ();
     }
 
     //general open method 
@@ -201,7 +201,7 @@ public class User : MonoBehaviour {
             if (file.Length != 0) {
                 file.Position = 0;
                 T data = (T) bf.Deserialize (file);
-                file.Close ();
+                file.Dispose();
                 return data;
 
             } else {

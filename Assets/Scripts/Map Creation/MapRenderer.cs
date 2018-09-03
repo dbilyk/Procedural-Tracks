@@ -22,13 +22,19 @@ public class MapRenderer : MapCreator {
     }
   }
 
-  float MapWidth = 100;
-  float MapHeight = 100;
   float CornerLerpStep = 0.1f;
-  int PtsPerQuad = 500;
+  int PtsPerQuad = 50;
 
+  //these are the configurable track params that affect the algorithm_______________
   float PointSpacing = 8f;
   int CornerWidth = 100;
+
+//implement this when UI changes are applied so that track can be capped by number of corners.
+  int CornerCount = 30;
+
+  float MapWidth = 100;
+  float MapHeight = 100;
+  //______________________________________________________________________________________________________________
 
   public readonly short MeshTrackPointFreq = 30;
   public readonly float MeshThickness = 1.2f;
@@ -63,6 +69,9 @@ public class MapRenderer : MapCreator {
   float RacingLineTightness = 0.3f;
   float RacingLineWaypointFreq = 10;
 
+  public delegate void NewTrackCreated();
+  public event NewTrackCreated OnNewTrackCreated;
+  
   public void GenerateNewTrackData (Track track) {
     track.TrackPtFrequency = this.MeshTrackPointFreq;
     track.TrackWidth = this.MeshThickness;
@@ -70,13 +79,17 @@ public class MapRenderer : MapCreator {
 
     track.RawPoints = CreateRawUnsortedPoints (MapWidth, MapHeight, PtsPerQuad);
     track.RawPoints = SortPoints (track.RawPoints);
+    
     //have to run point thinning and angle adjustment several times because they recursively affect each other.
-    for (int i = 0; i < 50; i++) {
-      track.RawPoints = RemovePointsTooClose (track.RawPoints, PointSpacing);
-      track.RawPoints = CheckControlPointAngles (track.RawPoints, CornerLerpStep, CornerWidth);
-    }
+    StopAllCoroutines();
+    StartCoroutine(ApplyTrackConstraints(track));
+    
+  }
 
-    //track.RawPoints = MapCreator.ApplyRandomRotation(track.RawPoints);
+  public void afterRawPointsCalc(Track track){
+    track.CornerCount = track.RawPoints.Count-1;
+    track.Length = GetTrackLength(track.RawPoints);
+    track.FastestLap = 0;
     track.ControlPoints = CreateControlPoints (track.RawPoints);
     track.TrackPoints = CreateTrackPoints (track.ControlPoints, MeshTrackPointFreq);
 
@@ -97,7 +110,53 @@ public class MapRenderer : MapCreator {
     track.InnerBarrierRawPoints = barrierCreator.CreateOutline (track.RawPoints, InnerBarrierOffset, "inner");
     track.OuterBarrierRawPoints = barrierCreator.CreateOutline (track.RawPoints, OuterBarrierOffset, "outer");
     foliageCreator.GenerateEnvironmentData (track);
+
+    //when all this is done, trigger an event to allow the ui to render the line drawing of this track.
+    if(OnNewTrackCreated != null) OnNewTrackCreated();
   }
+
+   IEnumerator ApplyTrackConstraints(Track track){
+    List<Vector2> result = new List<Vector2>(track.RawPoints);
+    bool keepGoing = true;
+    bool firstCheckDone = false;
+    int LastPointCount;
+    while(keepGoing){
+      LastPointCount = result.Count;
+      RawAnglesDataAndChangeCount anglesData;
+      //do a round of these.
+      result = RemovePointsTooClose (result, PointSpacing);
+      if(result.Count < 5){
+        result = new List<Vector2>(CreateRawUnsortedPoints(MapWidth,MapHeight,PtsPerQuad));
+        result = SortPoints (result);
+        result = RemovePointsTooClose (result, PointSpacing);
+      }
+      anglesData = CheckControlPointAngles (result, CornerLerpStep, CornerWidth);
+      result = anglesData.Data;
+      
+      if(LastPointCount == anglesData.Data.Count && anglesData.ChangeCount == 1){
+        
+        if(!firstCheckDone){
+          firstCheckDone = true;
+        }
+        else{
+          keepGoing = false;
+          track.RawPoints = result;
+        }
+      }
+      else{
+        firstCheckDone = false;
+      }
+      
+      yield return new WaitForSecondsRealtime(0.01f);
+    }
+    //this proceeds to do everything else pertaining to creating the track
+    afterRawPointsCalc(track);
+    
+  }
+
+
+
+
 
   public void GenerateLevel (Track track) {
     CreateOrSetMeshHelperObjects (track.TrackPoints, MeshHelpers);

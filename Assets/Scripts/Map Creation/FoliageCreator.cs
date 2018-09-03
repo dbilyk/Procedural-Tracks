@@ -66,16 +66,25 @@ public class FoliageCreator : MonoBehaviour {
 
   [Tooltip("how many points to clear on either side of the desired point.")]
   [SerializeField]
-  int LandmarkDataThinningFactor = 3;
+  int LandmarkThinningFactor = 1;
 
   //sets landmark loc track data
   private void SetLandmarkPositions(Track track){
+    List<Vector2> Inner =track.LrgEnvModelLocsInner; 
+    List<Vector2> Outer =track.LrgEnvModelLocsOuter; 
     
-    int closeToZero = GetClosestOrFarthestFromZero(track.LrgEnvModelLocsInner, distFromZero.closest);
-    int farFromZero = GetClosestOrFarthestFromZero(track.LrgEnvModelLocsOuter, distFromZero.farthest);
+    int closeToZero = GetClosestOrFarthestFromZero(Inner, distFromZero.closest);
+    int farFromZero = GetClosestOrFarthestFromZero(Outer, distFromZero.farthest);
 
-    track.LandmarkLocs.Add(GetLandmarkTform(envData.inner,track.LrgEnvModelLocsInner,closeToZero));
-    track.LandmarkLocs.Add(GetLandmarkTform(envData.outer,track.LrgEnvModelLocsOuter,farFromZero));
+
+    //FIX ME: trees overlap Landmarks.
+    track.LrgEnvModelLocsInner = RemoveoLandmarkTreeOverlap(Inner,closeToZero);
+    track.LrgEnvModelLocsOuter = RemoveoLandmarkTreeOverlap(Outer,farFromZero);
+    //closeToZero = ((closeToZero - LandmarkThinningFactor) + Inner.Count) % Inner.Count;
+    //farFromZero = ((farFromZero - LandmarkThinningFactor) + Outer.Count) % Outer.Count;
+    track.LandmarkLocs = new List<Tform>();
+    track.LandmarkLocs.Add(GetLandmarkTform(envData.inner,Inner,closeToZero));
+    track.LandmarkLocs.Add(GetLandmarkTform(envData.outer,Outer,farFromZero));
   }
 //helper enum for clarity
   enum distFromZero{
@@ -87,6 +96,22 @@ public class FoliageCreator : MonoBehaviour {
     inner =0,
     outer =1
   }
+
+  //remove tree positions where landmarks will be.
+  private List<Vector2> RemoveoLandmarkTreeOverlap(List<Vector2> data, int centerIndex){
+    List<Vector2> d = new List<Vector2>(data);
+    for(int i =centerIndex+LandmarkThinningFactor;i>=centerIndex-LandmarkThinningFactor;i--){
+      
+      // if(i == centerIndex){
+      //   continue;
+      // }
+
+      int ii = (i + d.Count) % d.Count;
+      d.RemoveAt(ii);      
+
+    }
+    return d;
+  } 
 
   //used to get specific points for landmark target locations
   private int GetClosestOrFarthestFromZero(List<Vector2> data, distFromZero dist){
@@ -114,19 +139,23 @@ public class FoliageCreator : MonoBehaviour {
    
     //wrap around zero
     int AdjacentIndex = (targetIndex==0)?data.Count-1:targetIndex-1;
-    Debug.Log("target index: " + targetIndex);
     //determine normal
     Vector2 normal = data[targetIndex]-data[AdjacentIndex];    
     normal = normal.normalized;
 
     if(innerOrOuter == envData.inner){
-      normal = new Vector2(-normal.y,normal.x);
+      normal = new Vector2(normal.y,-normal.x)*-0.2f;
     }
     else{
-      normal = new Vector2(normal.y,-normal.x);
+      normal = new Vector2(-normal.y,normal.x)*-0.2f;
     }
-    result.position = data[targetIndex];
-    result.rotation = Quaternion.Euler(0,0,Mathf.Round(Mathf.Atan2(normal.y,normal.x)*57.2958f));
+    result.position = data[targetIndex]-normal;
+    if(innerOrOuter == envData.inner){
+      result.rotation = Quaternion.Euler(0,0,Mathf.Round(Mathf.Atan2(normal.y,normal.x)*57.2958f)+45);
+    }
+    else{
+      result.rotation = Quaternion.Euler(0,0,Mathf.Round(Mathf.Atan2(normal.y,normal.x)*57.2958f)-45);
+    }
 
     return result;
   }

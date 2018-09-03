@@ -1,8 +1,13 @@
+BUGS:
+  mapCreator hangs if not enough datapoints to create a map, must fix this.
+  
+
+
 ENVIRONMENT
-Add two tracks of foliage data, plus building locations to Track object.
-  Make inner foliage loops smaller elements
-  Make outer foliage loops consist of trees, hay and bushes
-  find where to place barns
+  BUGS:
+    barn rotation screwed up
+    barn overlaps trees
+
   try striped BGmesh texture
 
 CRITTERS
@@ -13,7 +18,7 @@ CRITTERS
 
 UI
   Game Over Screen
-    
+
 
   Map Picker
     Wireframe Map Selector Screen again.

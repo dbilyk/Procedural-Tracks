@@ -57,13 +57,15 @@ public class UI_MapViewer : MonoBehaviour {
 	}
 
 	void OnEnable () {
-		mapSelector.OnClickNewTrackCoins += RedrawTrack;
-		mapSelector.OnClickNewTrackVideo += RedrawTrack;
+		mapSelector.OnClickNewTrackCoins += startNewMapRender;
+		mapSelector.OnClickNewTrackVideo += startNewMapRender;
+		mapRenderer.OnNewTrackCreated += RedrawTrack;
 	}
 
 	void OnDisable () {
-		mapSelector.OnClickNewTrackCoins -= RedrawTrack;
-		mapSelector.OnClickNewTrackVideo -= RedrawTrack;
+		mapSelector.OnClickNewTrackCoins -= startNewMapRender;
+		mapSelector.OnClickNewTrackVideo -= startNewMapRender;
+		mapRenderer.OnNewTrackCreated -= RedrawTrack;
 	}
 
 	//helper to convert all vec2 to vec3
@@ -114,12 +116,15 @@ public class UI_MapViewer : MonoBehaviour {
 
 	//called when newTrack Btn is clicked with either coins or Video
 	void RedrawTrack () {
-		mapRenderer.GenerateNewTrackData (SelectedTrack);
 		List<Vector2> hiResTrackPts = mapCreator.ShrinkData (SelectedTrack.TrackPoints, trackScale, trackScale);
 		List<Vector3> lowResTrackPts = thinData (convertVec2toVec3 (hiResTrackPts), 4);
 		newTrackLine.positionCount = lowResTrackPts.Count;
 		newTrackLine.SetPositions (lowResTrackPts.ToArray ());
 
+	}
+
+	void startNewMapRender(){
+		mapRenderer.GenerateNewTrackData (SelectedTrack);	
 	}
 
 }

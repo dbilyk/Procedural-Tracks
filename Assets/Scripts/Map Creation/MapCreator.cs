@@ -141,9 +141,20 @@ public class MapCreator : MonoBehaviour {
     //and if angle is greater than the minimum angle, 
     //move point B half way towards the midpoint between pt A and C, 
     //thereby increasing the angle.
-    public List<Vector2> CheckControlPointAngles (List<Vector2> currentCtrlPts, float lerpStep, float cornerW) {
-        List<Vector2> newPoints = new List<Vector2> (currentCtrlPts);
 
+    public struct RawAnglesDataAndChangeCount{
+        public List<Vector2> Data;
+        public int ChangeCount;
+
+        public RawAnglesDataAndChangeCount(List<Vector2> data, int count){
+            Data = data;
+            ChangeCount = count;
+        }
+    }
+
+    public RawAnglesDataAndChangeCount CheckControlPointAngles (List<Vector2> currentCtrlPts, float lerpStep, float cornerW) {
+        List<Vector2> newPoints = new List<Vector2> (currentCtrlPts);
+        int changeCount = 0;
         for (int i = 0; i < newPoints.Count; i++) {
             //in degrees
             int indexA = i;
@@ -159,6 +170,9 @@ public class MapCreator : MonoBehaviour {
             }
 
             float Angle = AngleBetweenThreePoints (newPoints[indexA], newPoints[indexB], newPoints[indexC]);
+            
+            //were adjusting an angle so we need to count it to determine when the track has no corner issues.
+            if(Angle < cornerW){changeCount +=1;}
 
             while (Angle < cornerW) {
                 Vector2 MidpointAC = new Vector2 ((newPoints[indexA].x + newPoints[indexC].x) / 2, (newPoints[indexA].y + newPoints[indexC].y) / 2);
@@ -174,9 +188,23 @@ public class MapCreator : MonoBehaviour {
         if (newPoints[newPoints.Count - 1] != newPoints[0]) {
             newPoints[newPoints.Count - 1] = newPoints[0];
         }
+        RawAnglesDataAndChangeCount result = new RawAnglesDataAndChangeCount(newPoints,changeCount);
 
-        return newPoints;
+        return result;
     }
+
+    //gets the estimated track length in miles given the Raw Points.
+
+    protected float GetTrackLength(List <Vector2> rawPoints){
+        float result = 0;
+        for(int i =0; i<rawPoints.Count-1;i++){
+            result += Vector2.Distance(rawPoints[i],rawPoints[i+1]);
+        }
+        result = Mathf.Round((result/100)*10)/10;
+
+        return result;
+    }
+
 
     //creates the array of track points with a passed in point frequency and a list of control points.
     public List<Vector2> CreateTrackPoints (List<Vector2> ControlPts, float trackPtFreq) {
