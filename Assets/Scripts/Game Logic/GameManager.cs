@@ -73,11 +73,11 @@ public class GameManager : MonoBehaviour {
         Player.GetComponent<CarMovement> ().enabled = false;
 
         StartCoroutine ("StartRace");
-        Vector3 CamStartPosition = new Vector3 (Player.transform.position.x - 5, Player.transform.position.y, -3);
-        Quaternion CamStartRotation = Quaternion.Euler (0, 100, 0);
-        FollowCam.gameObject.transform.position = CamStartPosition;
-        FollowCam.gameObject.transform.rotation = CamStartRotation;
-        InvokeRepeating ("StartingCam", 0, 0.02f);
+        //Vector3 CamStartPosition = new Vector3 (Player.transform.position.x - 5, Player.transform.position.y, -3);
+        //Quaternion CamStartRotation = Quaternion.Euler (0, 100, 0);
+        //FollowCam.gameObject.transform.position = CamStartPosition;
+        //FollowCam.gameObject.transform.rotation = CamStartRotation;
+        //InvokeRepeating ("StartingCam", 0, 0.02f);
     }
 
     public void StartingCam () {
@@ -90,7 +90,7 @@ public class GameManager : MonoBehaviour {
         StartingLights.SetActive (true);
         yield return new WaitForSeconds (CountdownLength);
         CancelInvoke ("StartingCam");
-        FollowCam.enabled = true;
+        //FollowCam.enabled = true;
 
         //must activate before GameloopUI
         RaceStatsManager.SetActive (true);

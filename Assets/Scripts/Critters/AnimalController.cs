@@ -16,17 +16,18 @@ public class AnimalController : MonoBehaviour {
     [SerializeField]
     VoxelBloodController bloodController;
 
-    private CritterType _myType;
-    public CritterType MyType {
-        get {
-            return _myType;
-        }
-        set {
-            _myType = value;
-        }
-    }
+    public CritterType MyType {get; set;}
 
     void Awake(){
+        //WHO AM I? figure out what type of critter for scoring etc
+        switch(gameObject.tag){
+            case "SmallCritter": MyType = CritterType.sml; break;
+            case "MediumCritter": MyType = CritterType.med; break;
+            case "LargeCritter": MyType = CritterType.lrg; break;
+            case "LegendaryCritter": MyType = CritterType.leg; break;
+            default: throw new MissingReferenceException("a critter in your scene isn't tagged properly with it's type");
+        }
+        
         bloodController = GameObject.FindGameObjectWithTag("BloodController").GetComponent<VoxelBloodController>();
     }
 

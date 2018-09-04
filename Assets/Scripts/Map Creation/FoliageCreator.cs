@@ -17,10 +17,10 @@ public class FoliageCreator : MonoBehaviour {
   GameObject LandmarkGO;
 
   [SerializeField]
-  float MinSmallObjectSpacing = 5f,
+  private float MinSmallObjectSpacing = 5f,
         MinFoliageSpacing = 10f,
-        SmallEnvDataOffset = 0.1f,
-        LrgEnvDataOffset = 0.3f;
+        SmallEnvDataOffset = 10.1f,
+        LrgEnvDataOffset = 10.3f;
   
   [SerializeField]
   BarrierCreator barrierCreator;
@@ -37,17 +37,18 @@ public class FoliageCreator : MonoBehaviour {
   public void GenerateEnvironmentData (Track track) {
     short freq = 1000;
     //populates the actual foliage data into track object
-    track.SmallEnvModelLocsInner = MakeEquidistantData(track,mapRenderer.InnerBarrierOffset,true, freq, SmallEnvDataOffset);
-    track.SmallEnvModelLocsOuter = MakeEquidistantData(track,mapRenderer.OuterBarrierOffset,false, freq,  SmallEnvDataOffset);
-    track.LrgEnvModelLocsInner   = MakeEquidistantData(track, mapRenderer.InnerBarrierOffset,true, freq, LrgEnvDataOffset);
-    track.LrgEnvModelLocsOuter   = MakeEquidistantData(track, mapRenderer.OuterBarrierOffset,false, freq, LrgEnvDataOffset);
+    track.SmallEnvModelLocsInner = MakeEquidistantData(track,true, freq, SmallEnvDataOffset);
+    track.SmallEnvModelLocsOuter = MakeEquidistantData(track,false, freq,  SmallEnvDataOffset);
+    track.LrgEnvModelLocsInner   = MakeEquidistantData(track,true, freq, LrgEnvDataOffset);
+    track.LrgEnvModelLocsOuter   = MakeEquidistantData(track,false, freq, LrgEnvDataOffset);
 
     SetLandmarkPositions(track);
 
   }
 
-  private List<Vector2> MakeEquidistantData(Track track,float barrierOffset, bool isInner, short frequency,float offset){
-    List<Vector2> FoliagePath       = barrierCreator.CreateOutline (track.RawPoints, barrierOffset + offset, (isInner)?"inner":"outer");
+  private List<Vector2> MakeEquidistantData(Track track, bool isInner, short frequency,float offset){
+    Debug.Log(offset);
+    List<Vector2> FoliagePath       = barrierCreator.CreateOutline (track.RawPoints,mapRenderer.InnerBarrierOffset + offset, (isInner)?"inner":"outer");
                   FoliagePath       = mapRenderer.CreateControlPoints(FoliagePath);
                   FoliagePath       = mapCreator.CreateTrackPoints (FoliagePath, frequency);
     List<Vector2> Result            = new List<Vector2>(); 
@@ -80,8 +81,6 @@ public class FoliageCreator : MonoBehaviour {
     //FIX ME: trees overlap Landmarks.
     track.LrgEnvModelLocsInner = RemoveoLandmarkTreeOverlap(Inner,closeToZero);
     track.LrgEnvModelLocsOuter = RemoveoLandmarkTreeOverlap(Outer,farFromZero);
-    //closeToZero = ((closeToZero - LandmarkThinningFactor) + Inner.Count) % Inner.Count;
-    //farFromZero = ((farFromZero - LandmarkThinningFactor) + Outer.Count) % Outer.Count;
     track.LandmarkLocs = new List<Tform>();
     track.LandmarkLocs.Add(GetLandmarkTform(envData.inner,Inner,closeToZero));
     track.LandmarkLocs.Add(GetLandmarkTform(envData.outer,Outer,farFromZero));
@@ -201,13 +200,13 @@ public class FoliageCreator : MonoBehaviour {
       
       GameObject newItem = GameObject.Instantiate (pool[randIndex], batches[batches.Count-1].transform);
 
-      newItem.transform.position = new Vector2(Random.insideUnitCircle.x + data[i].x,Random.insideUnitCircle.y + data[i].y);
+      newItem.transform.position = new Vector2((Random.insideUnitCircle.x*1.3f) + data[i].x,(Random.insideUnitCircle.y*1.3f) + data[i].y);
       newItem.transform.rotation = Quaternion.Euler(0,0,Random.value * 360);
       newItem.transform.localScale *= Random.Range(0.8f,1.2f);
       //if there are too many children under parent, create a new parent before adding to last parent 
       if(batches[batches.Count - 1].transform.childCount > RenderBatchSize){
         StaticBatchingUtility.Combine (batches[batches.Count - 1]);
-        batches.Add(GameObject.Instantiate(FoliageGroup)); 
+        batches.Add(GameObject.Instantiate(FoliageGroup,gameObject.transform)); 
       }
     }
   }

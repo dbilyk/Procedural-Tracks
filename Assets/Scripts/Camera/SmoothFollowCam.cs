@@ -21,7 +21,7 @@ public class SmoothFollowCam : MonoBehaviour {
 
     }
 
-    // Update is called once per frame
+    //Update is called once per frame
     void FixedUpdate () {
         CurrentDesiredPosition = new Vector3(PlayerTrans.position.x, PlayerTrans.position.y, Mathf.Clamp(-playerRB.velocity.sqrMagnitude, -MaxVertOffset, -MinVertOffset));
         transform.position = Vector3.Lerp(transform.position, CurrentDesiredPosition, PosLerpRate  * Time.fixedDeltaTime);

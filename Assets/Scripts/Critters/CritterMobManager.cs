@@ -5,77 +5,55 @@ using UnityEngine;
 public enum CritterType { sml, med, lrg, leg }
 
 
-class CritterParams{
+public class CritterParams{
     public TrackSkins Skin;
-    public float SpawnWidth {get;set;}
-    public float Odds {get;set;}
-    public int Density {get;set;}
-    public List<GameObject> Selection{get; set;}
-    public List<GameObject> Pool {get;set;}
+    public float[] SpawnWidths {get;set;}
+    //from small to legendary, must add up to 1
+    public float[] Odds {get;set;}
+    public int[] Densities {get;set;}
+    public List<GameObject> Critters{get; set;}
+    public List<GameObject>[] Pools {get;set;}
 
-    CritterParams(TrackSkins skin,List<GameObject> selection, float odds, int density, float spawnWidth){
+    public CritterParams(TrackSkins skin,List<GameObject> critters, float[] odds, int[] densities, float[] spawnWidths){
         this.Skin = skin;
-        this.Selection = new List<GameObject> (selection);
-        this.Pool = new List<GameObject>();
+        this.Critters = new List<GameObject> (critters);
+        this.Pools = new List<GameObject>[] {new List<GameObject>(),new List<GameObject>(),new List<GameObject>(),new List<GameObject>()};
         this.Odds = odds;
-        this.Density = density;
-        this.SpawnWidth = spawnWidth;
+        this.Densities = densities;
+        this.SpawnWidths = spawnWidths;
     }
 
 }
 
 public class CritterMobManager : MonoBehaviour {
-    public GameObject CritterContainer;
+    //these contain all the params for critters per skin, arrays are sorted from small criter to legendary critter.
+    private CritterParams FarmCrits, MtnCrits, DesertCrits, SnowCrits, CurrentCrits; 
+    
     [Tooltip ("How many points ahead of players current closest point on track does the mob spawn")]
     public int SpawnPointsLookahead = 2;
+    public float SecsBetweenSpawns = 10f;
 
-    private CritterParams FarmCrits, MtnCrits, DesertCrits, SnowCrits; 
-
-    public float SmlCritterSpawnAreaWidth = 0.5f;
-    public float MedCritterSpawnAreaWidth = 0.7f;
-    public float LgCritterSpawnAreaWidth = 1f;
-    public float LegendarySpawnAreaWidth = 0.5f;
+    private int LastNearestPointToPlayer;
 
     [SerializeField]
     User user;
+
     [SerializeField]
     MapRenderer mapRenderer;
 
-    [Tooltip ("Odds must add up to 1")]
-    public float SmlCritterOdds = 0.5f;
-    public int SmlCritterDensity = 20;
+    public GameObject CritterContainer;
 
-    [Tooltip ("Odds must add up to 1")]
-    public float MedCritterOdds = 0.3f;
-    public int MedCritterDensity = 10;
-
-    [Tooltip ("Odds must add up to 1")]
-    public float LgCritterOdds = 0.18f;
-    public int LgCritterDensity = 5;
-
-    [Tooltip ("Odds must add up to 1")]
-    public float LegendaryCritterOdds = 0.02f;
-    public int LegendaryCritterDensity = 3;
-
-    [Tooltip ("List index must correspond with TrackSkin Enum in Data class")]
-    public List<GameObject> smlCritterSelection = new List<GameObject> ();
-    [Tooltip ("List index must correspond with TrackSkin Enum in Data class")]
-    public List<GameObject> medCritters = new List<GameObject> ();
-    [Tooltip ("List index must correspond with TrackSkin Enum in Data class")]
-    public List<GameObject> lgCritters = new List<GameObject> ();
-
-    public List<GameObject> LegendaryCritters = new List<GameObject> ();
-
-    public float SecsBetweenSpawns = 10f;
 
     public GameObject Player;
     Camera cam;
-    private List<GameObject> SmlCritterPool = new List<GameObject> ();
-    private List<GameObject> MedCritterPool = new List<GameObject> ();
-    private List<GameObject> LgCritterPool = new List<GameObject> ();
-    private List<GameObject> LegendaryCritterPool = new List<GameObject> ();
+    //critter object lists for different skins.
+    public List<GameObject> 
+    FarmCritters = new List<GameObject> (), 
+    MtnCritters = new List<GameObject> (),
+    DesertCritters = new List<GameObject> (),
+    SnowCritters = new List<GameObject> ();
+    
     private List<Vector2> thinnedTrackPoints = new List<Vector2> ();
-    private int LastNearestPointToPlayer;
 
     //this delegate is called from any animal controller and is also the signature for broadcasting the event from one central location;
     public delegate void critterHit (CritterType type);
@@ -89,8 +67,29 @@ public class CritterMobManager : MonoBehaviour {
 
     public event critterHit OnCritterHit;
 
+    //TO DO: AFTER A RACE IS DONE, THIS GO MUST BE DISABLED
     void OnEnable () {
+        //these are the params for each skin, adjust here if necessary.
+        FarmCrits   = new CritterParams(TrackSkins.Farm,FarmCritters,  new float[]{0.5f,0.25f,0.2f,0.05f},new int[]{10,7,4,1},new float[]{1f,0.7f,0.5f,0.4f});
+        MtnCrits    = new CritterParams(TrackSkins.Farm,MtnCritters,   new float[]{0.5f,0.25f,0.2f,0.05f},new int[]{10,7,4,1},new float[]{1f,0.7f,0.5f,0.4f});
+        DesertCrits = new CritterParams(TrackSkins.Farm,DesertCritters,new float[]{0.5f,0.25f,0.2f,0.05f},new int[]{10,7,4,1},new float[]{1f,0.7f,0.5f,0.4f});
+        SnowCrits   = new CritterParams(TrackSkins.Farm,SnowCritters,  new float[]{0.5f,0.25f,0.2f,0.05f},new int[]{10,7,4,1},new float[]{1f,0.7f,0.5f,0.4f});
         
+        //now we can just deal with the current crits in the rest of the logic.
+        switch(user.CurrentSkin){
+            case TrackSkins.Farm:
+                CurrentCrits = FarmCrits;
+                break;
+            case TrackSkins.Mountains:
+                CurrentCrits = MtnCrits;
+                break;
+            case TrackSkins.Desert:
+                CurrentCrits = DesertCrits;
+                break;
+            case TrackSkins.Snow:
+                CurrentCrits = SnowCrits;
+                break;
+        }
 
         CritterHit = new critterHit (_critterHit);
         cam = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
@@ -108,8 +107,6 @@ public class CritterMobManager : MonoBehaviour {
         }
 
     }
-    
-    
 
 
     IEnumerator SpawnMob () {
@@ -117,85 +114,74 @@ public class CritterMobManager : MonoBehaviour {
         //grab nearest track point to player
         int nearestTrackIndex = ExtensionMethods.GetNearestInList ((Vector2) Player.transform.position, thinnedTrackPoints);
         Vector2 NearestPointToPlayer = user.ActiveTrack.TrackPoints[nearestTrackIndex];
+
+        //if its the same point and before, do nothing.
         if (nearestTrackIndex == LastNearestPointToPlayer) {
             Spawned = false;
             yield break;
         }
         LastNearestPointToPlayer = nearestTrackIndex;
-        int mobSpawnIndex;
+
         //makes sure mob spawn points loop across zero index
-        mobSpawnIndex = (nearestTrackIndex + SpawnPointsLookahead) % thinnedTrackPoints.Count;
+        int mobSpawnIndex = (nearestTrackIndex + SpawnPointsLookahead) % thinnedTrackPoints.Count;
         
         Vector2 SpawnCenterPoint = thinnedTrackPoints[mobSpawnIndex];
         SpawnCenterPoint = SpawnCenterPoint + Random.insideUnitCircle;
 
-        List<GameObject> TargetCritterType = new List<GameObject> ();
-        List<GameObject> TargetCritterPool = new List<GameObject> ();
-        int TargetCritterDensity;
-        float targetSpawnAreaWidth;
-        CritterType critterType;
-
-        // void setTargetParams(){
-        //     Debug.Log("hi");
-        // }
+        //this nubmer determines if were dealing with sml,med,lrg, or leg critters.
+        int targetType;
 
         //picks the type of critter and density for the current Mob.
-        float RandomCritterSelector = Random.value;
-        if (RandomCritterSelector < SmlCritterOdds) {
-            TargetCritterType = SmlCritters;
-            TargetCritterDensity = SmlCritterDensity;
-            targetSpawnAreaWidth = SmlCritterSpawnAreaWidth;
-            TargetCritterPool = SmlCritterPool;
-            critterType = CritterType.sml;
-        } else if (RandomCritterSelector > SmlCritterOdds && RandomCritterSelector < SmlCritterOdds + MedCritterOdds) {
-            TargetCritterType = MedCritters;
-            TargetCritterDensity = MedCritterDensity;
-            targetSpawnAreaWidth = MedCritterSpawnAreaWidth;
-            TargetCritterPool = MedCritterPool;
-            critterType = CritterType.med;
-        } else if (RandomCritterSelector > MedCritterOdds + SmlCritterOdds && RandomCritterSelector < LgCritterOdds + MedCritterOdds + SmlCritterOdds) {
-            TargetCritterType = LgCritters;
-            TargetCritterDensity = LgCritterDensity;
-            targetSpawnAreaWidth = LgCritterSpawnAreaWidth;
-            TargetCritterPool = LgCritterPool;
-            critterType = CritterType.lrg;
+        float random = Random.value;
+        if (random < CurrentCrits.Odds[0]) {
+            targetType = (int)CritterType.sml;
+            
+        } else if (random > CurrentCrits.Odds[0] && random < CurrentCrits.Odds[0] + CurrentCrits.Odds[1]) {
+            targetType = (int)CritterType.med;
+
+        } else if (random > CurrentCrits.Odds[0] + CurrentCrits.Odds[1] && random < CurrentCrits.Odds[0] + CurrentCrits.Odds[1] + CurrentCrits.Odds[1]) {
+            targetType = (int)CritterType.lrg;
+
         } else {
-            TargetCritterType = LegendaryCritters;
-            TargetCritterDensity = LegendaryCritterDensity;
-            targetSpawnAreaWidth = LegendarySpawnAreaWidth;
-            TargetCritterPool = LegendaryCritterPool;
-            critterType = CritterType.leg;
+            targetType = (int)CritterType.leg;
+            
         }
 
-        for (int i = 0; i < TargetCritterPool.Count; i++) {
-            Vector2 AnimalInScreenCoords = cam.WorldToScreenPoint (TargetCritterPool[i].transform.position);
-            if ((AnimalInScreenCoords.x > Screen.width + 50 || AnimalInScreenCoords.y > Screen.height + 50) && (AnimalInScreenCoords.x < -50 || AnimalInScreenCoords.y < -50)) {
-                GameObject CritterChild = TargetCritterPool[i].transform.GetChild (0).gameObject;
-                CritterChild.SetActive (false);
+        ViewportRect viewport = new ViewportRect(new Vector2(0,0),new Vector2(cam.pixelWidth,0),new Vector2(0,cam.pixelHeight),new Vector2(cam.pixelWidth,cam.pixelHeight));
+        
+        //go through the relevant pool and check which critters are out of view.
+        for (int i = 0; i < CurrentCrits.Pools[targetType].Count; i++) {
+            Vector2 thisCritter = cam.WorldToScreenPoint (CurrentCrits.Pools[targetType][i].transform.position);
+            
+            
+            if (!ExtensionMethods.PointInRectangle(thisCritter,viewport.A,viewport.B,viewport.C,viewport.D)) {
+                Debug.Log("critters out of view");
+                GameObject outOfViewCrit = CurrentCrits.Pools[targetType][i].transform.GetChild (0).gameObject;
+                outOfViewCrit.SetActive (false);
             }
         }
         
+        
 
         //trigger
-        for (int i = 0; i < TargetCritterDensity; i++) {
+        for (int i = 0; i < CurrentCrits.Densities[targetType]; i++) {
             GameObject newCritter;
-            Vector2 SpawnPosition = Random.insideUnitCircle * targetSpawnAreaWidth;
+            Vector2 SpawnPosition = Random.insideUnitCircle * CurrentCrits.SpawnWidths[targetType];
 
-            if (TargetCritterPool.Count < TargetCritterDensity) {
-                newCritter = Instantiate (TargetCritterType[(int) user.CurrentSkin], CritterContainer.transform);
+            if (CurrentCrits.Pools[targetType].Count < CurrentCrits.Densities[targetType]) {
+                newCritter = Instantiate (CurrentCrits.Critters[targetType], CritterContainer.transform);
                 AnimalController critterCtrl = newCritter.GetComponentInChildren<AnimalController> ();
-                critterCtrl.MyType = critterType;
                 critterCtrl.critterMobManager = gameObject.GetComponent<CritterMobManager> ();
-                TargetCritterPool.Add (newCritter);
+                CurrentCrits.Pools[targetType].Add (newCritter);
+
             } else {
-                newCritter = TargetCritterPool.Find (x => x.transform.GetChild (0).gameObject.activeInHierarchy == false);
+                newCritter = CurrentCrits.Pools[targetType].Find (x => x.transform.GetChild (0).gameObject.activeInHierarchy == false);
                 //if there's not enough disabled critters after the check, add some more to the pool
                 if (newCritter == null) {
-                    newCritter = Instantiate (TargetCritterType[(int) user.CurrentSkin], CritterContainer.transform);
+                    newCritter = Instantiate (CurrentCrits.Critters[targetType], CritterContainer.transform);
                     AnimalController critterCtrl = newCritter.GetComponentInChildren<AnimalController> ();
-                    critterCtrl.MyType = critterType;
                     critterCtrl.critterMobManager = gameObject.GetComponent<CritterMobManager> ();
-                    TargetCritterPool.Add (newCritter);
+                    CurrentCrits.Pools[targetType].Add (newCritter);
                 }
             }
 
@@ -206,6 +192,16 @@ public class CritterMobManager : MonoBehaviour {
         }
         Spawned = false;
 
+    }
+    public struct ViewportRect{
+        public Vector2 A,B,C,D;
+        public ViewportRect(Vector2 a, Vector2 b, Vector2 c, Vector2  d){
+            this.A = a;
+            this.B= b;
+            this.C = c;
+            this.D = d;
+
+        }
     }
 
 }
