@@ -5,10 +5,11 @@ using UnityEngine;
 public class VoxelBloodInstance : MonoBehaviour {
 	
 	Animator anim;
+	Rigidbody rb;
 
 	void Awake() {
 			anim = this.gameObject.transform.GetChild(0).GetComponent<Animator>();
-		
+			rb = this.gameObject.GetComponent<Rigidbody>();
 	}
 	void OnEnable(){
 		anim.Play("Default Take",0,0f);
@@ -18,6 +19,7 @@ public class VoxelBloodInstance : MonoBehaviour {
 	}
 	void OnCollisionEnter(Collision col){
 		if(col.gameObject.name =="BGMesh"){
+			rb.angularDrag = 5;
 			anim.speed = 1;
 			anim.Play("Default Take",0,0f);
 			StartCoroutine(AnimIsDone());
@@ -27,6 +29,7 @@ public class VoxelBloodInstance : MonoBehaviour {
 	IEnumerator AnimIsDone(){
 		yield return new WaitForSeconds(1.5f);
 		gameObject.SetActive(false);
+		rb.angularDrag = 0.05f;
 		transform.parent = transform.parent.parent.GetChild(1);
 	}
 

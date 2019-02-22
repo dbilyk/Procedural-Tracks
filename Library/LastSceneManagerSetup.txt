@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/June 2018/Blood Splatter Fixed.unity
+- path: Assets/Scenes/Sept 2018/New Car Physics v1.unity
   isLoaded: 1
   isActive: 1

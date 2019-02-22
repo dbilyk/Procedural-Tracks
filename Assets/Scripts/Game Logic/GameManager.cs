@@ -70,7 +70,9 @@ public class GameManager : MonoBehaviour {
         Player.transform.position = activeTrack.CarStartingPositions[user.OpponentQty - 1].position;
         Player.transform.rotation = activeTrack.CarStartingPositions[user.OpponentQty - 1].rotation;
         Player.GetComponent<Rigidbody2D> ().velocity = Vector2.zero;
-        Player.GetComponent<CarMovement> ().enabled = false;
+//        Player.GetComponent<CarMovement> ().enabled = false;
+
+        FollowCam.enabled = true;
 
         StartCoroutine ("StartRace");
         //Vector3 CamStartPosition = new Vector3 (Player.transform.position.x - 5, Player.transform.position.y, -3);
@@ -90,7 +92,6 @@ public class GameManager : MonoBehaviour {
         StartingLights.SetActive (true);
         yield return new WaitForSeconds (CountdownLength);
         CancelInvoke ("StartingCam");
-        //FollowCam.enabled = true;
 
         //must activate before GameloopUI
         RaceStatsManager.SetActive (true);
@@ -98,7 +99,7 @@ public class GameManager : MonoBehaviour {
         //enables AI input
         SetAIInput (true);
         //enables player movement
-        Player.GetComponent<CarMovement> ().enabled = true;
+//        Player.GetComponent<CarMovement> ().enabled = true;
 
         //Start Spawning Critters
         MobManager.SetActive (true);

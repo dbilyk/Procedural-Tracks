@@ -18,7 +18,7 @@ public class StartingLight : MonoBehaviour {
     }
 
     void Update () {
-        gameObject.transform.position = new Vector3 (MainCam.transform.position.x, MainCam.transform.position.y, -1) + MainCam.transform.up;
+        gameObject.transform.position = new Vector3 (MainCam.transform.position.x, MainCam.transform.position.y, -1) + (MainCam.transform.up *2)+ (MainCam.transform.forward);
         gameObject.transform.rotation = MainCam.transform.localRotation;
 
     }

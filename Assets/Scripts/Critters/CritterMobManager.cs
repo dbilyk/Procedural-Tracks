@@ -58,7 +58,6 @@ public class CritterMobManager : MonoBehaviour {
     //this delegate is called from any animal controller and is also the signature for broadcasting the event from one central location;
     public delegate void critterHit (CritterType type);
     void _critterHit (CritterType type) {
-        Debug.Log ("critter hit via delegate in AnimalController, type: " + type.ToString ());
         if (OnCritterHit != null) {
             OnCritterHit (type);
         }
@@ -67,7 +66,7 @@ public class CritterMobManager : MonoBehaviour {
 
     public event critterHit OnCritterHit;
 
-    //TO DO: AFTER A RACE IS DONE, THIS GO MUST BE DISABLED
+    //TO DO: AFTER A RACE IS DONE, THIS G.O. MUST BE DISABLED
     void OnEnable () {
         //these are the params for each skin, adjust here if necessary.
         FarmCrits   = new CritterParams(TrackSkins.Farm,FarmCritters,  new float[]{0.5f,0.25f,0.2f,0.05f},new int[]{10,7,4,1},new float[]{1f,0.7f,0.5f,0.4f});
@@ -96,6 +95,23 @@ public class CritterMobManager : MonoBehaviour {
         Spawned = false;
         for (int i = 0; i < user.ActiveTrack.TrackPoints.Count; i += Mathf.RoundToInt ((int) mapRenderer.MeshTrackPointFreq / 4)) {
             thinnedTrackPoints.Add (user.ActiveTrack.TrackPoints[i]);
+        }
+        StartCoroutine(InstantiateCrittersInPool());
+
+    }
+
+    IEnumerator InstantiateCrittersInPool(){
+        for(int i =0; i<CurrentCrits.Pools.Length;i++){
+            for(int j=0; j<CurrentCrits.Densities[i];j++){
+                yield return new WaitForEndOfFrame();
+                GameObject newCritter = Instantiate (CurrentCrits.Critters[i], CritterContainer.transform);
+                AnimalController critterCtrl = newCritter.GetComponentInChildren<AnimalController> ();
+                critterCtrl.critterMobManager = gameObject.GetComponent<CritterMobManager> ();
+                newCritter.transform.GetChild(0).gameObject.SetActive(false);
+                CurrentCrits.Pools[i].Add (newCritter);
+
+                
+            }
         }
     }
 
@@ -149,13 +165,12 @@ public class CritterMobManager : MonoBehaviour {
 
         ViewportRect viewport = new ViewportRect(new Vector2(0,0),new Vector2(cam.pixelWidth,0),new Vector2(0,cam.pixelHeight),new Vector2(cam.pixelWidth,cam.pixelHeight));
         
-        //go through the relevant pool and check which critters are out of view.
+        //go through the relevant pool and check which critters are out of view and disable.
         for (int i = 0; i < CurrentCrits.Pools[targetType].Count; i++) {
             Vector2 thisCritter = cam.WorldToScreenPoint (CurrentCrits.Pools[targetType][i].transform.position);
             
             
             if (!ExtensionMethods.PointInRectangle(thisCritter,viewport.A,viewport.B,viewport.C,viewport.D)) {
-                Debug.Log("critters out of view");
                 GameObject outOfViewCrit = CurrentCrits.Pools[targetType][i].transform.GetChild (0).gameObject;
                 outOfViewCrit.SetActive (false);
             }

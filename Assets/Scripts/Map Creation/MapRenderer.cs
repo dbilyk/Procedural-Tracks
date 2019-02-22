@@ -26,7 +26,7 @@ public class MapRenderer : MapCreator {
   int PtsPerQuad = 50;
 
   //these are the configurable track params that affect the algorithm_______________
-  float PointSpacing = 8f;
+  float PointSpacing = 4f;
   int CornerWidth = 100;
 
 //implement this when UI changes are applied so that track can be capped by number of corners.

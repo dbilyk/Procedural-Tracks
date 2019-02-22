@@ -5,6 +5,11 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
+
+class UserData {
+
+}
+
 public class User : MonoBehaviour {
 
     void Awake () {
@@ -147,6 +152,10 @@ public class User : MonoBehaviour {
 
     void OnDisable () {
         ui_skins.OnClickSkin -= setSkin;
+        mapSelector.OnOpponentCtChanged -= setOppQty;
+        critterMobManager.OnCritterHit -= userHitCritter;
+        mapSelector.OnClickStartRace -= targetTrack;
+        mapSelector.OnClickNewTrackCoins -= NewTrackPurchase;
     }
 
     //listens for StartRace btn, and if the requested track is new, it adds it to SavedTracks and saves the new set.

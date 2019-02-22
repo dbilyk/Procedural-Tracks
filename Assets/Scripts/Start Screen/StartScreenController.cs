@@ -39,6 +39,7 @@ public class StartScreenController : MonoBehaviour {
     private bool homeUIOn = false;
 
     void OnEnable () {
+        RenderSettings.fog = true;
         user.OnStartRace += StartRace;
         HomeScreenUI.SetActive (false);
         GameLoopLight.SetActive (false);
@@ -217,8 +218,9 @@ public class StartScreenController : MonoBehaviour {
         CarCollidedWIthCow = false;
 
         StartSlowMo = false;
-        RenderSettings.fogEndDistance = GameloopFogDistance;
-        RenderSettings.fogColor = GameloopFogColor;
+        RenderSettings.fog = false;
+        //RenderSettings.fogEndDistance = GameloopFogDistance;
+        //RenderSettings.fogColor = GameloopFogColor;
     }
 
 }
